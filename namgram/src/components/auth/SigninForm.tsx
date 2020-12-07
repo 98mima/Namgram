@@ -24,10 +24,13 @@ import { RootState } from '../../redux/index'
 
 const useStyles = makeStyles((theme: Theme) => ({
     paper: {
-      paddingTop: '20vh',
+      paddingTop: '10vh',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      background: 'rgb(255, 255, 255)',
+      padding: '4rem',
+      borderRadius: '5%'
     },
     avatar: {
       margin: theme.spacing(1),

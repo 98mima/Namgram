@@ -24,14 +24,14 @@ const enchancer = composeEnhancers(applyMiddleware(...middleware));
 const store = createStore(rootReducer, {ui: {loading: false, error: ""}}, enchancer);
 
 const theme = createMuiTheme({
-  // palette: {
-  //   primary: {
-  //     main: "#F95738",
-  //   },
-  //   secondary: {
-  //     main: "#F4D35E",
-  //   },
-  // },
+  palette: {
+    secondary: {
+      main: "rgba(34, 195, 150, 1)",
+    },
+    primary: {
+      main: "rgba(198, 45, 253, 1)",
+    },
+  },
 });
 
 ReactDOM.render(

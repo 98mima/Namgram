@@ -59,6 +59,40 @@ exports.getByUsername = async (req, res) =>  {
     }
 };
 
+exports.getFollowing = async (req, res) =>  {
+    try{
+        let session = driver.session();
+        const persons = await session.run('MATCH (n:Person {username: $username})-->(person) RETURN person', {
+            username: req.body.username
+          })
+        session.close();
+        const Data = _manyPeople(persons)
+        res.status(200)
+            .json({message: "Prikupljeno", Data})
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
+exports.getFollowers = async (req, res) =>  {
+    try{
+        let session = driver.session();
+        const persons = await session.run('MATCH (n:Person {username: $username})<--(person) RETURN person', {
+            username: req.body.username
+          })
+        session.close();
+        const Data = _manyPeople(persons)
+        res.status(200)
+            .json({message: "Prikupljeno", Data})
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
 exports.follow = async (req, res) =>  {
     try{
         let session = driver.session();

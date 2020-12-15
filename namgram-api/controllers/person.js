@@ -29,7 +29,7 @@ exports.getByEmail = async (req, res) =>  {
     try{
         let session = driver.session();
         const person = await session.run('MATCH (n:Person {email: $email}) RETURN n', {
-            email: req.body.email
+            email: req.params.email
           })
         session.close();
         const Data = person.records[0].get('n').properties

@@ -29,15 +29,15 @@ export const authUser = () => (dispatch: any) => {
 
 export const sigin = (user: ISignin) => (dispatch: any) => {
     dispatch({ type: START_LOADING });
-    signin(user)
-      .then(() => {
-        const t = 's';
-        const token = `Bearer ${t}`;
-        window.localStorage.setItem('TOKEN', token);
-        //axios.defaults.headers.common["Authorization"] = token;
-        const decodedToken = jwtDecode(token);
-      })
-      .catch((err: string) => {
-        dispatch({ type: SET_ERROR, payload: err });
-      });
+    // signin(user)
+    //   .then(() => {
+    //     const t = 's';
+    //     const token = `Bearer ${t}`;
+    //     window.localStorage.setItem('TOKEN', token);
+    //     //axios.defaults.headers.common["Authorization"] = token;
+    //     const decodedToken = jwtDecode(token);
+    //   })
+    //   .catch((err: string) => {
+    //     dispatch({ type: SET_ERROR, payload: err });
+    //   });
   };

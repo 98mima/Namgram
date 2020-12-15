@@ -15,9 +15,9 @@ const router = express.Router();
 // LIMIT 5
 router.get('/all', personController.getAll);
 router.get('/byEmail/:email', personController.getByEmail);
-router.get('/byUsername', personController.getByUsername);
-router.get('/getFollowing', personController.getFollowing);
-router.get('/getFollowers', personController.getFollowers);
+router.get('/byUsername/:username', personController.getByUsername);
+router.get('/getFollowing/:username', personController.getFollowing);
+router.get('/getFollowers/:username', personController.getFollowers);
 router.post('/follow', personController.follow);
 router.delete('/unfollow', personController.unfollow);
 router.delete('/delete', personController.deletePerson);

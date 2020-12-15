@@ -46,7 +46,7 @@ exports.getByUsername = async (req, res) =>  {
     try{
         let session = driver.session();
         const person = await session.run('MATCH (n:Person {username: $username}) RETURN n', {
-            username: req.body.username
+            username: req.params.username
           })
         session.close();
         const Data = person.records[0].get('n').properties
@@ -63,7 +63,7 @@ exports.getFollowing = async (req, res) =>  {
     try{
         let session = driver.session();
         const persons = await session.run('MATCH (n:Person {username: $username})-->(person) RETURN person', {
-            username: req.body.username
+            username: req.params.username
           })
         session.close();
         const Data = _manyPeople(persons)
@@ -80,7 +80,7 @@ exports.getFollowers = async (req, res) =>  {
     try{
         let session = driver.session();
         const persons = await session.run('MATCH (n:Person {username: $username})<--(person) RETURN person', {
-            username: req.body.username
+            username: req.params.username
           })
         session.close();
         const Data = _manyPeople(persons)

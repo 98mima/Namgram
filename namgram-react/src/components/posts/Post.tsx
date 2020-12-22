@@ -17,23 +17,43 @@ import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Favorite from '@material-ui/icons/FavoriteBorder'
-import { CardActionArea } from '@material-ui/core';
+import { CardActionArea, Grid } from '@material-ui/core';
 
-import {IPost} from '../../models/post'
+import { IPost } from '../../models/post'
+import { width, maxHeight, height } from '@material-ui/system';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-      container: {
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: "5rem"
-      },
-      img: {
-        maxWidth: "500px"
-      },
+    container: {
+      display: "flex",
+      justifyContent: "center",
+      alignContent: "center",
+      marginTop: "5rem",
+      maxHeight: "500px",
+    },
+    img: {
+      maxWidth: '100%',
+      height: 'auto',
+    },
+    imgContainer: {
+      width: '100%',
+      maxWidth: '500px',
+    },
+
+    levo: {
+      display: 'flex',
+      maxWidth: 'auto',
+      maxHeight: '100%'
+    },
+
     root: {
-      maxWidth: 345,
+      display: 'flex',
+      maxWidth: '345px',
+      flexDirection: 'column',
+      width: '100%'
+      // marginRight: '0',
+      // width: "100%" 
+
     },
     media: {
       height: 0,
@@ -55,55 +75,67 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-function Post(props: {post: IPost}) {
-  const {post} = props;
+function Post(props: { post: IPost }) {
+  const { post } = props;
 
-    const classes = useStyles();
-    const [expanded, setExpanded] = React.useState(false);
-  
-    const handleExpandClick = () => {
-      setExpanded(!expanded);
-    };
-  
-    return (
-        <div className={classes.container}>
-      <Card className={classes.root}>
-        <CardHeader
-          avatar={
-            <Avatar aria-label="recipe" className={classes.avatar}>
-              <img style={{maxHeight: '100%'}} src={post.user.image} />
-            </Avatar>
-          }
-          title={post.user.username}
-          subheader="September 14, 2016"
-        />
-        <div style={{display: "flex", justifyContent: "space-around"}}>
-        <CardHeader
-          avatar={
-            <CardActionArea><Avatar className={classes.avatar}><Favorite /></Avatar></CardActionArea>
-          }
-          title={post.likes}
-        />
-        <CardHeader
-          avatar={
-            <CardActionArea><Avatar color="primary" className={classes.avatar}><Favorite /></Avatar></CardActionArea>
-          }
-          title={post.dislikes}
-        />
-        </div>
-        
-        <CardContent>
-          <Typography variant="body2" color="textSecondary" component="p">
-            This impressive paella is a perfect party dish and a fun meal to cook together with your
-            guests. Add 1 cup of frozen peas along with the mussels, if you like.
+  const classes = useStyles();
+  const [expanded, setExpanded] = React.useState(false);
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
+
+  return (
+    <div className={classes.container}>
+      <div className={classes.levo}>
+        <Card className={classes.root}>
+          <CardHeader
+            avatar={
+              <Avatar aria-label="recipe" className={classes.avatar}>
+                <img style={{ maxHeight: '100%' }} src={post.user.image} />
+              </Avatar>
+            }
+            title={post.user.username}
+            subheader="September 14, 2016"
+          />
+          <div style={{ display: "flex", justifyContent: "space-around" }}>
+            <CardHeader
+              avatar={
+                <CardActionArea><Avatar className={classes.avatar}><Favorite /></Avatar></CardActionArea>
+              }
+              title={post.likes}
+            />
+            <CardHeader
+              avatar={
+                <CardActionArea><Avatar color="primary" className={classes.avatar}><Favorite /></Avatar></CardActionArea>
+              }
+              title={post.dislikes}
+            />
+          </div>
+
+          <CardContent>
+            <Typography variant="body2" color="textSecondary" component="p">
+              This impressive paella is a perfect party dish and a fun meal to cook together with your
+              guests. Add 1 cup of frozen peas along with the mussels, if you like.
           </Typography>
-        </CardContent>
-      </Card>
-      <div >
-          <img className={classes.img} src={post.image} />
+          </CardContent>
+          <CardContent>
+            <Typography variant="body2" color="textSecondary" component="p">
+              This impressive paella is a perfect party dish and a fun meal to cook together with your
+
+          </Typography>
+          </CardContent>
+        </Card>
       </div>
+
+      <div className={classes.imgContainer}>
+        <img className={classes.img} src={post.image} />
       </div>
-    );
+    </div >
+
+
+
+  );
 }
 
 export default Post

@@ -4,6 +4,7 @@ import { SET_ERROR, CLEAR_ERROR, START_LOADING, STOP_LOADING } from "../ui/actio
 
 import jwtDecode from 'jwt-decode'
 import axios, { AxiosError } from 'axios'
+import { getUserById } from "../../services/user";
 
 export const SET_AUTH = 'SET_AUTH';
 export const CLEAR_AUTH = 'CLEAR_AUTH';
@@ -20,24 +21,18 @@ export interface ClearAuthAction {
 export type AuthActionTypes = SetAuthAction | ClearAuthAction
 
 export const authUser = () => (dispatch: any) => {
-    // const token = localStorage.TOKEN;
-    // if (token) {
-    //   const decodedToken = jwtDecode(token);
-    //   if (decodedToken.exp * 1000 < Date.now()) {
-    //     dispatch(logoutUser());
-    //     window.location.href = "/login";
-    //   } else {
-    //     getUser(decodedToken.unique_name)
-    //       .then((res) => {
-    //         dispatch({ type: SET_USER, payload: res });
-    //         dispatch({ type: CLEAR_EXAM_PAPERS });
-    //         dispatch({ type: CLEAR_ANSWERS });
-    //         dispatch({ type: CLEAR_QUESTIONS });
-    //         axios.defaults.headers.common["Authorization"] = token;
-    //       })
-    //       .catch((err) => console.log("Bad token"));
-    //   }
-    // }
+ 
+    const token = localStorage.TOKEN;
+    console.log(token);
+    if (token) {
+      const decodedToken: {id: string} = jwtDecode(token);
+      getUserById(decodedToken.id)
+      .then((res) => {
+        dispatch({ type: SET_AUTH, payload: res.Data.id });
+        axios.defaults.headers.common["Authorization"] = token;
+      })
+      .catch((err) => console.log("Bad token"));
+    }
   };
 
 export const signinAction = (user: ISignin) => (dispatch: any) => {

@@ -1,6 +1,7 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
-import { createStyles, fade, makeStyles, Theme } from '@material-ui/core';
+import { Button, createStyles, fade, makeStyles, Theme } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -15,10 +16,19 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../redux';
+import { logoutAction } from '../../redux/auth/actions';
+
 
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    btn:{
+      color: 'white',
+      paddingRight: '1rem'
+    },
     grow: {
       flexGrow: 1,
     },
@@ -84,6 +94,11 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function Navbar() {
+    const history = useHistory();
+    const dispatch = useDispatch();
+
+    const auth = useSelector((state: RootState) => state.auth.auth?.id);
+
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -108,6 +123,11 @@ function Navbar() {
         setMobileMoreAnchorEl(event.currentTarget);
     };
 
+    const handleLogout = () => {
+      dispatch(logoutAction());
+      handleMenuClose();
+    }
+
   const menuId = 'primary-search-account-menu';
 
   const renderMenu = (
@@ -121,7 +141,7 @@ function Navbar() {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleLogout}>Log out</MenuItem>
     </Menu>
   );
 
@@ -178,7 +198,7 @@ function Navbar() {
             <MenuIcon />
           </IconButton>
           <Typography className={classes.title} variant="h6" noWrap>
-            Material-UI
+            namgram
           </Typography>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
@@ -195,7 +215,18 @@ function Navbar() {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton aria-label="show 4 new mails" color="inherit">
+           
+            {auth == undefined ? 
+            <div>
+              <Link to="/signin" style={{textDecoration: 'none'}}>
+                <Button className={classes.btn} variant='outlined' color='primary'>Sign in</Button>
+              </Link>
+              <Link to="/signup" style={{textDecoration: 'none'}}>
+                <Button variant='contained' color='secondary'>Sign up</Button>
+              </Link>
+            </div> : 
+            <div>
+               <IconButton aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <MailIcon />
               </Badge>
@@ -206,15 +237,15 @@ function Navbar() {
               </Badge>
             </IconButton>
             <IconButton
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            edge="end"
+            aria-label="account of current user"
+            aria-controls={menuId}
+            aria-haspopup="true"
+            onClick={handleProfileMenuOpen}
+            color="inherit"
+          >
+            <AccountCircle />
+          </IconButton> </div>}
           </div>
           <div className={classes.sectionMobile}>
             <IconButton

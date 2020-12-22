@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Avatar from '@material-ui/core/Avatar'
 import Box from '@material-ui/core/Box'
@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { START_LOADING, STOP_LOADING } from '../../redux/ui/actions'
 import { RootState } from '../../redux/index'
 import { signinAction } from '../../redux/auth/actions'
+import { useHistory } from 'react-router-dom'
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -51,6 +52,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 function SigninForm() {
     const dispatch = useDispatch()
+    const history = useHistory();
     const classes = useStyles();
 
     const [email, setEmail] = useState("");
@@ -58,6 +60,7 @@ function SigninForm() {
 
     const loading = useSelector((state: RootState) => state.ui.loading);
     const error = useSelector((state: RootState) => state.ui.error);
+    const auth = useSelector((state: RootState) => state.auth.auth);
     
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -71,6 +74,10 @@ function SigninForm() {
       else if (event.currentTarget.name === "password") 
         setPassword(event.currentTarget.value);
     }
+
+    useEffect(() => {
+      if(auth) history.push("/");
+    }, [auth])
 
     return (
       <Container component="main" maxWidth="xs">

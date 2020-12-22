@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -18,6 +18,7 @@ import { ISignup } from "../../models/auth";
 import { START_LOADING, STOP_LOADING } from "../../redux/ui/actions";
 import { RootState } from '../../redux/index'
 import { signupAction } from '../../redux/auth/actions'
+import { useHistory } from 'react-router-dom';
 
 function Copyright() {
   return (
@@ -59,6 +60,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 export default function SignUp() {
   const classes = useStyles();
 
+  const history = useHistory();
   const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
@@ -74,6 +76,7 @@ export default function SignUp() {
 
   const loading = useSelector((state: RootState) => state.ui.loading);
   const error = useSelector((state: RootState) => state.ui.error);
+  const auth = useSelector((state: RootState) => state.auth.auth);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -94,6 +97,10 @@ export default function SignUp() {
       setUsername(event.currentTarget.value);
 
   }
+
+  useEffect(() => {
+    if(auth) history.push("/");
+  }, [auth])
 
   return (
     <Container component="main" maxWidth="xs">

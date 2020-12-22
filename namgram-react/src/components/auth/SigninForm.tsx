@@ -66,6 +66,13 @@ function SigninForm() {
       dispatch({type: STOP_LOADING});
     }
 
+    const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
+      if (event.currentTarget.value === "email") 
+        setEmail(event.currentTarget.value);
+      else if (event.currentTarget.value === "password") 
+        setPassword(event.currentTarget.value);
+    };
+
     return (
       <Container component="main" maxWidth="xs">
       <CssBaseline />

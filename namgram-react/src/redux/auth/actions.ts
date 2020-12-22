@@ -43,7 +43,7 @@ export const authUser = () => (dispatch: any) => {
 export const signinAction = (user: ISignin) => (dispatch: any) => {
     dispatch({ type: START_LOADING });
     signin(user)
-      .then((res : ISigninRes | AxiosError<string>) => {
+      .then((res : ISigninRes) => {
         dispatch({ type: CLEAR_ERROR });
         const token = `Bearer ${(res as ISigninRes).AuthToken}`;
         window.localStorage.setItem('TOKEN', token);
@@ -53,16 +53,23 @@ export const signinAction = (user: ISignin) => (dispatch: any) => {
         dispatch({type: STOP_LOADING});
         window.location.href = '/';
       })
-      .catch((err : AxiosError<string>) => {
+      .catch((err : AxiosError) => {
         dispatch({type: STOP_LOADING});
-        dispatch({ type: SET_ERROR, payload: err.message });
+        if (err.request){
+          dispatch({ type: SET_ERROR, payload: `${err.request.response}` });
+        } else if (err.response){
+          dispatch({ type: SET_ERROR, payload: `${err.response.data}` });
+        }
+        else{
+          console.log(err);
+        }
       });
   };
 
   export const signupAction = (user: ISignup) => (dispatch: any) => {
     dispatch({ type: START_LOADING });
     signup(user)
-      .then((res : ISignupRes | AxiosError<string>) => {
+      .then((res : ISignupRes) => {
         dispatch({ type: CLEAR_ERROR });
         const token = `Bearer ${(res as ISigninRes).AuthToken}`;
         window.localStorage.setItem('TOKEN', token);
@@ -72,9 +79,16 @@ export const signinAction = (user: ISignin) => (dispatch: any) => {
         dispatch({type: STOP_LOADING});
         window.location.href = '/';
       })
-      .catch((err : AxiosError<string>) => {
+      .catch((err : AxiosError) => {
         dispatch({type: STOP_LOADING});
-        dispatch({ type: SET_ERROR, payload: err.message });
+        if (err.request){
+          dispatch({ type: SET_ERROR, payload: `${err.request.response}` });
+        } else if (err.response){
+          dispatch({ type: SET_ERROR, payload: `${err.response.data}` });
+        }
+        else{
+          console.log(err);
+        }
       });
   };
 

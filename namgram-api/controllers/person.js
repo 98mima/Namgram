@@ -25,6 +25,23 @@ exports.getAll = async (req, res) =>  {
     }
 };
 
+exports.get = async (req, res) =>  {
+    try{
+        let session = driver.session();
+        const person = await session.run('MATCH (n:Person {id: $id}) RETURN n', {
+            id: req.params.id
+        });
+        session.close();
+        const Data = person.records[0].get('n').properties;
+       res.status(200)
+       .json({message: "Prikupljeno", Data})   
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
 exports.getByEmail = async (req, res) =>  {
     try{
         let session = driver.session();

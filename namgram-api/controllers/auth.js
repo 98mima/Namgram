@@ -14,7 +14,7 @@ let session = driver.session();
 exports.register = async (req, res, next) => {
   const { error } = registerValidation(req.body);
   if (error)
-    return res.status(400).send(res.json({ Status: error.details[0].message }))
+    return res.status(400).send(error.details[0].message)
 
   const emailExist = await session.run('MATCH (n:Person {email: $email}) RETURN n', {
     email: req.body.email
@@ -23,7 +23,7 @@ exports.register = async (req, res, next) => {
     username: req.body.username
   })
   if (!_.isEmpty(emailExist.records) || !_.isEmpty(usernameExist.records)) {
-    return res.json({ Status: 'Korisnik sa takvim mejlom ili username-om vec postoji', email: emailExist });
+    return res.status(401).send('Korisnik sa takvim mejlom ili username-om vec postoji: ' + emailExist );
   }
   //hashing the password
   const salt = await bcryptjs.genSalt(10);
@@ -46,7 +46,7 @@ exports.register = async (req, res, next) => {
       AuthToken: token
     });
   } catch (err) {
-    res.json({ Success: false, Message: err });
+    res.status(401).send(err);
     console.log(err)
   }
 }
@@ -61,13 +61,13 @@ exports.login = async (req, res, next) => {
   });
 
   if (_.isEmpty(userExist.records))
-    return res.json({ Status: 'Wrong email', Success: false });
+    return res.status(401).send('Wrong email');
 
   const dbPerson = (userExist.records[0].get('person'))
 
   const validPassword = await bcryptjs.compare(req.body.password, dbPerson.properties.password);
   if (!validPassword)
-    return res.json({ Status: 'Wrong Password', Success: false });
+    return res.status(401).send('Wrong Password');
 
 
   //Create Token

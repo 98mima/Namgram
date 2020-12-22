@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import axios from "axios"
 
 import { Provider } from 'react-redux'
 import { applyMiddleware, createStore, compose } from 'redux'
@@ -12,12 +13,8 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 import { rootReducer } from './redux/index'
 
 
-const composeEnhancers =
 //@ts-ignore
-  typeof window === "object" && window.REDUX_DEVTOOLS_EXTENSION_COMPOSE
-  //@ts-ignore
-    ? window.REDUX_DEVTOOLS_EXTENSION_COMPOSE({})
-    : compose;
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const middleware = [thunk];
 const enchancer = composeEnhancers(applyMiddleware(...middleware));
 //@ts-ignore
@@ -33,6 +30,8 @@ const theme = createMuiTheme({
     },
   },
 });
+
+axios.defaults.baseURL = "http://localhost:8080/";
 //test
 ReactDOM.render(
   <React.StrictMode>

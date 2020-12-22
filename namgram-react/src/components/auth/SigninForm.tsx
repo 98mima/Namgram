@@ -16,10 +16,10 @@ import { makeStyles, Theme } from '@material-ui/core/styles'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 
 import { ISignin } from '../../models/auth'
-import { signin } from "../../services/auth";
 import { useDispatch, useSelector } from 'react-redux'
 import { START_LOADING, STOP_LOADING } from '../../redux/ui/actions'
 import { RootState } from '../../redux/index'
+import { signinAction } from '../../redux/auth/actions'
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -57,21 +57,20 @@ function SigninForm() {
     const [password, setPassword] = useState("");
 
     const loading = useSelector((state: RootState) => state.ui.loading);
+    const error = useSelector((state: RootState) => state.ui.error);
     
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       const user: ISignin = {email, password};
-      dispatch({type: START_LOADING});
-      await signin(user);
-      dispatch({type: STOP_LOADING});
+      dispatch(signinAction(user));
     }
 
-    const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
-      if (event.currentTarget.value === "email") 
+    const onInput = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if (event.currentTarget.name === "email") 
         setEmail(event.currentTarget.value);
-      else if (event.currentTarget.value === "password") 
+      else if (event.currentTarget.name === "password") 
         setPassword(event.currentTarget.value);
-    };
+    }
 
     return (
       <Container component="main" maxWidth="xs">
@@ -94,6 +93,7 @@ function SigninForm() {
             name="email"
             autoComplete="email"
             autoFocus
+            onChange={(event) => onInput(event)}
           />
           <TextField
             variant="outlined"
@@ -105,6 +105,7 @@ function SigninForm() {
             type="password"
             id="password"
             autoComplete="current-password"
+            onChange={(event) => onInput(event)}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
@@ -121,6 +122,7 @@ function SigninForm() {
           </Button>
           <Grid container>
             <Grid item xs>
+              <Typography color="error">{error}</Typography>
               <Link href="#" variant="body2">
                 Forgot password?
               </Link>

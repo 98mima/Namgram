@@ -1,17 +1,14 @@
-import axios from "axios"
+import axios, {AxiosError} from "axios"
 
-import { ISignin, ISignup } from "../models/auth";
-export function signin(user: ISignin) {
-    const a = {
-        "email": "zlatkovnik@gmail.com",
-        "password": "12345678"
-    };
-    axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-    axios.get("http://localhost:8080/person/byEmail/zlatkovnik@gmail.com")
-        .then(d => console.log(d.data))
-        .catch(console.log);
+import { ISignin, ISigninRes, ISignup, ISignupRes } from "../models/auth";
+export async function signin(user: ISignin){
+    return axios.post<ISigninRes>("auth/login", user)
+        .then(d => d.data)
+        .catch((err: AxiosError<string>) => err);
 }
 
-export function signup(user: ISignup): Promise<null> {
-    return new Promise<null>(resolve => setTimeout(resolve, 2000));
+export async function signup(user: ISignup) {
+    return axios.post<ISignupRes>("auth/register", user)
+        .then(d => d.data)
+        .catch((err: AxiosError<string>) => err);
 }

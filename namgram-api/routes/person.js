@@ -14,6 +14,7 @@ const router = express.Router();
 // ORDER BY count(*) DESC
 // LIMIT 5
 router.get('/all', personController.getAll);
+router.get('/byId/:id', personController.get);
 router.get('/byEmail/:email', personController.getByEmail);
 router.get('/byUsername/:username', personController.getByUsername);
 router.get('/getFollowing/:username', personController.getFollowing);

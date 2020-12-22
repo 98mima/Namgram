@@ -23,7 +23,6 @@ export type AuthActionTypes = SetAuthAction | ClearAuthAction
 export const authUser = () => (dispatch: any) => {
  
     const token = localStorage.TOKEN;
-    console.log(token);
     if (token) {
       const decodedToken: {id: string} = jwtDecode(token);
       getUserById(decodedToken.id)
@@ -37,6 +36,7 @@ export const authUser = () => (dispatch: any) => {
 
 export const signinAction = (user: ISignin) => (dispatch: any) => {
     dispatch({ type: START_LOADING });
+    dispatch({type: CLEAR_ERROR});
     signin(user)
       .then((res : ISigninRes) => {
         dispatch({ type: CLEAR_ERROR });
@@ -63,6 +63,7 @@ export const signinAction = (user: ISignin) => (dispatch: any) => {
 
   export const signupAction = (user: ISignup) => (dispatch: any) => {
     dispatch({ type: START_LOADING });
+    dispatch({type: CLEAR_ERROR});
     signup(user)
       .then((res : ISignupRes) => {
         dispatch({ type: CLEAR_ERROR });

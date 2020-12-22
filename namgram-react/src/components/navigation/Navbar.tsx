@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Button, createStyles, fade, makeStyles, Theme } from '@material-ui/core';
@@ -97,7 +97,7 @@ function Navbar() {
     const history = useHistory();
     const dispatch = useDispatch();
 
-    const auth = useSelector((state: RootState) => state.auth.auth?.id);
+    const auth = useSelector((state: RootState) => state.auth.auth);
 
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -127,6 +127,7 @@ function Navbar() {
       dispatch(logoutAction());
       handleMenuClose();
     }
+
 
   const menuId = 'primary-search-account-menu';
 
@@ -215,8 +216,7 @@ function Navbar() {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-           
-            {auth == undefined ? 
+            {!auth ? 
             <div>
               <Link to="/signin" style={{textDecoration: 'none'}}>
                 <Button className={classes.btn} variant='outlined' color='primary'>Sign in</Button>

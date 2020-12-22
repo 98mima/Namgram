@@ -3,8 +3,6 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -12,8 +10,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress'
-
 import Container from '@material-ui/core/Container';
+
 
 import { useDispatch, useSelector } from 'react-redux';
 import { ISignup } from "../../models/auth";
@@ -65,17 +63,21 @@ export default function SignUp() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [name, setName] = useState("");
+  const [lastname, setLastname] = useState("");
   const [username, setUsername] = useState("");
+  const [birthday, setBirthday] = React.useState<any>(new Date());
+
+  const onBirthdayChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+   setBirthday(event.currentTarget.value);
+  };
 
   const loading = useSelector((state: RootState) => state.ui.loading);
   const error = useSelector((state: RootState) => state.ui.error);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const user: ISignup = { firstName, lastName, username, email, password };
-    console.log(user);
+    const user: ISignup = { name, lastname, username, email, password, birthday};
     dispatch(signupAction(user));
   }
 
@@ -84,10 +86,10 @@ export default function SignUp() {
       setEmail(event.currentTarget.value);
     else if (event.currentTarget.name === "password")
       setPassword(event.currentTarget.value);
-    else if (event.currentTarget.name === "firstName")
-      setFirstName(event.currentTarget.value);
-    else if (event.currentTarget.name === "lastName")
-      setLastName(event.currentTarget.value);
+    else if (event.currentTarget.name === "name")
+      setName(event.currentTarget.value);
+    else if (event.currentTarget.name === "lastname")
+      setLastname(event.currentTarget.value);
     else if (event.currentTarget.name === "username")
       setUsername(event.currentTarget.value);
 
@@ -108,7 +110,7 @@ export default function SignUp() {
             <Grid item xs={12} sm={6}>
               <TextField
                 autoComplete="fname"
-                name="firstName"
+                name="name"
                 variant="outlined"
                 required
                 fullWidth
@@ -125,7 +127,7 @@ export default function SignUp() {
                 fullWidth
                 id="lastName"
                 label="Last Name"
-                name="lastName"
+                name="lastname"
                 autoComplete="lname"
                 onChange={(event) => onInput(event)}
               />
@@ -167,6 +169,9 @@ export default function SignUp() {
                 onChange={(event) => onInput(event)}
               />
             </Grid>
+            <Grid item xs={12}>
+            <input type="date" value={birthday} onChange={(event) => onBirthdayChange(event)}></input>
+            </Grid>
           </Grid>
           <Button
             type="submit"
@@ -177,6 +182,7 @@ export default function SignUp() {
           >
             {loading ? <CircularProgress color="secondary" /> : "Sign up"}
           </Button>
+          <Typography color="error">{error}</Typography>
           <Grid container justify="center">
             <Grid item>
               <Link href="#" variant="body2">

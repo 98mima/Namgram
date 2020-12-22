@@ -9,11 +9,12 @@ export interface ISigninRes {
 }
 
 export interface ISignup {
-    firstName: string,
-    lastName: string,
+    name: string,
+    lastname: string,
     username: string,
     email: string,
     password: string,
+    birthday: Date
 }
 
 export interface ISignupRes {

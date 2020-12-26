@@ -1,6 +1,6 @@
 const Post = require('../models/post');
 const Person = require('../models/person');
-const controller = require('../controllers/post');
+const uuid = require('node-uuid');
 let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
 const _ = require('lodash');
@@ -42,6 +42,41 @@ exports.getByPerson = async (req, res) =>  {
         const Data = _manyPosts(posts)
        res.status(200)
        .json({message: "Prikupljeno", Data})   
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
+exports.createPost = async (req, res) =>  {
+    try{
+        let session = driver.session();
+        const p = await session.run('CREATE (post:Post {id: $id, date: $date, content: $content}) RETURN post', {
+            id: uuid.v4(),
+            date: req.body.date,
+            content: req.body.content
+          })
+        session.close();
+        res.status(200)
+            .json({message: "Kreiran post", p})
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
+exports.like = async (req, res) =>  {
+    try{
+        let session = driver.session();
+        const rel = await session.run('match (a:Person {id:$personId}),(post:Post {id:$postId}) merge (a)-[r:like]->(post) return r ', {
+            personId: req.body.personId,
+            postId: req.body.postId
+          })
+        session.close();
+        res.status(200)
+            .json({message: "Like postavljen", rel})
     }
     catch (err) {
         res.json({ success: false });

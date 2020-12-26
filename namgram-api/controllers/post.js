@@ -83,3 +83,20 @@ exports.like = async (req, res) =>  {
         console.log(err);
     }
 };
+
+exports.dislike = async (req, res) =>  {
+    try{
+        let session = driver.session();
+        const rel = await session.run('match (a:Person {id:$personId}),(post:Post {id:$postId}) merge (a)-[r:dislike]->(post) return r ', {
+            personId: req.body.personId,
+            postId: req.body.postId
+          })
+        session.close();
+        res.status(200)
+            .json({message: "Disike postavljen", rel})
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};

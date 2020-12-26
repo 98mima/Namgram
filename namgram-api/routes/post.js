@@ -13,7 +13,7 @@ router.get('/byId/:username', postController.getByPerson);
 // router.get('/getFollowing/:username', personController.getFollowing);
 router.post('/add', postController.createPost);
 router.post('/like', postController.like);
-// router.delete('/unfollow', personController.unfollow);
+router.post('/dislike', postController.dislike);
 // router.delete('/delete', personController.deletePerson);
 
 module.exports = router;

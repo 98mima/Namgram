@@ -7,13 +7,13 @@ const postController = require('../controllers/post');
 const router = express.Router();
 
 router.get('/all', postController.getAll);
-router.get('/byId/:username', postController.getByPerson);
-// router.get('/byEmail/:email', personController.getByEmail);
+router.get('/byId/:id', postController.getByPerson);
+router.get('/byPostId/:id', postController.getByPostId);
 // router.get('/byUsername/:username', personController.getByUsername);
 // router.get('/getFollowing/:username', personController.getFollowing);
 router.post('/add', postController.createPost);
 router.post('/like', postController.like);
 router.post('/dislike', postController.dislike);
-// router.delete('/delete', personController.deletePerson);
+router.delete('/delete', postController.deletePost);
 
 module.exports = router;

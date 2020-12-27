@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const User = module.exports = function (_node) {
+const Person = module.exports = function (_node) {
     _.extend(this, {
         "id":  _node.properties['id'],
         "username": _node.properties['username'],

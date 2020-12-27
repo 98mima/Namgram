@@ -2,9 +2,7 @@ const Post = require('../models/post');
 const Person = require('../models/person');
 const uuid = require('node-uuid');
 let { creds } = require("./../config/credentials");
-
-const Neode = require('neode')
-const instance = Neode.fromEnv();
+const controller = require('../controllers/person');
 
 let neo4j = require('neo4j-driver');
 const _ = require('lodash');
@@ -18,10 +16,10 @@ client.get = util.promisify(client.get);
 //broj likeova, dis, comm
 
 //get za postove od ljudi koje pratim
-//delete post
 //add comment 
 
 //redis za getove
+
 function _manyPosts(neo4jResult) {
     return neo4jResult.records.map(r => new Post(r.get('post')))
 }
@@ -34,6 +32,11 @@ exports.getAll = async (req, res) => {
 
         session.close();
         const Data = _manyPosts(posts)
+
+        // const d = Data.forEach(function (value, i) {
+        //     Data[i].likes = controller.findLikes(Data[i].id)
+        // });
+
         res.status(200)
             .json({ message: "Prikupljeno", Data })
     }
@@ -76,7 +79,6 @@ exports.getByPerson = async (req, res) => {
 
         //ako jeste
         if(cacheValue) {
-            console.log("iz redisa")
             const Data = JSON.parse(cacheValue)
 
             return res.status(200).json({message: "Prikupljeno iz redisa", Data})
@@ -176,3 +178,16 @@ exports.deletePost = async  (req, res) => {
         console.log(err);
     }
 }
+
+// exports.findLikes = (id) => {
+//     let session = driver.session();
+//     try {
+//         const l = session.run('MATCH (post:Post {id: $id})<-[r:like]-(n:Person) RETURN count(r) as count'
+//         ).records[0].get('count').low
+
+//         return l
+//     }
+//     catch (err) {
+//         console.log(err);
+//     }
+// }

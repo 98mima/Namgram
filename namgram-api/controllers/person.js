@@ -161,3 +161,16 @@ exports.deletePerson = async  (req, res) => {
         console.log(err);
     }
 }
+
+exports.findLikes = (id) => {
+    let session = driver.session();
+    try {
+        const l = session.run('MATCH (post:Post {id: $id})<-[r:like]-(n:Person) RETURN count(r) as count'
+        ).records[0].get('count').low
+
+        return l
+    }
+    catch (err) {
+        console.log(err);
+    }
+}

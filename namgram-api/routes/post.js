@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/all', postController.getAll);
 router.get('/byId/:id', postController.getByPerson);
 router.get('/byPostId/:id', postController.getByPostId);
-// router.get('/byUsername/:username', personController.getByUsername);
+router.get('/byFollowings/:id', postController.getByFollowings);
 // router.get('/getFollowing/:username', personController.getFollowing);
 router.post('/add', postController.createPost);
 router.post('/like', postController.like);

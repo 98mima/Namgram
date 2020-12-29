@@ -162,15 +162,20 @@ exports.deletePerson = async  (req, res) => {
     }
 }
 
-exports.findLikes = (id) => {
-    let session = driver.session();
-    try {
-        const l = session.run('MATCH (post:Post {id: $id})<-[r:like]-(n:Person) RETURN count(r) as count'
-        ).records[0].get('count').low
-
-        return l
-    }
-    catch (err) {
-        console.log(err);
-    }
-}
+// exports.findLikes =  (id) => {
+//     try {
+//         let session = driver.session()
+//           session.run('MATCH (post:Post {id: $id})<-[r:like]-(n:Person) RETURN count(r) as count', {
+//             id: id
+//         }).then(function(result) {
+//             const likes = result.records[0].get('count').low
+//             console.log(likes)
+//             return likes
+//         })
+//         .catch(err => 
+//             console.log(err))
+//     }
+//     catch (err) {
+//         console.log(err);
+//     }
+// }

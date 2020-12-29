@@ -9,11 +9,14 @@ const _ = require('lodash');
 let driver = neo4j.driver("bolt://0.0.0.0:7687", neo4j.auth.basic(creds.neo4jusername, creds.neo4jpw));
 const util = require('util')
 const redis = require('redis');
+const { concat } = require('lodash');
 const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
 client.get = util.promisify(client.get);
 
 //broj likeova, dis, comm
+
+//nakon kreiranja posta da se napravi relacija created
 
 //get za postove od ljudi koje pratim
 //add comment 
@@ -24,19 +27,86 @@ function _manyPosts(neo4jResult) {
     return neo4jResult.records.map(r => new Post(r.get('post')))
 }
 
+function addToArray(el, arr) {
+    arr.push(el)
+    
+}
+
+function findProps(node) {
+    try{
+        let session = driver.session();
+
+        const query = [
+            'MATCH (post:Post {id: $id})<-[r1:like]-(n:Person) with count(r1) as count \
+             MATCH (post:Post {id: $id}) RETURN post, count \
+             union all \
+             MATCH (post:Post {id: $id})<-[r2:dislike]-(n:Person) with count(r2) as count \
+             MATCH (post:Post {id: $id}) RETURN post, count \
+             union all \
+             MATCH (post:Post {id: $id})<-[r3:commented]-(n:Person) with count(r3) as count \
+             MATCH (post:Post {id: $id}) RETURN post, count'
+
+        ].join('\n')
+
+        return session.readTransaction(txc =>
+            txc.run(query, {
+                id: node.id
+            }))
+            .then( result => {  
+            const Data1 = _manyPosts(result)
+            Data1[0].likes = result.records[0].get('count').low
+            Data1[0].dislikes = result.records[1].get('count').low
+            Data1[0].comments = result.records[2].get('count').low
+            const Data = Data1[0]
+            session.close();
+    
+            return Data})
+            .catch(err => {
+                console.log(err)
+            })
+    }
+    catch (err){
+        console.log(err)
+    }
+}
+
 exports.getAll = async (req, res) => {
+    try {
+        let session = driver.session();
+
+        const posts = await session.run('MATCH (post:Post) RETURN post', {
+        });
+        const p = _manyPosts(posts)
+
+        let Data = []
+
+        Data = await Promise.all(p.map(post => {
+            return findProps(post)
+        }))
+
+        session.close();
+        res.status(200)
+            .json({ message: "Prikupljeno", Data })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
+exports.getByFollowings = async (req, res) => {
     try {
         let session = driver.session();
         const posts = await session.run('MATCH (post:Post) RETURN post', {
         });
-
-        session.close();
         const Data = _manyPosts(posts)
 
-        // const d = Data.forEach(function (value, i) {
-        //     Data[i].likes = controller.findLikes(Data[i].id)
-        // });
+        Data.forEach(function (value, i) {
+            console.log(Post.findLikes(Data[i].id))
+            Data[i].likes = Post.findLikes(Data[i].id)
+        });
 
+        session.close();
         res.status(200)
             .json({ message: "Prikupljeno", Data })
     }
@@ -49,16 +119,13 @@ exports.getAll = async (req, res) => {
 exports.getByPostId = async (req, res) => {
     try {
         let session = driver.session();
-        const posts = await session.run('MATCH (post:Post {id: $id}) RETURN post', {
-            id: req.params.id
-        });
 
-        const Data = _manyPosts(posts)
-        const like = await session.run('MATCH (post:Post {id: $id})<-[r:like]-(n:Person) RETURN count(r) as count', {
+        const post1 = await session.run('MATCH (post:Post {id: $id}) RETURN post', {
             id: req.params.id
         })
-        const likes = like.records[0].get('count').low
-        const d = Data.map(d => d.likes=likes)
+        const post = _manyPosts(post1)[0]
+        Data = await findProps(post)
+
         session.close();
         res.status(200)
             .json({ message: "Prikupljeno", Data })
@@ -72,16 +139,16 @@ exports.getByPostId = async (req, res) => {
 exports.getByPerson = async (req, res) => {
     try {
         let session = driver.session();
-        const key = JSON.stringify(Object.assign({}, {user: req.params.id}, {collection: "post"}));
+        const key = JSON.stringify(Object.assign({}, { user: req.params.id }, { collection: "post" }));
 
         //da li je u redisu
         const cacheValue = await client.get(key)
 
         //ako jeste
-        if(cacheValue) {
+        if (cacheValue) {
             const Data = JSON.parse(cacheValue)
 
-            return res.status(200).json({message: "Prikupljeno iz redisa", Data})
+            return res.status(200).json({ message: "Prikupljeno iz redisa", Data })
         }
         //ako nije
         const posts = await session.run('MATCH (n:Person {id: $id})-[r:created]->(post:Post) RETURN post', {
@@ -111,14 +178,24 @@ exports.createPost = async (req, res) => {
         today = dd + '.' + mm + '.' + yyyy;
 
         let session = driver.session();
-        const p = await session.run('CREATE (post:Post {id: $id, date: $date, content: $content}) RETURN post', {
-            id: uuid.v4(),
-            date: today,
-            content: req.body.content
-        })
+        const query = [
+            'CREATE (post:Post {id: $id, date: $date, content: $content})<-[:created]-(a:Person {id:$personId}) \
+             RETURN post'
+        ].join('\n')
+
+        const d = await session.writeTransaction(txc =>
+            txc.run(query, {
+                id: uuid.v4(),
+                date: today,
+                content: req.body.content,
+                personId: req.body.personId
+            }))
+
+        const Data1 = _manyPosts(d)
+        const Data = Data1[0]
         session.close();
         res.status(200)
-            .json({ message: "Kreiran post", p })
+            .json({ message: "Kreiran post", Data })
     }
     catch (err) {
         res.json({ success: false });
@@ -160,34 +237,22 @@ exports.dislike = async (req, res) => {
     }
 };
 
-exports.deletePost = async  (req, res) => {
+exports.deletePost = async (req, res) => {
     let session = driver.session();
     try {
         const rel = await session.run('match (a:Person {id:$personId})-[r:created]->(b:Post {id:$postId}) delete r ', {
             personId: req.body.personId,
             postId: req.body.postId
-          })
+        })
 
         p = await session.run('MATCH (post:Post {id: $postId}) DELETE post', {
-            postId: req.body.postId});
+            postId: req.body.postId
+        });
         res.status(200)
-            .json({message: "Obrisan"});
+            .json({ message: "Obrisan" });
     }
     catch (err) {
         res.json({ success: false });
         console.log(err);
     }
 }
-
-// exports.findLikes = (id) => {
-//     let session = driver.session();
-//     try {
-//         const l = session.run('MATCH (post:Post {id: $id})<-[r:like]-(n:Person) RETURN count(r) as count'
-//         ).records[0].get('count').low
-
-//         return l
-//     }
-//     catch (err) {
-//         console.log(err);
-//     }
-// }

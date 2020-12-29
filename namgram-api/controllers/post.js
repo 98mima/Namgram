@@ -1,5 +1,5 @@
 const Post = require('../models/post');
-const Person = require('../models/person');
+const Comment = require('../models/comment');
 const uuid = require('node-uuid');
 let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
@@ -18,6 +18,9 @@ client.get = util.promisify(client.get);
 
 function _manyPosts(neo4jResult) {
     return neo4jResult.records.map(r => new Post(r.get('post')))
+}
+function _manyComments(neo4jResult) {
+    return neo4jResult.records.map(r => new Comment(r.get('comments')))
 }
 
 function findProps(node) {
@@ -58,6 +61,36 @@ function findProps(node) {
     }
 }
 
+function findComments(node) {
+    try{
+        let session = driver.session();
+
+        const query = [
+            'MATCH (post:Post {id: $id})<-[r1:commented]-(n:Person) return r1 as comments'
+        ].join('\n')
+
+        return session.readTransaction(txc =>
+            txc.run(query, {
+                id: node.id
+            }))
+            .then( result => {  
+            const listOfComments = _manyComments(result)
+            
+            session.close();
+            console.log(listOfComments)
+    
+            return listOfComments})
+            .catch(err => {
+                console.log(err)
+            })
+    }
+    catch (err){
+        console.log(err)
+    }
+}
+
+//ovde ne mogu da se prikazu komentari, vec samo njihov broj
+//tako da kad se klikne na broj komentara onda treba da izadju komentari za taj post
 exports.getAll = async (req, res) => {
     try {
         let session = driver.session();
@@ -67,10 +100,15 @@ exports.getAll = async (req, res) => {
         const p = _manyPosts(posts)
 
         let Data = []
-
         Data = await Promise.all(p.map(post => {
             return findProps(post)
         }))
+
+        // kk = Data
+        // let Data1 = []
+        // Data1 = await Promise.all(kk.map(d => {
+        //      d.commentsList = findComments(d)
+        // }))
 
         session.close();
         res.status(200)
@@ -111,8 +149,11 @@ exports.getByPostId = async (req, res) => {
         const post1 = await session.run('MATCH (post:Post {id: $id}) RETURN post', {
             id: req.params.id
         })
-        const post = _manyPosts(post1)[0]
-        Data = await findProps(post)
+        const post2 = _manyPosts(post1)[0]
+        post = await findProps(post2)
+
+        post.commentsList = await findComments(post)
+        Data = post
 
         session.close();
         res.status(200)

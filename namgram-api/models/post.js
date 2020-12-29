@@ -10,7 +10,8 @@ const Post = module.exports = function (_node) {
         'content': _node.properties['content'],
         'likes': _node.properties['likes'],
         'dislikes': _node.properties['dislikes'],
-        'comments': _node.properties['comments']
+        'comments': _node.properties['comments'],
+        'commentsList': _node.properties['commentsList']
     })
   
 };

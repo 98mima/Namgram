@@ -7,7 +7,7 @@ const commentController = require('../controllers/comment');
 const router = express.Router();
 
 router.post('/add', commentController.add);
-// router.get('/byId/:id', postController.getByPerson);
+router.get('/byPostId/:postId', commentController.getByPost);
 // router.get('/byPostId/:id', postController.getByPostId);
 // router.get('/byFollowings/:userId', postController.getByFollowings);
 // // router.get('/getFollowing/:username', personController.getFollowing);

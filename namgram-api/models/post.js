@@ -15,20 +15,20 @@ const Post = module.exports = function (_node) {
   
 };
 
-module.exports.findLikes =  (id) => {
-    try {
-        let session = driver.session()
-          session.run('MATCH (post:Post {id: $id})<-[r:like]-(n:Person) RETURN count(r) as count', {
-            id: id
-        }).then(function(result) {
-            const likes = result.records[0].get('count').low
-            console.log(likes)
-            return likes
-        })
-        .catch(err => 
-            console.log(err))
-    }
-    catch (err) {
-        console.log(err);
-    }
-}
+// module.exports.findLikes =  (id) => {
+//     try {
+//         let session = driver.session()
+//           session.run('MATCH (post:Post {id: $id})<-[r:like]-(n:Person) RETURN count(r) as count', {
+//             id: id
+//         }).then(function(result) {
+//             const likes = result.records[0].get('count').low
+//             console.log(likes)
+//             return likes
+//         })
+//         .catch(err => 
+//             console.log(err))
+//     }
+//     catch (err) {
+//         console.log(err);
+//     }
+// }

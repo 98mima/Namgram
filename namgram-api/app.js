@@ -14,6 +14,7 @@ dotenv.config();
 const personRoutes = require('./routes/person');
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
 
 let client = redis.createClient();
 client.on('connect', function(){
@@ -39,6 +40,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use('/person', personRoutes);
 app.use('/auth', authRoutes);
 app.use('/post', postRoutes);
+app.use('/comment', commentRoutes);
 
 const port = 8080;
 app.listen(port, function(){

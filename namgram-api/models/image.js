@@ -1,12 +1,15 @@
 const _ = require('lodash');
+let { creds } = require("./../config/credentials");
+let neo4j = require('neo4j-driver');
+let driver = neo4j.driver("bolt://0.0.0.0:7687", neo4j.auth.basic(creds.neo4jusername, creds.neo4jpw));
 
 const Image = module.exports = function (_node) {
     _.extend(this, {
         "id":  _node.properties['id'],
-        "user": _node.properties['user'],
         "date": _node.properties['date'],
-        "caption": _node.properties['caption'],
-        "image_url": _node.properties['image_url']
+        "name": _node.properties['name'],
+        "data": _node.properties['data'],
+        "content": _node.properties['content']
     })
   //MATCH (U:User{name:'Alice'}) set U.url="<img src="https://placekitten.com/200/300 13" alt="cat image"/>" return U
 };

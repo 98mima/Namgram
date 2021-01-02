@@ -12,6 +12,7 @@ import SignupForm from './components/auth/SignupForm';
 import Navbar from './components/navigation/Navbar';
 import Posts from './components/posts/Posts';
 import { authUser } from './redux/auth/actions';
+import Profile from './components/profile/Profile';
 
 
 
@@ -23,15 +24,10 @@ function App() {
       <Router>
         <Navbar />
           <Switch>
-            <Route path="/signin">
-              <SigninForm />
-            </Route>
-            <Route path="/signup">
-              <SignupForm />
-            </Route>
-            <Route path="/">
-              <Posts />
-            </Route>
+            <Route exact path="/signin" component={SigninForm} />
+            <Route exact path="/signup" component={SignupForm} />
+            <Route path="/profile/:id" component={Profile} />
+            <Route path="/" component={Posts} />
           </Switch>
       </Router>
     </React.Fragment>

@@ -27,7 +27,7 @@ export const authUser = () => (dispatch: any) => {
       const decodedToken: {id: string} = jwtDecode(token);
       getUserById(decodedToken.id)
       .then((res) => {
-        dispatch({ type: SET_AUTH, payload: res.Data.id });
+        dispatch({ type: SET_AUTH, payload: res.Data });
         axios.defaults.headers.common["Authorization"] = token;
       })
       .catch((err) => console.log("Bad token"));

@@ -14,7 +14,7 @@ export default (state = initialState, action: PostsActionTypes) => {
         case SET_POSTS:
             return {...state, posts: action.payload}
         case CLEAR_POSTS:
-            return {...state, loading: false}
+            return {...state, posts: []}
         default:
             return {...state}
     }

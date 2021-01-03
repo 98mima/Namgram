@@ -169,7 +169,6 @@ exports.getByPerson = async (req, res) => {
     try {
         let session = driver.session();
         const key = JSON.stringify(Object.assign({}, { user: req.params.id }, { collection: "post" }));
-
         //da li je u redisu
         const cacheValue = await client.get(key)
 
@@ -186,7 +185,8 @@ exports.getByPerson = async (req, res) => {
         session.close();
         const Data = _manyPosts(posts)
 
-        client.set(key, JSON.stringify(Data), 'EX', 10)
+        client.set(key, JSON.stringify(Data));
+        client.expire(key, 10);
 
         res.status(200)
             .json({ message: "Prikupljeno iz neo4j", Data })

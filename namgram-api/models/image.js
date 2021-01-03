@@ -8,7 +8,7 @@ const Image = module.exports = function (_node) {
         "id":  _node.properties['id'],
         "date": _node.properties['date'],
         "name": _node.properties['name'],
-        "data": _node.properties['data'],
+        "blobName": _node.properties['blobName'],
         "content": _node.properties['content']
     })
   //MATCH (U:User{name:'Alice'}) set U.url="<img src="https://placekitten.com/200/300 13" alt="cat image"/>" return U

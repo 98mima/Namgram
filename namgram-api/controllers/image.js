@@ -10,47 +10,39 @@ const { concat } = require('lodash');
 const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
 client.get = util.promisify(client.get);
-
+const multer = require('multer');
+const inMemoryStorage = multer.memoryStorage();
+const uploadStrategy = multer({ storage: inMemoryStorage }).single('image');
+const containerName = 'namgram1609522522970';
+const ONE_MEGABYTE = 1024 * 1024;
+const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 
 function _manyImages(neo4jResult) {
     return neo4jResult.records.map(r => new Image(r.get('image')))
 }
 
-exports.add = async  (req, res) => {
-
+exports.getAll = async (req, res) => {
     try {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-        today = dd + '.' + mm + '.' + yyyy;
-
-        const {name, data} = req.files.pic
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+        const listBlobsResponse = await containerClient.listBlobFlatSegment();
+        for await (const blob of listBlobsResponse.segment.blobItems) {
+            console.log(`Blob: ${blob.name}`);
+          }
 
         let session = driver.session();
-        const query = [
-            'CREATE (image:Image {id: $id, date: $date, content: $content, name: $name, data: $data})<-[:created]-(a:Person {id:$personId}) \
-             RETURN image'
-        ].join('\n')
 
-        const d = await session.writeTransaction(txc =>
-            txc.run(query, {
-                id: uuid.v4(),
-                date: today,
-                content: req.body.content,
-                personId: req.body.personId,
-                name: name,
-                data: data
-            }))
+        const im = await session.run('MATCH (image:Image) RETURN image', {
+        });
+        const p = _manyImages(im)
 
-        const Data1 = _manyImages(d)
-        const Data = Data1[0]
         session.close();
         res.status(200)
-            .json({ message: "Kreirana slika", Data })
+            .json({ message: "Prikupljeno", p })
     }
     catch (err) {
         res.json({ success: false });
         console.log(err);
     }
-};
+}
+
+

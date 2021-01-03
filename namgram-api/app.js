@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const dotenv = require('dotenv');
-const fileUpload = require('express-fileupload');
 const redis = require('redis');
 // const redisUrl = 'redis://127.0.0.1:6379';
 // const client = redis.createClient(redisUrl);
@@ -25,14 +24,11 @@ client.on('connect', function () {
 
 const app = express();
 
-app.use(fileUpload());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/person', personRoutes);
 app.use('/auth', authRoutes);

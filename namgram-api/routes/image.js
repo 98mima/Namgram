@@ -14,15 +14,7 @@ const {
     StorageSharedKeyCredential,
     newPipeline
 } = require('@azure/storage-blob');
-const containerName1 = 'thumbnails';
 const multer = require('multer');
-// const storage = multer.memoryStorage();
-// const upload = multer({
-//     storage: storage,
-//     limits: {
-//       fileSize: 1024 * 1024 * 5
-//     }
-//   });
 const inMemoryStorage = multer.memoryStorage();
 const uploadStrategy = multer({ storage: inMemoryStorage }).single('image');
 const getStream = require('into-stream');
@@ -42,8 +34,6 @@ const blobServiceClient = new BlobServiceClient(
 );
 
 const getBlobName = originalName => {
-    // Use a random number to generate a unique file name, 
-    // removing "0." from the start of the string.
     const identifier = Math.random().toString().replace(/0\./, '');
     return `${identifier}-${originalName}`;
 };
@@ -53,6 +43,10 @@ function _manyImages(neo4jResult) {
 }
 
 router.get('/getAll', imageController.getAll)
+router.get('/byId/:id', imageController.getByPerson);
+router.get('/byFollowings/:userId', imageController.getByFollowings);
+router.post('/like', imageController.like);
+router.post('/dislike', imageController.dislike);
 
 router.post('/add', uploadStrategy, async (req, res) => {
     try {

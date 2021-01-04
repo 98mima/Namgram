@@ -104,12 +104,6 @@ exports.getAll = async (req, res) => {
             return findProps(post)
         }))
 
-        // kk = Data
-        // let Data1 = []
-        // Data1 = await Promise.all(kk.map(d => {
-        //      d.commentsList = findComments(d)
-        // }))
-
         session.close();
         res.status(200)
             .json({ message: "Prikupljeno", Data })

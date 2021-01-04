@@ -64,9 +64,7 @@ router.post('/add', uploadStrategy, async (req, res) => {
     
         const content = req.body.caption
         const personId = req.body.personId
-        console.log(req.body)
-    
-        //const { name, data } = req.file.image
+        
         const blobName = await getBlobName(req.file.fieldname);
         const stream = await getStream(req.file.buffer);
         const containerClient = await blobServiceClient.getContainerClient(containerName2);
@@ -78,7 +76,7 @@ router.post('/add', uploadStrategy, async (req, res) => {
              RETURN image'
         ].join('\n')
 
-        const d = session.writeTransaction(txc =>
+        const d = await session.writeTransaction(txc =>
             txc.run(query, {
                 id: uuid.v4(),
                 date: today,
@@ -88,14 +86,13 @@ router.post('/add', uploadStrategy, async (req, res) => {
             }))
 
         const Data1 = _manyImages(d)
-        const Data = Data1[0]
-        session.close();
-        
+         const Data = Data1[0]
         await blockBlobClient.uploadStream(stream,
             uploadOptions.bufferSize, uploadOptions.maxBuffers,
             { blobHTTPHeaders: { blobContentType: "image/jpeg" } });
 
-        res.json({ message: 'File uploaded to Azure Blob storage.' });
+        session.close();
+        res.json({ message: 'File uploaded to Azure Blob storage.', Data });
     } catch (err) {
         res.json({ message: err.message });
     }

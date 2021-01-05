@@ -118,6 +118,23 @@ exports.getByPerson = async (req, res) => {
         Data1 = await Promise.all(Data.map(p => {
             return findProps(p)
         }))
+        Data1.map(image => {
+            const containerClient = blobServiceClient.getContainerClient(containerName);
+                const blobName = image.blobName
+                const blobClient = client.getBlobClient(blobName);
+                const blobSAS = storage.generateBlobSASQueryParameters({
+                    containerName, 
+                    blobName: blobName, 
+                    permissions: storage.BlobSASPermissions.parse("racwd"), 
+                    startsOn: new Date(),
+                    expiresOn: new Date(new Date().valueOf() + 86400)
+                  },
+                  cerds 
+                ).toString();
+              
+                  const sasUrl= blobClient.url+"?"+blobSAS;         
+              image.sasToken = sasUrl
+        })
 
         res.status(200)
             .json({ message: "Prikupljeno iz neo4j", Data1 })
@@ -140,6 +157,24 @@ exports.getByFollowings = async (req, res) => {
         Data = await Promise.all(images.map(p => {
             return findProps(p)
         }))
+
+        Data.map(image => {
+            const containerClient = blobServiceClient.getContainerClient(containerName);
+                const blobName = image.blobName
+                const blobClient = client.getBlobClient(blobName);
+                const blobSAS = storage.generateBlobSASQueryParameters({
+                    containerName, 
+                    blobName: blobName, 
+                    permissions: storage.BlobSASPermissions.parse("racwd"), 
+                    startsOn: new Date(),
+                    expiresOn: new Date(new Date().valueOf() + 86400)
+                  },
+                  cerds 
+                ).toString();
+              
+                  const sasUrl= blobClient.url+"?"+blobSAS;         
+              image.sasToken = sasUrl
+        })
         session.close();
         res.status(200)
             .json({ message: "Prikupljeno", Data })

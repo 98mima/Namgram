@@ -201,8 +201,8 @@ exports.createPost = async (req, res) => {
 
         let session = driver.session();
         const query = [
-            'CREATE (post:Post {id: $id, date: $date, content: $content})<-[:created]-(a:Person {id:$personId}) \
-             RETURN post'
+            'match (a:Person {id:$personId}) \
+            merge (a)-[r:created]->(post:Post {id: $id, date: $date, content: $content})'
         ].join('\n')
 
         const d = await session.writeTransaction(txc =>

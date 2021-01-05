@@ -5,6 +5,7 @@ import { SET_ERROR, CLEAR_ERROR, START_LOADING, STOP_LOADING } from "../ui/actio
 import jwtDecode from 'jwt-decode'
 import axios, { AxiosError } from 'axios'
 import { getUserById } from "../../services/user";
+import { getFollowers, getFollowing } from "../../services/profile";
 
 export const SET_AUTH = 'SET_AUTH';
 export const CLEAR_AUTH = 'CLEAR_AUTH';
@@ -25,14 +26,17 @@ export const authUser = () => (dispatch: any) => {
     const token = localStorage.TOKEN;
     if (token) {
       const decodedToken: {id: string} = jwtDecode(token);
-      getUserById(decodedToken.id)
-      .then((res) => {
-        dispatch({ type: SET_AUTH, payload: res.Data });
-        axios.defaults.headers.common["Authorization"] = token;
-      })
-      .catch((err) => console.log("Bad token"));
-    }
-  };
+      Promise.all([getUserById(decodedToken.id), 
+        getFollowers(decodedToken.id), 
+        getFollowing(decodedToken.id)]).then(res => {
+          const user = res[0].Data;
+          const followers = res[1];
+          const following = res[2];
+          dispatch({ type: SET_AUTH, payload: {...user, followers, following} });
+          axios.defaults.headers.common["Authorization"] = token;
+      }).catch((err) => console.log("Bad token"));
+  }
+}
 
 export const signinAction = (user: ISignin) => (dispatch: any) => {
     dispatch({ type: START_LOADING });

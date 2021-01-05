@@ -1,3 +1,5 @@
+import { IUser } from "./user";
+
 export interface ISignin {
     email: string,
     password: string
@@ -28,5 +30,7 @@ export interface IAuth {
     lastname: string,
     username: string,
     email: string,
-    picture: string
+    picture: string,
+    followers: IUser[],
+    following: IUser[]
 }

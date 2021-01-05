@@ -25,10 +25,11 @@ export const authUser = () => (dispatch: any) => {
  
     const token = localStorage.TOKEN;
     if (token) {
-      const decodedToken: {id: string} = jwtDecode(token);
+      const decodedToken: {id: string, username: string} = jwtDecode(token);
       Promise.all([getUserById(decodedToken.id), 
-        getFollowers(decodedToken.id), 
-        getFollowing(decodedToken.id)]).then(res => {
+        getFollowers(decodedToken.username), 
+        getFollowing(decodedToken.username)]).then(res => {
+          console.log(res)
           const user = res[0].Data;
           const followers = res[1];
           const following = res[2];

@@ -46,6 +46,8 @@ router.get('/getAll', imageController.getAll)
 router.get('/byId/:id', imageController.getByPerson);
 router.get('/byFollowings/:userId', imageController.getByFollowings);
 router.get('/mostLikedF/:userId', imageController.getMostLikedF);
+router.get('/mostHatedF/:userId', imageController.getMostHatedF);
+router.get('/mostCommentedF/:userId', imageController.getMostCommentedF);
 router.post('/like', imageController.like);
 router.post('/dislike', imageController.dislike);
 

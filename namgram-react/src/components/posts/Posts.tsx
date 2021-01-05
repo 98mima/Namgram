@@ -20,6 +20,8 @@ function Posts() {
     const classes= useStyles();
     const dispatch = useDispatch();
     const posts = useSelector((state: RootState) => state.posts.posts);
+    const auth = 
+
     useEffect(() => {
         dispatch(loadPosts());
     }, []);

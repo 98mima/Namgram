@@ -13,6 +13,7 @@ import Navbar from './components/navigation/Navbar';
 import Posts from './components/posts/Posts';
 import { authUser } from './redux/auth/actions';
 import Profile from './components/profile/Profile';
+import Home from './components/home/Home';
 
 
 
@@ -27,7 +28,8 @@ function App() {
             <Route exact path="/signin" component={SigninForm} />
             <Route exact path="/signup" component={SignupForm} />
             <Route path="/profile/:id" component={Profile} />
-            <Route path="/" component={Posts} />
+            <Route path="/posts" component={Posts} />
+            <Route path="/" component={Home} />
           </Switch>
       </Router>
     </React.Fragment>

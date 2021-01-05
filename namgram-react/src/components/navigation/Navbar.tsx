@@ -90,6 +90,16 @@ const useStyles = makeStyles((theme: Theme) =>
         display: 'none',
       },
     },
+    logo: {
+      background: "white",
+      borderRadius: "10%",
+      height: "50px",
+      width: "70px",
+      "&:hover": {
+        background: "rgb(220, 220, 220, 50)",
+        cursor: "pointer"
+      }
+    }
   }),
 );
 
@@ -123,9 +133,19 @@ function Navbar() {
         setMobileMoreAnchorEl(event.currentTarget);
     };
 
+    const handleMyProfile = () => {
+      history.push("profile/" + auth?.id.toString());
+      handleMenuClose();
+    }
+
     const handleLogout = () => {
       dispatch(logoutAction());
       handleMenuClose();
+    }
+
+    const handleHome = () => {
+      if(auth) history.push("posts");
+      else history.push("/");
     }
 
 
@@ -141,7 +161,7 @@ function Navbar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleMyProfile}>Profile</MenuItem>
       <MenuItem onClick={handleLogout}>Log out</MenuItem>
     </Menu>
   );
@@ -198,7 +218,9 @@ function Navbar() {
           >
             <MenuIcon />
           </IconButton>
-          <img width="100px" src="https://cdn.discordapp.com/attachments/777890574253817889/792441180054749224/e52d18ae-4e0c-40cf-8d30-07396304f4e0_200x200.png" />
+          <img className={classes.logo} 
+          onClick={handleHome}
+          src="https://cdn.discordapp.com/attachments/777890574253817889/792441180054749224/e52d18ae-4e0c-40cf-8d30-07396304f4e0_200x200.png" />
           {/* <Typography className={classes.title} variant="h6" noWrap>
             namgram
           </Typography> */}

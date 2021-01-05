@@ -28,6 +28,7 @@ export const loadProfile = (userId: string) => (dispatch: any) => {
             following: res[2],
             posts: res[3]
         }
+        //profile.posts[0].image = "https://i.redd.it/tib5ul9c41l41.png";
         dispatch({type: SET_PROFILE, payload: profile});
         dispatch({type: STOP_LOADING});
     }).catch((err: AxiosError) => {

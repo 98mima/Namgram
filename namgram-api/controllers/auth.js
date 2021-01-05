@@ -72,7 +72,14 @@ exports.login = async (req, res, next) => {
 
 
   //Create Token
-  const token = jwt.sign({ id: dbPerson.properties.id }, process.env.TOKEN);
+  const token = jwt.sign({ 
+    id: dbPerson.properties.id,
+    username: dbPerson.properties.username,
+    email: dbPerson.properties.email, 
+    birthday: dbPerson.properties.birthday, 
+    name: dbPerson.properties.name, 
+    lastname: dbPerson.properties.lastname, 
+  }, process.env.TOKEN);
   res.json({ AuthToken: token, Success: true });
 }
 

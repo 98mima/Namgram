@@ -26,6 +26,12 @@ const blobServiceClient = new BlobServiceClient(
 const containerName = 'namgram1609522522970';
 const client =blobServiceClient.getContainerClient(containerName)
 
+const util = require('util')
+const redis = require('redis');
+const redisUrl = 'redis://127.0.0.1:6379';
+const clientR = redis.createClient(redisUrl);
+clientR.get = util.promisify(clientR.get);
+
 
 function findProps(node) {
     try{
@@ -185,6 +191,65 @@ exports.getByFollowings = async (req, res) => {
     }
 };
 
+exports.getMostLikedF = async (req, res) => {
+    try {
+        
+
+        const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "image" }));
+        const cacheValue = await clientR.get(key)
+        //ako je u redisu
+        if (cacheValue) {
+            const Data2 = JSON.parse(cacheValue)
+            return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
+        }
+        //ako nije
+        let session = driver.session();
+        const images1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(image:Image) return image', {
+            id: req.params.userId
+        })
+        const images = _manyImages(images1)
+        let Data = []
+        Data = await Promise.all(images.map(p => {
+            return findProps(p)
+        }))
+
+        Data.map(image => {
+            const containerClient = blobServiceClient.getContainerClient(containerName);
+                const blobName = image.blobName
+                const blobClient = client.getBlobClient(blobName);
+                const blobSAS = storage.generateBlobSASQueryParameters({
+                    containerName, 
+                    blobName: blobName, 
+                    permissions: storage.BlobSASPermissions.parse("racwd"), 
+                    startsOn: new Date(),
+                    expiresOn: new Date(new Date().valueOf() + 86400)
+                  },
+                  cerds 
+                ).toString();
+                  const sasUrl= blobClient.url+"?"+blobSAS;         
+              image.sasToken = sasUrl
+        })
+        session.close();
+
+        Data.sort(function (a, b) {
+            return b.likes - a.likes
+        })
+        let Data1 = []
+        let size = 5
+        Data1 = Data.slice(0, size)
+
+        clientR.set(key, JSON.stringify(Data1));
+        clientR.expire(key, 10);
+
+        res.status(200)
+            .json({ message: "Prikupljeno", Data1 })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
 exports.like = async (req, res) => {
     try {
         let session = driver.session();
@@ -194,7 +259,7 @@ exports.like = async (req, res) => {
         })
         session.close();
         res.status(200)
-            .json({ message: "Like", rel })
+            .json({ message: "Like" })
     }
     catch (err) {
         res.json({ success: false });

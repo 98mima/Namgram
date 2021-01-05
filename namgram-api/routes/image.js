@@ -45,6 +45,7 @@ function _manyImages(neo4jResult) {
 router.get('/getAll', imageController.getAll)
 router.get('/byId/:id', imageController.getByPerson);
 router.get('/byFollowings/:userId', imageController.getByFollowings);
+router.get('/mostLikedF/:userId', imageController.getMostLikedF);
 router.post('/like', imageController.like);
 router.post('/dislike', imageController.dislike);
 

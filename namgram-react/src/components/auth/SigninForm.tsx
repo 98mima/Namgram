@@ -76,7 +76,7 @@ function SigninForm() {
     }
 
     useEffect(() => {
-      if(auth) history.push("/");
+      if(auth) history.replace("/posts");
     }, [auth])
 
     return (

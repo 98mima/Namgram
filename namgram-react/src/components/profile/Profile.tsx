@@ -12,6 +12,9 @@ import Grid from "@material-ui/core/Grid";
 import GridList from "@material-ui/core/GridList";
 import GridListTile from "@material-ui/core/GridListTile";
 
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
+
 import { useSelector, useDispatch } from "react-redux";
 import { loadProfile } from "../../redux/profile/actions";
 import { RootState } from "../../redux";
@@ -25,10 +28,11 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     margin: theme.spacing(3),
+    marginBottom: "100px",
     display: "flex",
     flexDirection: "column",
     alignItems: "space-around",
-    padding: "0 5px"
+    padding: "0 5px",
   },
   avatar: {
     width: "200px",
@@ -44,12 +48,12 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "row",
   },
   count: {
-      textAlign: "center",
-      "&:hover": {
-        backgroundColor: 'rgb(0, 0, 0, 0.1)',
-        cursor: "pointer",
-        borderRadius: "5%"
-      }
+    textAlign: "center",
+    "&:hover": {
+      backgroundColor: "rgb(0, 0, 0, 0.1)",
+      cursor: "pointer",
+      borderRadius: "5%",
+    },
   },
   gridList: {
     paddingTop: "20px",
@@ -59,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Profile() {
-  const { id } = useParams<{id: string}>();
+  const { id } = useParams<{ id: string }>();
   const history = useHistory();
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -76,13 +80,17 @@ function Profile() {
   const handleEdit = () => {
     //history.push("/profile/edit/" + auth?.id);
   };
+  const handleFollow = () = {
+    const username1 = auth?.id
+    follow();
+  }
 
   const checkMyProfile = () => {
-      if(!auth) return false;
-      else{
-          return profile?.id == auth?.id;
-      }
-  }
+    if (!auth) return false;
+    else {
+      return profile?.id == auth?.id;
+    }
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -91,37 +99,60 @@ function Profile() {
       {profile && (
         <Paper variant="outlined" className={classes.paper}>
           <div className={classes.container}>
-            <Avatar className={classes.avatar} src="https://miro.medium.com/max/10368/1*o8tTGo3vsocTKnCUyz0wHA.jpeg"></Avatar>
+            <Avatar
+              className={classes.avatar}
+              src="https://miro.medium.com/max/10368/1*o8tTGo3vsocTKnCUyz0wHA.jpeg"
+            ></Avatar>
+            <Popup
+              trigger={<button className="button"> Open Modal </button>}
+              modal
+            >
+              <span> Modal content </span>
+            </Popup>
             <br />
             <Typography variant="h4">{profile.username}</Typography>
             <Grid container>
-                <Grid className={classes.count} item xs={4}>
-                    <Typography>{profile?.posts.length}</Typography>
-                    <Typography>Posts</Typography>
-                </Grid>
-                <Grid className={classes.count} item xs={4}>
-                    <Typography>{profile?.followers.length}</Typography>
-                    <Typography>Followers</Typography>
-                    
-                </Grid>
-                <Grid className={classes.count} item xs={4}>
-                    <Typography>{profile?.following.length}</Typography>
-                    <Typography>Following</Typography>
-                </Grid> 
+              <Grid className={classes.count} item xs={4}>
+                <Typography>{profile?.posts.length}</Typography>
+                <Typography>Posts</Typography>
+              </Grid>
+              <Grid className={classes.count} item xs={4}>
+                <Typography>{profile?.followers.length}</Typography>
+                <Typography>Followers</Typography>
+              </Grid>
+              <Grid className={classes.count} item xs={4}>
+                <Typography>{profile?.following.length}</Typography>
+                <Typography>Following</Typography>
+              </Grid>
             </Grid>
             {checkMyProfile() && (
-              <Button type="submit" variant="contained" color="primary" onClick={handleEdit}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                onClick={handleEdit}
+              >
                 Izmeni profil
               </Button>
             )}
+            {!checkMyProfile() && (
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                onClick={handleFollow}
+              >
+                Follow
+              </Button>
+            )}
           </div>
-            <GridList cellHeight={160} className={classes.gridList} cols={3}>
-                {profile.posts.map((post, i) => (
-                    <GridListTile key={i} cols={1}>
-                    <img src={post.image} alt={"DIK"} />
-                    </GridListTile>
-                ))}
-            </GridList>
+          <GridList cellHeight={160} className={classes.gridList} cols={3}>
+            {profile.posts.map((post, i) => (
+              <GridListTile key={i} cols={1}>
+                <img src={post.image} alt={"DIK"} />
+              </GridListTile>
+            ))}
+          </GridList>
         </Paper>
       )}
     </Container>

@@ -136,6 +136,120 @@ exports.getByFollowings = async (req, res) => {
     }
 };
 
+exports.getMostLiked = async (req, res) => {
+    try {
+        const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "postL" }));
+        const cacheValue = await client.get(key)
+        //ako je u redisu
+        if (cacheValue) {
+            const Data2 = JSON.parse(cacheValue)
+            return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
+        }
+        //ako nije
+        let session = driver.session();
+        const posts1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(post:Post) return post', {
+            id: req.params.userId
+        })
+        const posts = _manyPosts(posts1)
+        let Data = []
+        Data = await Promise.all(posts.map(p => {
+            return findProps(p)
+        }))
+        session.close();
+        Data.sort(function (a, b) {
+            return b.likes - a.likes
+        })
+        let Data1 = []
+        let size = 5
+        Data1 = Data.slice(0, size)
+
+        client.set(key, JSON.stringify(Data1));
+        client.expire(key, 10);
+        res.status(200)
+            .json({ message: "Prikupljeno", Data1 })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
+exports.getMostHated = async (req, res) => {
+    try {
+        const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "postL" }));
+        const cacheValue = await client.get(key)
+        //ako je u redisu
+        if (cacheValue) {
+            const Data2 = JSON.parse(cacheValue)
+            return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
+        }
+        //ako nije
+        let session = driver.session();
+        const posts1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(post:Post) return post', {
+            id: req.params.userId
+        })
+        const posts = _manyPosts(posts1)
+        let Data = []
+        Data = await Promise.all(posts.map(p => {
+            return findProps(p)
+        }))
+        session.close();
+        Data.sort(function (a, b) {
+            return b.dislikes - a.dislikes
+        })
+        let Data1 = []
+        let size = 5
+        Data1 = Data.slice(0, size)
+
+        client.set(key, JSON.stringify(Data1));
+        client.expire(key, 10);
+        res.status(200)
+            .json({ message: "Prikupljeno", Data1 })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
+exports.getMostCommented = async (req, res) => {
+    try {
+        const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "postL" }));
+        const cacheValue = await client.get(key)
+        //ako je u redisu
+        if (cacheValue) {
+            const Data2 = JSON.parse(cacheValue)
+            return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
+        }
+        //ako nije
+        let session = driver.session();
+        const posts1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(post:Post) return post', {
+            id: req.params.userId
+        })
+        const posts = _manyPosts(posts1)
+        let Data = []
+        Data = await Promise.all(posts.map(p => {
+            return findProps(p)
+        }))
+        session.close();
+        Data.sort(function (a, b) {
+            return b.comments - a.comments
+        })
+        let Data1 = []
+        let size = 5
+        Data1 = Data.slice(0, size)
+
+        client.set(key, JSON.stringify(Data1));
+        client.expire(key, 10);
+        res.status(200)
+            .json({ message: "Prikupljeno", Data1 })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
 exports.getByPostId = async (req, res) => {
     try {
         let session = driver.session();

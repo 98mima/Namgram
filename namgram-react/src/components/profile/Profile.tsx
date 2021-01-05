@@ -18,6 +18,7 @@ import "reactjs-popup/dist/index.css";
 import { useSelector, useDispatch } from "react-redux";
 import { loadProfile } from "../../redux/profile/actions";
 import { RootState } from "../../redux";
+import { follow, getFollowers } from "../../services/profile";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -71,19 +72,28 @@ function Profile() {
   const error = useSelector((state: RootState) => state.ui.error);
   const loading = useSelector((state: RootState) => state.ui.loading);
   const auth = useSelector((state: RootState) => state.auth.auth);
+  const isFollowing = useState(false);
 
   useEffect(() => {
     dispatch(loadProfile(id));
+
     return () => {};
   }, []);
+
+  // const following = () => {
+  //   const followers = getFollowers(auth?.id as string);
+  //   if(followers.contains)
+
+  // }
 
   const handleEdit = () => {
     //history.push("/profile/edit/" + auth?.id);
   };
-  const handleFollow = () = {
-    const username1 = auth?.id
-    follow();
-  }
+  const handleFollow = () => {
+    const username1 = auth?.username;
+    const username2 = profile?.username;
+    follow(username1 as string, username2 as string);
+  };
 
   const checkMyProfile = () => {
     if (!auth) return false;

@@ -23,5 +23,10 @@ export interface ISignupRes {
 }
 
 export interface IAuth {
-    id: string
+    id: string,
+    name: string,
+    lastname: string,
+    username: string,
+    email: string,
+    picture: string
 }

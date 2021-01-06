@@ -15,6 +15,7 @@ import { authUser } from './redux/auth/actions';
 import Profile from './components/profile/Profile';
 import Home from './components/home/Home';
 import CreatePost from './components/posts/CreatePost';
+import Chat from './components/chat/Chat';
 
 
 
@@ -31,7 +32,7 @@ function App() {
             <Route path="/profile/:id" component={Profile} />
             <Route path="/posts/create" component={CreatePost} />
             <Route path="/posts" component={Posts} />
-            
+            <Route path="/chat" component={Chat} />
             <Route path="/" component={Home} />
           </Switch>
       </Router>

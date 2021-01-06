@@ -89,14 +89,19 @@ function Profile() {
     if (!profile) {
       dispatch(loadProfile(id));
     }
-    console.log(isFollowing);
-    if (auth?.following.find((user) => user.username == profile?.username)) {
+    if (
+      profile &&
+      auth?.following.some((user) => user.username == profile?.username)
+    ) {
       setIsFollowing(true);
+    } else {
+      setIsFollowing(false);
     }
     return () => {};
-  }, [auth, profile, isFollowing]);
+  }, [auth, profile]);
 
   const handleEdit = () => {
+    console.log(profile?.following);
     //history.push("/profile/edit/" + auth?.id);
   };
   const handleFollow = () => {
@@ -109,7 +114,7 @@ function Profile() {
     const username1 = auth?.username;
     const username2 = profile?.username;
     unfollow(username1 as string, username2 as string);
-    if (isFollowing == true) setIsFollowing(false);
+    setIsFollowing(false);
   };
 
   const checkMyProfile = () => {
@@ -180,24 +185,14 @@ function Profile() {
               nested
             >
               <List className={classes.root}>
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar></Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary="Photos" secondary="Jan 9, 2014" />
-                </ListItem>
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar></Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary="Work" secondary="Jan 7, 2014" />
-                </ListItem>
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar></Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary="Vacation" secondary="July 20, 2014" />
-                </ListItem>
+                {profile.following.map((person) => (
+                  <ListItem>
+                    <ListItemAvatar>
+                      <Avatar></Avatar>
+                    </ListItemAvatar>
+                    <ListItemText primary="Photos" secondary="Jan 9, 2014" />
+                  </ListItem>
+                ))}
               </List>
             </Popup>
             <br />
@@ -250,7 +245,7 @@ function Profile() {
           <GridList cellHeight={160} className={classes.gridList} cols={3}>
             {profile.posts.map((post, i) => (
               <GridListTile key={i} cols={1}>
-                <img src={post.image} alt={"DIK"} />
+                <img src={post.sasToken} alt={"Slicka bato"} />
               </GridListTile>
             ))}
           </GridList>

@@ -20,17 +20,17 @@ export async function getProfile(userId: string) {
     });
 }
 
-export async function getFollowers(userId: string) {
+export async function getFollowers(username: string) {
   return axios
-    .get<{ message: string; Data: IUser[] }>(`person/getFollowers/${userId}`)
+    .get<{ message: string; Data: IUser[] }>(`person/getFollowers/${username}`)
     .then((res) => {
       return res.data.Data;
     });
 }
 
-export async function getFollowing(userId: string) {
+export async function getFollowing(username: string) {
   return axios
-    .get<{ message: string; Data: IUser[] }>(`person/getFollowing/${userId}`)
+    .get<{ message: string; Data: IUser[] }>(`person/getFollowing/${username}`)
     .then((res) => {
       return res.data.Data;
     });

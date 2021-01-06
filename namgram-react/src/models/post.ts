@@ -10,6 +10,16 @@ export interface IPost{
     dislikes: number
 }
 
+export interface IImage{
+    id: string,
+    date: Date,
+    content: string,
+    sasToken: string,
+    likes: number,
+    dislikes: number,
+    comments: number
+}
+
 export interface IPostUpload{
     image: File,
     personId: string,

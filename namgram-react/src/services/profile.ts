@@ -45,3 +45,13 @@ export async function follow(follower: string, followee: string) {
       return res.data;
     });
 }
+export async function unfollow(follower: string, followee: string) {
+  return axios
+    .post<{ username1: string; username2: string }>("person/unfollow", {
+      username1: follower,
+      username2: followee,
+    })
+    .then((res) => {
+      return res.data;
+    });
+}

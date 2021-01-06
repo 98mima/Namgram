@@ -1,4 +1,4 @@
-import { IPost } from "./post";
+import { IImage, IPost } from "./post";
 
 export interface IUser{
     birthday: Date,
@@ -18,5 +18,5 @@ export interface IProfile {
     birthday: Date,
     followers: IUser[],
     following: IUser[],
-    posts: IPost[]
+    posts: IImage[]
 }

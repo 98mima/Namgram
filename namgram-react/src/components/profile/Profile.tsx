@@ -91,9 +91,11 @@ function Profile() {
     }
     if (profile && auth?.following.some((user) => user.username == profile?.username)) {
       setIsFollowing(true);
+    } else {
+      setIsFollowing(false);
     }
     return () => {};
-  }, [auth, profile, isFollowing]);
+  }, [auth, profile]);
 
   const handleEdit = () => {
     //history.push("/profile/edit/" + auth?.id);
@@ -108,7 +110,7 @@ function Profile() {
     const username1 = auth?.username;
     const username2 = profile?.username;
     unfollow(username1 as string, username2 as string);
-    if (isFollowing == true) setIsFollowing(false);
+    setIsFollowing(false);
   };
 
   const checkMyProfile = () => {
@@ -249,7 +251,7 @@ function Profile() {
           <GridList cellHeight={160} className={classes.gridList} cols={3}>
             {profile.posts.map((post, i) => (
               <GridListTile key={i} cols={1}>
-                <img src={post.image} alt={"DIK"} />
+                <img src={post.sasToken} alt={"Slicka bato"} />
               </GridListTile>
             ))}
           </GridList>

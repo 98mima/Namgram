@@ -61,3 +61,20 @@ exports.leaveChat = async (req, res) => {
         console.log(err)
     }
 }
+
+exports.sendMessage = async (req, res) => {
+    try {
+        var username = req.body.username
+        var message = req.body.message
+        chat_messages.push({
+            "sender": username,
+            "message": message
+        })
+            client.set('chat_app_messages', JSON.stringify(chat_messages))
+            res.json({"status": "OK"})
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err)
+    }
+}

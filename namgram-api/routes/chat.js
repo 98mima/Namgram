@@ -8,5 +8,6 @@ const router = express.Router();
 
 router.post('/join', chatController.joinChat);
 router.post('/leave', chatController.leaveChat);
+router.post('/send', chatController.sendMessage);
 
 module.exports = router;

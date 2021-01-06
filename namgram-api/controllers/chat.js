@@ -9,7 +9,7 @@ const redis = require('redis');
 const { concat } = require('lodash');
 const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
-client.get = util.promisify(client.get);
+//client.get = util.promisify(client.get);
 
 var chatters = []
 var chat_messages = []
@@ -33,11 +33,15 @@ client.once('ready', function () {
     })
 })
 
-exports.getUsers = async (req, res) => {
+exports.joinChat = async (req, res) => {
     try {
-
-        res.status(200)
-            .json({ Data })
+        var username = req.body.username
+        if(chatters.indexOf(username) == -1) {
+            chatters.push(username)
+            client.set('chat_users', JSON.stringify(chatters))
+            res.json({"chatters": chatters,
+                    "status": "OK"})
+        }
     }
     catch (err) {
         res.json({ success: false });

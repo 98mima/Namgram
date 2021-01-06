@@ -18,6 +18,7 @@ const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
 const imageRoutes = require('./routes/image');
+const chatRoutes = require('./routes/chat');
 
 let client = redis.createClient();
 client.on('connect', function () {
@@ -36,6 +37,7 @@ app.use('/auth', authRoutes);
 app.use('/post', postRoutes);
 app.use('/comment', commentRoutes);
 app.use('/image', imageRoutes);
+app.use('/chat', chatRoutes);
 
 const port = 8080;
 app.listen(port, function () {

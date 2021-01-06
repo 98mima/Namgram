@@ -8,6 +8,7 @@ const Post = module.exports = function (_node) {
         'id':  _node.properties['id'],
         'date': _node.properties['date'],
         'content': _node.properties['content'],
+        'creator': _node.properties['creator'],
         'likes': _node.properties['likes'],
         'dislikes': _node.properties['dislikes'],
         'comments': _node.properties['comments'],

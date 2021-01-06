@@ -15,19 +15,27 @@ import { uploadPost } from "../../services/posts";
 const useStyles = makeStyles((theme) => ({
   paper: {
     maxWidth: "600px",
+    padding: "20px",
     margin: "10vw auto 0 auto",
-    height: "50vh"
-  },
-  form: {
+    height: "50vh",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    justifyContent: "space-between"
+  },
+  form: {
+    
   },
   input: {
-      width: "100%"
+    flex: 1,
+      width: "80%"
   },
   image: {
     maxWidth: "600px",
+  },
+  btn:{
+    marginTop: "3rem",
+    width: "80%",
   }
 }));
 
@@ -82,16 +90,17 @@ function CreatePost() {
   };
 
   return (
-    <Paper className={classes.paper}>
-        <form className={classes.form} noValidate onSubmit={onSubmit}>
-            <TextField onChange={onInput} className={classes.input} />
-            <input type="file" name="file" onChange={onFileChange} />
+    <form className={classes.form} noValidate onSubmit={onSubmit}>
+        <Paper className={classes.paper}>
+            <Typography>Create a post</Typography>
+            <TextField label="Enter something interesting!" placeholder="I'm so happy!" onChange={onInput} className={classes.input} />
             {file && <img className={classes.image} src={URL.createObjectURL(file)} />}
-            <Button type="submit">Submit</Button>
+            <input type="file" name="file" onChange={onFileChange} />
+            <Button variant="contained" color="primary" className={classes.btn} type="submit">{loading ? <CircularProgress /> : "Submit"}</Button>
             <Typography color="error">{error}</Typography>
-        </form>
-        {loading && <CircularProgress />}
-    </Paper>
+        
+      </Paper>
+     </form>
   );
 }
 

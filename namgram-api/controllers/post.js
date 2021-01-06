@@ -1,5 +1,6 @@
 const Post = require('../models/post');
 const Comment = require('../models/comment');
+const Person = require('../models/person');
 const uuid = require('node-uuid');
 let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
@@ -8,13 +9,10 @@ let driver = neo4j.driver("bolt://0.0.0.0:7687", neo4j.auth.basic(creds.neo4juse
 const util = require('util')
 const redis = require('redis');
 const { concat } = require('lodash');
+const post = require('../models/post');
 const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
 client.get = util.promisify(client.get);
-
-//add comment 
-
-//redis za getove
 
 function _manyPosts(neo4jResult) {
     return neo4jResult.records.map(r => new Post(r.get('post')))
@@ -23,7 +21,11 @@ function _manyComments(neo4jResult) {
     return neo4jResult.records.map(r => new Comment(r.get('comments')))
 }
 
-function findProps(node) {
+function _manyPeople(neo4jResult) {
+    return neo4jResult.records.map(r => new Person(r.get('person')))
+  }
+
+async function findProps(node) {
     try{
         let session = driver.session();
 
@@ -89,6 +91,32 @@ function findComments(node) {
     }
 }
 
+async function findCreator(node) {
+    try{
+        let session = driver.session();
+
+        const query = [
+            'MATCH (post:Post {id: $id})<-[r1:created]-(person:Person) return person'
+        ].join('\n')
+
+        return session.readTransaction(txc =>
+            txc.run(query, {
+                id: node.id
+            }))
+            .then( result => {  
+            const user = _manyPeople(result)
+            session.close();
+    
+            return user[0].username})
+            .catch(err => {
+                console.log(err)
+            })
+    }
+    catch (err){
+        console.log(err)
+    }
+}
+
 //ovde ne mogu da se prikazu komentari, vec samo njihov broj
 //tako da kad se klikne na broj komentara onda treba da izadju komentari za taj post
 exports.getAll = async (req, res) => {
@@ -98,13 +126,22 @@ exports.getAll = async (req, res) => {
         const posts = await session.run('MATCH (post:Post) RETURN post', {
         });
         const p = _manyPosts(posts)
+        session.close();
 
         let Data = []
+        let creators = []
+        
         Data = await Promise.all(p.map(post => {
             return findProps(post)
         }))
 
-        session.close();
+        creators = await Promise.all(
+            p.map(post => {
+            return post.creator = findCreator(post)
+        }))
+        Data.map((post, index) =>
+            post.creator = creators[index])
+
         res.status(200)
             .json({ message: "Prikupljeno", Data })
     }
@@ -122,11 +159,23 @@ exports.getByFollowings = async (req, res) => {
             id: req.params.userId
         })
         const posts = _manyPosts(posts1)
+        session.close();
+
+        let creators = []
         let Data = []
+
         Data = await Promise.all(posts.map(p => {
             return findProps(p)
         }))
-        session.close();
+
+        creators = await Promise.all(
+            Data.map(post => {
+            return post.creator = findCreator(post)
+        }))
+
+        Data.map((post, index) =>
+             post.creator = creators[index])
+
         res.status(200)
             .json({ message: "Prikupljeno", Data })
     }
@@ -151,11 +200,21 @@ exports.getMostLiked = async (req, res) => {
             id: req.params.userId
         })
         const posts = _manyPosts(posts1)
+        session.close();
+
+        let creators = []
         let Data = []
         Data = await Promise.all(posts.map(p => {
             return findProps(p)
         }))
-        session.close();
+        creators = await Promise.all(
+            Data.map(post => {
+            return post.creator = findCreator(post)
+        }))
+        Data.map((post, index) =>
+            post.creator = creators[index])
+
+
         Data.sort(function (a, b) {
             return b.likes - a.likes
         })
@@ -189,11 +248,20 @@ exports.getMostHated = async (req, res) => {
             id: req.params.userId
         })
         const posts = _manyPosts(posts1)
+        session.close();
+
+        let creators = []
         let Data = []
         Data = await Promise.all(posts.map(p => {
             return findProps(p)
         }))
-        session.close();
+        creators = await Promise.all(
+            Data.map(post => {
+            return post.creator = findCreator(post)
+        }))
+        Data.map((post, index) =>
+            post.creator = creators[index])
+        
         Data.sort(function (a, b) {
             return b.dislikes - a.dislikes
         })
@@ -227,11 +295,21 @@ exports.getMostCommented = async (req, res) => {
             id: req.params.userId
         })
         const posts = _manyPosts(posts1)
+        session.close();
+
+        let creators = []
         let Data = []
         Data = await Promise.all(posts.map(p => {
             return findProps(p)
         }))
-        session.close();
+        creators = await Promise.all(
+            Data.map(post => {
+            return post.creator = findCreator(post)
+        }))
+        Data.map((post, index) =>
+            post.creator = creators[index])
+
+
         Data.sort(function (a, b) {
             return b.comments - a.comments
         })
@@ -258,9 +336,10 @@ exports.getByPostId = async (req, res) => {
             id: req.params.id
         })
         const post2 = _manyPosts(post1)[0]
-        post = await findProps(post2)
+        let post = await findProps(post2)
 
         post.commentsList = await findComments(post)
+        post.creator = await findCreator(post)
         Data = post
 
         session.close();

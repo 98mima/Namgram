@@ -94,4 +94,5 @@ export const signinAction = (user: ISignin) => (dispatch: any) => {
     localStorage.removeItem('TOKEN');
     delete axios.defaults.headers.common["Authorization"];
     dispatch({ type: CLEAR_AUTH });
+    window.location.href="/";
   };

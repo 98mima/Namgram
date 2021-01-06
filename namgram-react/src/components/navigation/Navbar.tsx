@@ -139,7 +139,7 @@ function Navbar() {
     };
 
     const handleMyProfile = () => {
-      history.push('profile/' + auth?.id as string);
+      history.push('/profile/' + auth?.id as string);
       handleMenuClose();
     }
 
@@ -149,7 +149,7 @@ function Navbar() {
     }
 
     const handleHome = () => {
-      if(auth) history.push("posts");
+      if(auth) history.push("/posts");
       else history.push("/");
     }
 

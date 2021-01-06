@@ -20,10 +20,10 @@ function Posts() {
     const classes= useStyles();
     const dispatch = useDispatch();
     const posts = useSelector((state: RootState) => state.posts.posts);
-    const auth = 
+    const auth = useSelector((state: RootState) => state.auth.auth)
 
     useEffect(() => {
-        dispatch(loadPosts());
+        //dispatch(loadPosts(auth?.followers));
     }, []);
 
     const loading = useSelector((state: RootState) => state.ui.loading);    

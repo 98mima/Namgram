@@ -9,3 +9,9 @@ export interface IPost{
     likes: number,
     dislikes: number
 }
+
+export interface IPostUpload{
+    image: File,
+    personId: string,
+    caption: string
+}

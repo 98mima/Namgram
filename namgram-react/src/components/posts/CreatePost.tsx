@@ -4,89 +4,89 @@ import { useHistory } from "react-router-dom";
 
 //MUI
 import { makeStyles } from "@material-ui/core/styles";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
 import { RootState } from "../../redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { TextField, Typography, CircularProgress } from "@material-ui/core";
+import { SET_ERROR, START_LOADING, STOP_LOADING } from "../../redux/ui/actions";
+import { uploadPost } from "../../services/posts";
 
 const useStyles = makeStyles((theme) => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  fileControl: {
-    margin: "0 auto",
-  },
-  container: {
-    height: "80vw",
-    maxHeight: "400px",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-around",
-    alignItems: "center",
-    flexWrap: "wrap",
-  },
   paper: {
     maxWidth: "600px",
     margin: "10vw auto 0 auto",
   },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  input: {
+      width: "100%"
+  }
 }));
 
 function CreatePost() {
   const classes = useStyles();
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const [caption, setCaption] = useState("");
+  const [file, setFile] = useState<File>();
     const auth = useSelector((state: RootState) => state.auth.auth);
+    const loading = useSelector((state: RootState) => state.ui.loading);
+    const error = useSelector((state: RootState) => state.ui.error);
 
   useEffect(() => {
     return () => {};
   }, []);
 
   const onInput = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      event.preventDefault();
     setCaption(event.currentTarget.value);
   };
 
 
-  const onFileChange = () => {
-    // if (!event.target.files.length) return;
-    // const name = event.target.files[0].name;
-    // if (name.includes(".jpg") || name.includes(".png")) {
-    //   setFile(event.target.files[0]);
-    // } else {
-    //   setError("Tip fajla nije podržan (podržani .jpg i .png)");
-    // }
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement | HTMLInputElement>) => {
+    if (!event.currentTarget.files?.length) return;
+    const name = event.currentTarget.files[0].name;
+    if (name.includes(".jpg") || name.includes(".png")) {
+      setFile(event.currentTarget.files[0]);
+    } else {
+        dispatch({type: SET_ERROR, payload: "Tip fajla nije podržan (podržani .jpg i .png)"})
+    }
   };
 
-  const onSubmit = () => {
-    // event.preventDefault();
-    // if (courseId && examType && year && term && file) {
-    //   postExamPaper(courseId, examType, year, term, file)
-    //     .then((data) => {
-    //       history.push("/");
-    //       alert("Uspešno ste dodali blanket. potrebno je samo još Administrator da odobri dodavanje.");
-    //     })
-    //     .catch((err) => setError(err.message));
-    // } else {
-    //   setError("Sva polja su obavezna!");
-    // }
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (caption && file) {
+        dispatch({type: START_LOADING});
+        const id = auth?.id as string;
+        uploadPost({caption, image: file, personId: id}).then(res => {
+            dispatch({type: STOP_LOADING});
+            dispatch({type: SET_ERROR, payload: ""})
+            history.push("/");
+            //Da bude redirect do slike
+        }).catch(err => {
+            dispatch({type: STOP_LOADING});
+            dispatch({type: SET_ERROR, payload: "Sva polja su obavezna!"})
+        })
+    } else {
+      dispatch({type: SET_ERROR, payload: "Sva polja su obavezna!"})
+    }
   };
-
-  const getTerms = () => ["Januar", "April", "Jun I", "Jun II", "Septembar", "Oktobar", "Novembar", "Decembar"];
-  const getTypes = () => ["Pismeni", "Usmeni", "Kolokvijum I", "Kolokvijum II", "Kolokvijum III"];
 
   return (
     <Paper className={classes.paper}>
-
+        <form className={classes.form} noValidate onSubmit={onSubmit}>
+            <TextField onChange={onInput} className={classes.input} />
+            <input type="file" name="file" onChange={onFileChange} />
+            <Button type="submit">Submit</Button>
+            <Typography color="error">{error}</Typography>
+        </form>
+        {loading && <CircularProgress />}
     </Paper>
   );
 }

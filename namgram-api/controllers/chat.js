@@ -1,9 +1,13 @@
 const util = require('util')
 const redis = require('redis');
-const { concat } = require('lodash');
+const { concat, isObject } = require('lodash');
 const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
 //client.get = util.promisify(client.get);
+var express = require('express')
+var app = express()
+var http = require('http').Server(app)
+var io = require('socket.io')(http)
 
 var chatters = []
 var chat_messages = []
@@ -132,3 +136,13 @@ exports.sendMessage = async (req, res) => {
         console.log(err)
     }
 }
+
+
+io.on('connection', function(socket) {
+    socket.on('message', function(data) {
+        io.emit('send', data)
+    });
+    socket.io('update_chatter_count', function(data) {
+        io.emit('count_chatters', data)
+    })
+})

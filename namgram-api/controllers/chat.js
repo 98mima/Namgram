@@ -48,3 +48,16 @@ exports.joinChat = async (req, res) => {
         console.log(err)
     }
 }
+
+exports.leaveChat = async (req, res) => {
+    try {
+        var username = req.body.username
+            chatters.splice(chatters.indexOf(username), 1)
+            client.set('chat_users', JSON.stringify(chatters))
+            res.json({"status": "OK"})
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err)
+    }
+}

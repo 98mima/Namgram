@@ -7,5 +7,6 @@ const chatController = require('../controllers/chat');
 const router = express.Router();
 
 router.post('/join', chatController.joinChat);
+router.post('/leave', chatController.leaveChat);
 
 module.exports = router;

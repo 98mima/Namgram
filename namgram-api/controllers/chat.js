@@ -30,9 +30,22 @@ client.once('ready', function () {
 
 exports.getMessages = async (req, res) => {
     try {
-        res.json({
-            "messages": chat_messages,
-            "status": "OK"
+        var username1 = req.params.username1
+        var username2 = req.params.username2
+
+        const users = []
+        users.push(username1)
+        users.push(username2)
+        users.sort()
+
+        let Data = []
+        const key = JSON.stringify(Object.assign({}, { user1: users[0] }, { user2: users[1] }, { collection: "messages" }));
+        client.get(key, function (err, reply) {
+            if (reply) {
+                Data = JSON.parse(reply)
+                return res.status(200).json(Data)
+            }
+            console.log(err)
         })
     }
     catch (err) {
@@ -43,9 +56,11 @@ exports.getMessages = async (req, res) => {
 
 exports.getActiveChatters = async (req, res) => {
     try {
+        const number = chatters.length
         res.json({
             "active": chatters,
-            "status": "OK"
+            "status": "OK",
+            number
         })
     }
     catch (err) {
@@ -99,7 +114,6 @@ exports.sendMessage = async (req, res) => {
         users.push(usernameReceiver)
         users.push(usernameSender)
         users.sort()
-        console.log(users)
 
         const key = JSON.stringify(Object.assign({}, { user1: users[0] }, { user2: users[1] }, { collection: "messages" }));
         mess.push({

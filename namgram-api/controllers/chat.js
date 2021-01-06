@@ -12,15 +12,11 @@ var mess = []
 client.once('ready', function () {
     //flush Redis
     //client.flushdb();
-
-    //inicijalizacija chattera
     client.get('chat_users', function (err, reply) {
         if (reply) {
             chatters = JSON.parse(reply)
         }
     })
-
-    //inic poruka
     client.get('chat_app_messages', function (err, reply) {
         if (reply) {
             chat_messages = JSON.parse(reply)
@@ -69,20 +65,28 @@ exports.getActiveChatters = async (req, res) => {
     }
 }
 
-//kad udje u chat sa nekom osobom da:
-//-bude aktivan
-//-da vidi prethodne poruke
 exports.joinChat = async (req, res) => {
     try {
         var username = req.body.username
+        var username2 = req.body.username2
+        const users = []
+        users.push(username)
+        users.push(username2)
+        users.sort()
+
         if (chatters.indexOf(username) == -1) {
             chatters.push(username)
             client.set('active_users', JSON.stringify(chatters))
-            res.json({
-                "active": chatters,
-                "status": "OK"
-            })
         }
+        let Data = []
+        const key = JSON.stringify(Object.assign({}, { user1: users[0] }, { user2: users[1] }, { collection: "messages" }));
+        client.get(key, function (err, reply) {
+            if (reply) {
+                Data = JSON.parse(reply)
+                return res.status(200).json({Data, "active": chatters,
+                "status": "OK"})
+            }
+        })
     }
     catch (err) {
         res.json({ success: false });
@@ -90,7 +94,6 @@ exports.joinChat = async (req, res) => {
     }
 }
 
-//user nije vise aktivan
 exports.leaveChat = async (req, res) => {
     try {
         var username = req.body.username

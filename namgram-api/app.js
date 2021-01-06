@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const dotenv = require('dotenv');
 const redis = require('redis');
+const app = express();
+var http = require('http').Server(app)
+var io = require('socket.io')(http)
 // const redisUrl = 'redis://127.0.0.1:6379';
 // const client = redis.createClient(redisUrl);
 
@@ -22,8 +25,6 @@ client.on('connect', function () {
 })
 
 
-const app = express();
-
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(cors());
@@ -42,3 +43,4 @@ app.listen(port, function () {
 })
 
 module.exports = app;
+

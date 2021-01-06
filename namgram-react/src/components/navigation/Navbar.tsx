@@ -20,11 +20,16 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux';
 import { logoutAction } from '../../redux/auth/actions';
+import { AddCircleRounded } from '@material-ui/icons';
 
 
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    link: {
+      textDecoration: "none",
+      color: "inherit"
+    },
     btn:{
       color: 'white',
       paddingRight: '1rem'
@@ -134,7 +139,7 @@ function Navbar() {
     };
 
     const handleMyProfile = () => {
-      history.push("profile/" + auth?.id.toString());
+      history.push('profile/' + auth?.id as string);
       handleMenuClose();
     }
 
@@ -218,9 +223,10 @@ function Navbar() {
           >
             <MenuIcon />
           </IconButton>
+          <Link to="/" className={classes.link}>
           <img className={classes.logo} 
-          onClick={handleHome}
           src="https://cdn.discordapp.com/attachments/777890574253817889/792441180054749224/e52d18ae-4e0c-40cf-8d30-07396304f4e0_200x200.png" />
+          </Link>
           {/* <Typography className={classes.title} variant="h6" noWrap>
             namgram
           </Typography> */}
@@ -249,6 +255,11 @@ function Navbar() {
               </Link>
             </div> : 
             <div>
+              <Link className={classes.link} to="/posts/create">
+              <IconButton aria-label="Add new image" color="inherit">
+                <AddCircleRounded />
+              </IconButton>
+              </Link>
                <IconButton aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <MailIcon />

@@ -33,14 +33,29 @@ client.once('ready', function () {
     })
 })
 
+exports.getMessages = async (req, res) => {
+    try {
+        res.json({
+            "messages": chat_messages,
+            "status": "OK"
+        })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err)
+    }
+}
+
 exports.joinChat = async (req, res) => {
     try {
         var username = req.body.username
-        if(chatters.indexOf(username) == -1) {
+        if (chatters.indexOf(username) == -1) {
             chatters.push(username)
             client.set('chat_users', JSON.stringify(chatters))
-            res.json({"chatters": chatters,
-                    "status": "OK"})
+            res.json({
+                "chatters": chatters,
+                "status": "OK"
+            })
         }
     }
     catch (err) {
@@ -52,9 +67,9 @@ exports.joinChat = async (req, res) => {
 exports.leaveChat = async (req, res) => {
     try {
         var username = req.body.username
-            chatters.splice(chatters.indexOf(username), 1)
-            client.set('chat_users', JSON.stringify(chatters))
-            res.json({"status": "OK"})
+        chatters.splice(chatters.indexOf(username), 1)
+        client.set('chat_users', JSON.stringify(chatters))
+        res.json({ "status": "OK" })
     }
     catch (err) {
         res.json({ success: false });
@@ -70,8 +85,8 @@ exports.sendMessage = async (req, res) => {
             "sender": username,
             "message": message
         })
-            client.set('chat_app_messages', JSON.stringify(chat_messages))
-            res.json({"status": "OK"})
+        client.set('chat_app_messages', JSON.stringify(chat_messages))
+        res.json({ "status": "OK" })
     }
     catch (err) {
         res.json({ success: false });

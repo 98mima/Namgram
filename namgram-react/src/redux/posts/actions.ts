@@ -1,4 +1,5 @@
 import { IPost } from "../../models/post";
+import { IUser } from "../../models/user";
 import { getPosts } from "../../services/posts";
 import { SET_ERROR, START_LOADING, STOP_LOADING } from "../ui/actions";
 
@@ -16,8 +17,9 @@ export interface ClearPostsAction {
 
 export type PostsActionTypes = SetPostsAction | ClearPostsAction
 
-export const loadPosts = () => (dispatch: any) => {
+export const loadPosts = (followers: IUser) => (dispatch: any) => {
     dispatch({type: START_LOADING});
+    
     getPosts("1").then(posts => {
             dispatch({type: SET_POSTS, payload: posts});
             dispatch({type: STOP_LOADING});

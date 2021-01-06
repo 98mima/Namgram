@@ -29,7 +29,6 @@ export const authUser = () => (dispatch: any) => {
       Promise.all([getUserById(decodedToken.id), 
         getFollowers(decodedToken.username), 
         getFollowing(decodedToken.username)]).then(res => {
-          console.log(res)
           const user = res[0].Data;
           const followers = res[1];
           const following = res[2];

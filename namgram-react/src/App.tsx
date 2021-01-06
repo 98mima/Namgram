@@ -14,6 +14,7 @@ import Posts from './components/posts/Posts';
 import { authUser } from './redux/auth/actions';
 import Profile from './components/profile/Profile';
 import Home from './components/home/Home';
+import CreatePost from './components/posts/CreatePost';
 
 
 
@@ -28,7 +29,9 @@ function App() {
             <Route exact path="/signin" component={SigninForm} />
             <Route exact path="/signup" component={SignupForm} />
             <Route path="/profile/:id" component={Profile} />
+            <Route path="/posts/create" component={CreatePost} />
             <Route path="/posts" component={Posts} />
+            
             <Route path="/" component={Home} />
           </Switch>
       </Router>

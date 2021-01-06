@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const dotenv = require('dotenv');
 const redis = require('redis');
+const app = express();
+var http = require('http').Server(app)
+var io = require('socket.io')(http)
 // const redisUrl = 'redis://127.0.0.1:6379';
 // const client = redis.createClient(redisUrl);
 
@@ -15,14 +18,13 @@ const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
 const imageRoutes = require('./routes/image');
+const chatRoutes = require('./routes/chat');
 
 let client = redis.createClient();
 client.on('connect', function () {
     console.log('Konektovano sa Redis')
 })
 
-
-const app = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
@@ -35,6 +37,7 @@ app.use('/auth', authRoutes);
 app.use('/post', postRoutes);
 app.use('/comment', commentRoutes);
 app.use('/image', imageRoutes);
+app.use('/chat', chatRoutes);
 
 const port = 8080;
 app.listen(port, function () {
@@ -42,3 +45,4 @@ app.listen(port, function () {
 })
 
 module.exports = app;
+

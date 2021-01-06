@@ -293,7 +293,7 @@ exports.getByPerson = async (req, res) => {
         session.close();
         const Data = _manyPosts(posts)
 
-        client.set(key, JSON.stringify(Data));
+        client.set(key, JSON.stringify(mess));
         client.expire(key, 10);
 
         res.status(200)

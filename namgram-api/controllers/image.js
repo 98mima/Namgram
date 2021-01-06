@@ -1,4 +1,5 @@
 const Image = require('../models/image');
+const Person = require('../models/person');
 const uuid = require('node-uuid');
 let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
@@ -71,10 +72,38 @@ function findProps(node) {
     }
 }
 
+async function findCreator(node) {
+    try{
+        let session = driver.session();
+
+        const query = [
+            'MATCH (image:Image {id: $id})<-[r1:created]-(person:Person) return person'
+        ].join('\n')
+
+        return session.readTransaction(txc =>
+            txc.run(query, {
+                id: node.id
+            }))
+            .then( result => {  
+            const user = _manyPeople(result)
+            session.close();
+    
+            return user[0].username})
+            .catch(err => {
+                console.log(err)
+            })
+    }
+    catch (err){
+        console.log(err)
+    }
+}
 
 function _manyImages(neo4jResult) {
     return neo4jResult.records.map(r => new Image(r.get('image')))
 }
+function _manyPeople(neo4jResult) {
+    return neo4jResult.records.map(r => new Person(r.get('person')))
+  }
 
 exports.getAll = async (req, res) => {
     try {
@@ -102,6 +131,15 @@ exports.getAll = async (req, res) => {
               image.sasToken = sasUrl
         })
         session.close();
+
+        let creators = []
+        creators = await Promise.all(
+            p.map(post => {
+            return post.creator = findCreator(post)
+        }))
+        p.map((post, index) =>
+            post.creator = creators[index])
+
         res.status(200)
             .json({ message: "Prikupljeno", p })
     }
@@ -142,6 +180,14 @@ exports.getByPerson = async (req, res) => {
               image.sasToken = sasUrl
         })
 
+        let creators = []
+        creators = await Promise.all(
+            Data1.map(post => {
+            return post.creator = findCreator(post)
+        }))
+        Data1.map((post, index) =>
+            post.creator = creators[index])
+
         res.status(200)
             .json({ message: "Prikupljeno iz neo4j", Data1 })
     }
@@ -181,6 +227,14 @@ exports.getByFollowings = async (req, res) => {
                   const sasUrl= blobClient.url+"?"+blobSAS;         
               image.sasToken = sasUrl
         })
+
+        let creators = []
+        creators = await Promise.all(
+            Data.map(post => {
+            return post.creator = findCreator(post)
+        }))
+        Data.map((post, index) =>
+            post.creator = creators[index])
         session.close();
         res.status(200)
             .json({ message: "Prikupljeno", Data })
@@ -228,6 +282,14 @@ exports.getMostLikedF = async (req, res) => {
               image.sasToken = sasUrl
         })
         session.close();
+
+        let creators = []
+        creators = await Promise.all(
+            Data.map(post => {
+            return post.creator = findCreator(post)
+        }))
+        Data.map((post, index) =>
+            post.creator = creators[index])
 
         Data.sort(function (a, b) {
             return b.likes - a.likes
@@ -285,6 +347,13 @@ exports.getMostHatedF = async (req, res) => {
               image.sasToken = sasUrl
         })
         session.close();
+        let creators = []
+        creators = await Promise.all(
+            Data.map(post => {
+            return post.creator = findCreator(post)
+        }))
+        Data.map((post, index) =>
+            post.creator = creators[index])
 
         Data.sort(function (a, b) {
             return b.dislikes - a.dislikes
@@ -342,6 +411,13 @@ exports.getMostCommentedF = async (req, res) => {
               image.sasToken = sasUrl
         })
         session.close();
+        let creators = []
+        creators = await Promise.all(
+            Data.map(post => {
+            return post.creator = findCreator(post)
+        }))
+        Data.map((post, index) =>
+            post.creator = creators[index])
 
         Data.sort(function (a, b) {
             return b.comments - a.comments

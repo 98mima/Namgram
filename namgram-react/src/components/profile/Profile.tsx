@@ -89,7 +89,10 @@ function Profile() {
     if (!profile) {
       dispatch(loadProfile(id));
     }
-    if (profile && auth?.following.some((user) => user.username == profile?.username)) {
+    if (
+      profile &&
+      auth?.following.some((user) => user.username == profile?.username)
+    ) {
       setIsFollowing(true);
     } else {
       setIsFollowing(false);
@@ -98,6 +101,7 @@ function Profile() {
   }, [auth, profile]);
 
   const handleEdit = () => {
+    console.log(profile?.following);
     //history.push("/profile/edit/" + auth?.id);
   };
   const handleFollow = () => {
@@ -181,24 +185,14 @@ function Profile() {
               nested
             >
               <List className={classes.root}>
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar></Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary="Photos" secondary="Jan 9, 2014" />
-                </ListItem>
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar></Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary="Work" secondary="Jan 7, 2014" />
-                </ListItem>
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar></Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary="Vacation" secondary="July 20, 2014" />
-                </ListItem>
+                {profile.following.map((person) => (
+                  <ListItem>
+                    <ListItemAvatar>
+                      <Avatar></Avatar>
+                    </ListItemAvatar>
+                    <ListItemText primary="Photos" secondary="Jan 9, 2014" />
+                  </ListItem>
+                ))}
               </List>
             </Popup>
             <br />

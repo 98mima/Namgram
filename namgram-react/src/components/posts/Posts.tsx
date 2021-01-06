@@ -23,8 +23,8 @@ function Posts() {
     const auth = useSelector((state: RootState) => state.auth.auth)
 
     useEffect(() => {
-        //dispatch(loadPosts(auth?.followers));
-    }, []);
+        if(auth) dispatch(loadPosts(auth?.id as string));
+    }, [auth]);
 
     const loading = useSelector((state: RootState) => state.ui.loading);    
 

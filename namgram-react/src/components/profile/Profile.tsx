@@ -89,8 +89,7 @@ function Profile() {
     if (!profile) {
       dispatch(loadProfile(id));
     }
-    console.log(isFollowing);
-    if (auth?.following.find((user) => user.username == profile?.username)) {
+    if (profile && auth?.following.some((user) => user.username == profile?.username)) {
       setIsFollowing(true);
     }
     return () => {};

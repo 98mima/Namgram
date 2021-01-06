@@ -19,7 +19,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Favorite from '@material-ui/icons/FavoriteBorder'
 import { CardActionArea, Grid } from '@material-ui/core';
 
-import { IPost } from '../../models/post'
+import { IImage } from '../../models/post'
 import { width, maxHeight, height } from '@material-ui/system';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -75,7 +75,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-function Post(props: { post: IPost }) {
+function Post(props: { post: IImage }) {
   const { post } = props;
 
   const classes = useStyles();
@@ -92,11 +92,10 @@ function Post(props: { post: IPost }) {
           <CardHeader
             avatar={
               <Avatar aria-label="recipe" className={classes.avatar}>
-                <img style={{ maxHeight: '100%' }} src={post.user.image} />
+                {/* <img style={{ maxHeight: '100%' }} src={post.user.image} /> */}
               </Avatar>
             }
-            title={post.user.username}
-            subheader="September 14, 2016"
+            subheader={post.date}
           />
           <div style={{ display: "flex", justifyContent: "space-around" }}>
             <CardHeader
@@ -129,7 +128,7 @@ function Post(props: { post: IPost }) {
       </div>
 
       <div className={classes.imgContainer}>
-        <img className={classes.img} src={post.image} />
+        <img className={classes.img} src={post.sasToken} />
       </div>
     </div >
 

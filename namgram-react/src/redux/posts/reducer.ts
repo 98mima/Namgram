@@ -1,8 +1,8 @@
-import { IPost } from "../../models/post"
+import { IImage, IPost } from "../../models/post"
 import { CLEAR_POSTS, SET_POSTS, PostsActionTypes } from "./actions"
 
 export interface PostsState{
-    posts: IPost[]
+    posts: IImage[]
 }
 
 const initialState: PostsState = {

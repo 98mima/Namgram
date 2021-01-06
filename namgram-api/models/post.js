@@ -16,28 +16,3 @@ const Post = module.exports = function (_node) {
     })
   
 };
-
-
-
-let session = driver.session();
-
-const posts = await session.run('MATCH (post:Post) RETURN post', {
-});
-const p = _manyPosts(posts)
-session.close();
-
-let Data = []
-let creators = []
-
-Data = await Promise.all(p.map(post => {
-    return findProps(post)
-}))
-
-creators = await Promise.all(
-    Data.map(post => {
-    return post.creator = findCreator(post)
-}))
-Data.map((post, index) =>
-    post.creator = creators[index])
-
-res.status(200)

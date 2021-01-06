@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center',
     background: 'rgb(255, 255, 255)',
     padding: '2rem',
-    borderRadius: '5%'
+    borderRadius: '20px'
   },
   avatar: {
     margin: theme.spacing(1),

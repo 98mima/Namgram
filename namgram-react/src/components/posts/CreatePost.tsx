@@ -16,15 +16,18 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     maxWidth: "600px",
     margin: "10vw auto 0 auto",
+    height: "50vh"
   },
   form: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   input: {
       width: "100%"
+  },
+  image: {
+    maxWidth: "600px",
   }
 }));
 
@@ -83,6 +86,7 @@ function CreatePost() {
         <form className={classes.form} noValidate onSubmit={onSubmit}>
             <TextField onChange={onInput} className={classes.input} />
             <input type="file" name="file" onChange={onFileChange} />
+            {file && <img className={classes.image} src={URL.createObjectURL(file)} />}
             <Button type="submit">Submit</Button>
             <Typography color="error">{error}</Typography>
         </form>

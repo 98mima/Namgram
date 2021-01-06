@@ -25,13 +25,14 @@ import { useHistory } from 'react-router-dom'
 
 const useStyles = makeStyles((theme: Theme) => ({
     paper: {
+      marginTop: '3rem',
       paddingTop: '10vh',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       background: 'rgb(255, 255, 255)',
       padding: '4rem',
-      borderRadius: '5%'
+      borderRadius: '20px'
     },
     avatar: {
       margin: theme.spacing(1),
@@ -47,7 +48,18 @@ const useStyles = makeStyles((theme: Theme) => ({
   }));
 
 
-
+  function Copyright() {
+    return (
+      <Typography variant="body2" color="textSecondary" align="center">
+        {'Copyright © '}
+        <Link color="inherit" href="http://localhost:3000/">
+          Namgram
+        </Link>{' '}
+        {new Date().getFullYear()}
+        {'.'}
+      </Typography>
+    );
+  }
 
 
 function SigninForm() {
@@ -114,10 +126,6 @@ function SigninForm() {
             autoComplete="current-password"
             onChange={(event) => onInput(event)}
           />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
           <Button
             type="submit"
             fullWidth
@@ -143,7 +151,7 @@ function SigninForm() {
         </form>
       </div>
       <Box mt={8}>
-        Kopirajt
+        {Copyright()}
       </Box>
     </Container>
     )

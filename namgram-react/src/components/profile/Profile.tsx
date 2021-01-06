@@ -18,7 +18,13 @@ import "reactjs-popup/dist/index.css";
 import { useSelector, useDispatch } from "react-redux";
 import { loadProfile } from "../../redux/profile/actions";
 import { RootState } from "../../redux";
-import { follow, getFollowers } from "../../services/profile";
+import { follow, unfollow, getFollowers } from "../../services/profile";
+import {
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -61,6 +67,11 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     height: "50vh",
   },
+  root: {
+    width: "100%",
+    maxWidth: 360,
+    backgroundColor: theme.palette.background.paper,
+  },
 }));
 
 function Profile() {
@@ -72,19 +83,18 @@ function Profile() {
   const error = useSelector((state: RootState) => state.ui.error);
   const loading = useSelector((state: RootState) => state.ui.loading);
   const auth = useSelector((state: RootState) => state.auth.auth);
-  const isFollowing = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
-    dispatch(loadProfile(id));
-
+    if (!profile) {
+      dispatch(loadProfile(id));
+    }
+    console.log(isFollowing);
+    if (auth?.following.find((user) => user.username == profile?.username)) {
+      setIsFollowing(true);
+    }
     return () => {};
-  }, []);
-
-  // const following = () => {
-  //   const followers = getFollowers(auth?.id as string);
-  //   if(followers.contains)
-
-  // }
+  }, [auth, profile, isFollowing]);
 
   const handleEdit = () => {
     //history.push("/profile/edit/" + auth?.id);
@@ -93,6 +103,13 @@ function Profile() {
     const username1 = auth?.username;
     const username2 = profile?.username;
     follow(username1 as string, username2 as string);
+    setIsFollowing(true);
+  };
+  const handleUnFollow = () => {
+    const username1 = auth?.username;
+    const username2 = profile?.username;
+    unfollow(username1 as string, username2 as string);
+    if (isFollowing == true) setIsFollowing(false);
   };
 
   const checkMyProfile = () => {
@@ -101,6 +118,50 @@ function Profile() {
       return profile?.id == auth?.id;
     }
   };
+
+  const close = () => (
+    <div className="modal">
+      <button className="close" onClick={close}>
+        &times;
+      </button>
+      <div className="header"> Modal Title </div>
+      <div className="content">
+        {" "}
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque, a
+        nostrum. Dolorem, repellat quidem ut, minima sint vel eveniet quibusdam
+        voluptates delectus doloremque, explicabo tempore dicta adipisci fugit
+        amet dignissimos?
+        <br />
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur
+        sit commodi beatae optio voluptatum sed eius cumque, delectus saepe
+        repudiandae explicabo nemo nam libero ad, doloribus, voluptas rem alias.
+        Vitae?
+      </div>
+      <div className="actions">
+        <Popup
+          trigger={<button className="button"> Trigger </button>}
+          position="top center"
+          nested
+        >
+          <span>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae
+            magni omnis delectus nemo, maxime molestiae dolorem numquam
+            mollitia, voluptate ea, accusamus excepturi deleniti ratione
+            sapiente! Laudantium, aperiam doloribus. Odit, aut.
+          </span>
+        </Popup>
+        <button
+          className="button"
+          onClick={() => {
+            console.log("modal closed ");
+            close();
+          }}
+        >
+          close modal
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <Container component="main" maxWidth="xs">
@@ -116,8 +177,28 @@ function Profile() {
             <Popup
               trigger={<button className="button"> Open Modal </button>}
               modal
+              nested
             >
-              <span> Modal content </span>
+              <List className={classes.root}>
+                <ListItem>
+                  <ListItemAvatar>
+                    <Avatar></Avatar>
+                  </ListItemAvatar>
+                  <ListItemText primary="Photos" secondary="Jan 9, 2014" />
+                </ListItem>
+                <ListItem>
+                  <ListItemAvatar>
+                    <Avatar></Avatar>
+                  </ListItemAvatar>
+                  <ListItemText primary="Work" secondary="Jan 7, 2014" />
+                </ListItem>
+                <ListItem>
+                  <ListItemAvatar>
+                    <Avatar></Avatar>
+                  </ListItemAvatar>
+                  <ListItemText primary="Vacation" secondary="July 20, 2014" />
+                </ListItem>
+              </List>
             </Popup>
             <br />
             <Typography variant="h4">{profile.username}</Typography>
@@ -145,7 +226,7 @@ function Profile() {
                 Izmeni profil
               </Button>
             )}
-            {!checkMyProfile() && (
+            {!checkMyProfile() && !isFollowing && (
               <Button
                 type="submit"
                 variant="contained"
@@ -153,6 +234,16 @@ function Profile() {
                 onClick={handleFollow}
               >
                 Follow
+              </Button>
+            )}
+            {!checkMyProfile() && isFollowing && (
+              <Button
+                type="submit"
+                variant="contained"
+                color="secondary"
+                onClick={handleUnFollow}
+              >
+                Unfollow
               </Button>
             )}
           </div>

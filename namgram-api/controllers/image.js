@@ -113,7 +113,10 @@ exports.getAll = async (req, res) => {
         });
         const p = _manyImages(im)
 
-        p.map(image => {
+        Data1 = await Promise.all(p.map(p => {
+            return findProps(p)
+        }))
+        Data1.map(image => {
             const containerClient = blobServiceClient.getContainerClient(containerName);
                 const blobName = image.blobName
                 const blobClient = client.getBlobClient(blobName);
@@ -134,14 +137,14 @@ exports.getAll = async (req, res) => {
 
         let creators = []
         creators = await Promise.all(
-            p.map(post => {
+            Data1.map(post => {
             return post.creator = findCreator(post)
         }))
-        p.map((post, index) =>
+        Data1.map((post, index) =>
             post.creator = creators[index])
 
         res.status(200)
-            .json({ message: "Prikupljeno", p })
+            .json({ message: "Prikupljeno", Data1 })
     }
     catch (err) {
         res.json({ success: false });

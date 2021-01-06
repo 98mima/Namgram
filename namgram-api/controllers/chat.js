@@ -1,9 +1,3 @@
-const Comment = require('../models/comment');
-const uuid = require('node-uuid');
-let { creds } = require("./../config/credentials");
-let neo4j = require('neo4j-driver');
-const _ = require('lodash');
-let driver = neo4j.driver("bolt://0.0.0.0:7687", neo4j.auth.basic(creds.neo4jusername, creds.neo4jpw));
 const util = require('util')
 const redis = require('redis');
 const { concat } = require('lodash');
@@ -13,6 +7,7 @@ const client = redis.createClient(redisUrl);
 
 var chatters = []
 var chat_messages = []
+var mess = []
 
 client.once('ready', function () {
     //flush Redis
@@ -46,14 +41,30 @@ exports.getMessages = async (req, res) => {
     }
 }
 
+exports.getActiveChatters = async (req, res) => {
+    try {
+        res.json({
+            "active": chatters,
+            "status": "OK"
+        })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err)
+    }
+}
+
+//kad udje u chat sa nekom osobom da:
+//-bude aktivan
+//-da vidi prethodne poruke
 exports.joinChat = async (req, res) => {
     try {
         var username = req.body.username
         if (chatters.indexOf(username) == -1) {
             chatters.push(username)
-            client.set('chat_users', JSON.stringify(chatters))
+            client.set('active_users', JSON.stringify(chatters))
             res.json({
-                "chatters": chatters,
+                "active": chatters,
                 "status": "OK"
             })
         }
@@ -64,11 +75,12 @@ exports.joinChat = async (req, res) => {
     }
 }
 
+//user nije vise aktivan
 exports.leaveChat = async (req, res) => {
     try {
         var username = req.body.username
         chatters.splice(chatters.indexOf(username), 1)
-        client.set('chat_users', JSON.stringify(chatters))
+        client.set('active_users', JSON.stringify(chatters))
         res.json({ "status": "OK" })
     }
     catch (err) {
@@ -79,13 +91,23 @@ exports.leaveChat = async (req, res) => {
 
 exports.sendMessage = async (req, res) => {
     try {
-        var username = req.body.username
+        var usernameSender = req.body.usernameSender
+        var usernameReceiver = req.body.usernameReceiver
         var message = req.body.message
-        chat_messages.push({
-            "sender": username,
+
+        const users = []
+        users.push(usernameReceiver)
+        users.push(usernameSender)
+        users.sort()
+        console.log(users)
+
+        const key = JSON.stringify(Object.assign({}, { user1: users[0] }, { user2: users[1] }, { collection: "messages" }));
+        mess.push({
+            "sender": usernameSender,
             "message": message
         })
-        client.set('chat_app_messages', JSON.stringify(chat_messages))
+        console.log(mess)
+        client.set(key, JSON.stringify(mess))
         res.json({ "status": "OK" })
     }
     catch (err) {

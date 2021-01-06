@@ -7,6 +7,7 @@ const chatController = require('../controllers/chat');
 const router = express.Router();
 
 router.get('/getMessages', chatController.getMessages);
+router.get('/getChatters', chatController.getActiveChatters);
 router.post('/join', chatController.joinChat);
 router.post('/leave', chatController.leaveChat);
 router.post('/send', chatController.sendMessage);

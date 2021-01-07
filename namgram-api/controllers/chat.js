@@ -22,20 +22,20 @@ function _manyPeople(neo4jResult) {
     return neo4jResult.records.map(r => new Person(r.get('person')))
   }
 
-client.once('ready', function () {
-    //flush Redis
-    //client.flushdb();
-    client.get('chat_users', function (err, reply) {
-        if (reply) {
-            chatters = JSON.parse(reply)
-        }
-    })
-    client.get('chat_app_messages', function (err, reply) {
-        if (reply) {
-            chat_messages = JSON.parse(reply)
-        }
-    })
-})
+// client.once('ready', function () {
+//     //flush Redis
+//     //client.flushdb();
+//     client.get('chat_users', function (err, reply) {
+//         if (reply) {
+//             chatters = JSON.parse(reply)
+//         }
+//     })
+//     client.get('chat_app_messages', function (err, reply) {
+//         if (reply) {
+//             chat_messages = JSON.parse(reply)
+//         }
+//     })
+// })
 
 exports.getMessages = async (req, res) => {
     try {
@@ -63,29 +63,23 @@ exports.getMessages = async (req, res) => {
     }
 }
 
-exports.getActiveChatters = async (req, res) => {
-    try {
-        //const number = chatters.length
-        let Data = []
-        const key = JSON.stringify(Object.assign({}, { user: req.params.username }, { collection: "chatters" }));
-        client.get(key, function (err, reply) {
-            if (reply) {
-                Data = JSON.parse(reply)
-                return res.status(200).json(Data)
-            }
-            console.log(err)
-        })
-        // res.json({
-        //     "active": chatters,
-        //     "status": "OK",
-        //     number
-        // })
-    }
-    catch (err) {
-        res.json({ success: false });
-        console.log(err)
-    }
-}
+// exports.getActiveChatters = async (req, res) => {
+//     try {
+//         let Data = []
+//         const key = JSON.stringify(Object.assign({}, { user: req.params.username }, { collection: "chatters" }));
+//         client.get(key, function (err, reply) {
+//             if (reply) {
+//                 Data = JSON.parse(reply)
+//                 return res.status(200).json(Data)
+//             }
+//             console.log(err)
+//         })
+//     }
+//     catch (err) {
+//         res.json({ success: false });
+//         console.log(err)
+//     }
+// }
 
 exports.joinChat = async (req, res) => {
     try {
@@ -110,7 +104,6 @@ exports.joinChat = async (req, res) => {
             })
         });
 
-        //prikaz poruka
         var username = req.body.username
         var username2 = req.body.username2
         const users = []
@@ -123,7 +116,7 @@ exports.joinChat = async (req, res) => {
         client.get(key, function (err, reply) {
             if (reply) {
                 Data = JSON.parse(reply)
-                return res.status(200).json({Data, "active": "nadji aktivne",
+                return res.status(200).json({"messages": Data, "active": active,
                 "status": "OK"})
             }
         })

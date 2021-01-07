@@ -102,13 +102,12 @@ exports.joinChat = async (req, res) => {
             client.get(keyActive, function (err, reply) {
                 if (reply) {
                     active = JSON.parse(reply)
+                    if (active.indexOf(follower.username) == -1) {
+                        active.push(req.body.username)
+                        client.set(keyActive, JSON.stringify(active))
+                    }
                 }
             })
-            console.log(active)
-            if (active.indexOf(follower.username) == -1) {
-                active.push(req.body.username)
-                client.set(keyActive, JSON.stringify(active))
-            }
         });
 
         //prikaz poruka
@@ -143,6 +142,7 @@ exports.leaveChat = async (req, res) => {
         })
         session.close();
         const followers = _manyPeople(persons)
+        let active = []
 
         followers.forEach(follower => {
             const keyActive = JSON.stringify(Object.assign({}, { user: follower.username }, { collection: "chatters" }));

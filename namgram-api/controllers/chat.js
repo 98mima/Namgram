@@ -184,10 +184,11 @@ exports.sendMessage = async (req, res) => {
 
 
 io.on('connection', function(socket) {
+    console.log("welcome")
     socket.on('message', function(data) {
         io.emit('send', data)
     });
-    socket.io('update_chatter_count', function(data) {
-        io.emit('count_chatters', data)
+    socket.on('update_active_users', function(data) {
+        io.emit('active_users', data)
     })
 })

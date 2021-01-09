@@ -130,15 +130,14 @@ exports.getAll = async (req, res) => {
 
         let Data = []
         let creators = []
-        
         Data = await Promise.all(p.map(post => {
             return findProps(post)
         }))
 
         creators = await Promise.all(
             p.map(post => {
-            return post.creator = findCreator(post)
-        }))
+                return post.creator = findCreator(post)
+            }))
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -341,6 +340,8 @@ exports.getByPostId = async (req, res) => {
         post.commentsList = await findComments(post)
         post.creator = await findCreator(post)
         Data = post
+        
+        client.publish("posts", "Data.toString()")
 
         session.close();
         res.status(200)
@@ -426,6 +427,9 @@ exports.like = async (req, res) => {
             postId: req.body.postId
         })
         session.close();
+
+        client.publish("posts", "lajkovao sam")
+
         res.status(200)
             .json({ message: "Like postavljen", rel })
     }

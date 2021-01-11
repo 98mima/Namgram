@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IBasicPost, IImage, IPost, IPostUpload } from "../models/post";
+import { IImage, IPost, IPostUpload } from "../models/post";
 
 export async function getPosts(userId: string) {
   return axios
@@ -44,16 +44,16 @@ export async function uploadPost(uploadForm: IPostUpload) {
   });
 }
 
-export async function uploadBasicPost(uploadForm: IBasicPost) {
-  return axios
-    .post<{ content: string; personId: string }>("post/add", {
-      content: uploadForm.content,
-      personId: uploadForm.personId,
-    })
-    .then((res) => {
-      return res.data;
-    });
-}
+// export async function uploadBasicPost(uploadForm: IBasicPost) {
+//   return axios
+//     .post<{ content: string; personId: string }>("post/add", {
+//       content: uploadForm.content,
+//       personId: uploadForm.personId,
+//     })
+//     .then((res) => {
+//       return res.data;
+//     });
+// }
 export async function like(personId: string, postId: string) {
   return axios
     .post<{ personId: string; postId: string }>("post/like", {

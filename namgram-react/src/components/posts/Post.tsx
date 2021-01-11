@@ -93,47 +93,47 @@ function Post(props: { post: IImage }) {
   };
 
   const handleLike = (imageId: string) => {
-    if (!alreadyLiked && !alreadyDisliked) {
-      likePost(auth?.id as string, post.id).then((res) => {
-        setLikes((prevLikes) => prevLikes + 1);
-        setAlreadyLiked(true);
-      });
-    } else if (!alreadyLiked && alreadyDisliked) {
-      unDisLikeQuestion(question.id).then((res) => {
-        likeQuestion(question.id).then((res) => {
-          setLikes((prevLikes) => prevLikes + 2);
-          setAlreadyLiked(true);
-          setAlreadyDisliked(false);
-        });
-      });
-    } else if (alreadyLiked) {
-      unLikeQuestion(question.id).then((res) => {
-        setLikes((prevLikes) => prevLikes - 1);
-        setAlreadyLiked(false);
-      });
-    }
+    // if (!alreadyLiked && !alreadyDisliked) {
+    //   likePost(auth?.id as string, post.id).then((res) => {
+    //     setLikes((prevLikes) => prevLikes + 1);
+    //     setAlreadyLiked(true);
+    //   });
+    // } else if (!alreadyLiked && alreadyDisliked) {
+    //   unDisLikeQuestion(question.id).then((res) => {
+    //     likeQuestion(question.id).then((res) => {
+    //       setLikes((prevLikes) => prevLikes + 2);
+    //       setAlreadyLiked(true);
+    //       setAlreadyDisliked(false);
+    //     });
+    //   });
+    // } else if (alreadyLiked) {
+    //   unLikeQuestion(question.id).then((res) => {
+    //     setLikes((prevLikes) => prevLikes - 1);
+    //     setAlreadyLiked(false);
+    //   });
+    // }
   };
 
   const handleDislike = (imageId: string) => {
-    if (!alreadyLiked && !alreadyDisliked) {
-      dislikePost(question.id, imageId).then((res) => {
-        setLikes((prevLikes) => prevLikes - 1);
-        setAlreadyDisliked(true);
-      });
-    } else if (alreadyLiked && !alreadyDisliked) {
-      unLikeQuestion(question.id).then((res) => {
-        disLikeQuestion(question.id).then((res) => {
-          setLikes((prevLikes) => prevLikes - 2);
-          setAlreadyLiked(false);
-          setAlreadyDisliked(true);
-        });
-      });
-    } else if (alreadyDisliked) {
-      unDisLikeQuestion(question.id).then((res) => {
-        setLikes((prevLikes) => prevLikes + 1);
-        setAlreadyDisliked(false);
-      });
-    }
+    // if (!alreadyLiked && !alreadyDisliked) {
+    //   dislikePost(question.id, imageId).then((res) => {
+    //     setLikes((prevLikes) => prevLikes - 1);
+    //     setAlreadyDisliked(true);
+    //   });
+    // } else if (alreadyLiked && !alreadyDisliked) {
+    //   unLikeQuestion(question.id).then((res) => {
+    //     disLikeQuestion(question.id).then((res) => {
+    //       setLikes((prevLikes) => prevLikes - 2);
+    //       setAlreadyLiked(false);
+    //       setAlreadyDisliked(true);
+    //     });
+    //   });
+    // } else if (alreadyDisliked) {
+    //   unDisLikeQuestion(question.id).then((res) => {
+    //     setLikes((prevLikes) => prevLikes + 1);
+    //     setAlreadyDisliked(false);
+    //   });
+    // }
   };
 
   return (

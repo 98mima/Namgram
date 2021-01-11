@@ -449,6 +449,10 @@ exports.like = async (req, res) => {
             imageId: req.body.imageId
         })
         session.close();
+
+        console.log(rel)
+        //clientR.GET()
+
         res.status(200)
             .json({ message: "Like" })
     }

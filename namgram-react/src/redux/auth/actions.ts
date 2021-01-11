@@ -40,12 +40,12 @@ export const authUser = () => (dispatch: any) => {
           const followers = res[1];
           const following = res[2];
 
-          const socket = io("ws://localhost:5000");
+          const socket = io("ws://localhost:8000", {query: `userId=${user.id}`});
           // socket.emit("join", {name: decodedToken.id}, (err: any) => {
           //   if(err) alert(err);
           // });
-          socket.on("message", (message: any) => {
-            console.log(message);
+          socket.on("chat", (message: any) => {
+            socket.emit("like", user.id);
           })
           dispatch({type: SET_SOCKET, payload: socket});
           

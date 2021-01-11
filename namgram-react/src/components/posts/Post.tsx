@@ -21,6 +21,9 @@ import { CardActionArea, Grid } from '@material-ui/core';
 
 import { IImage } from '../../models/post'
 import { width, maxHeight, height } from '@material-ui/system';
+import { likePost } from '../../services/posts';
+import { RootState } from '../../redux';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -80,10 +83,15 @@ function Post(props: { post: IImage }) {
 
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
+  const auth = useSelector((state: RootState) => state.auth.auth)
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
+  const handleLike = (imageId: string) => {
+    likePost(auth?.id as string, imageId);
+  }
 
   return (
     <div className={classes.container}>
@@ -95,12 +103,13 @@ function Post(props: { post: IImage }) {
                 {/* <img style={{ maxHeight: '100%' }} src={post.user.image} /> */}
               </Avatar>
             }
+            
             subheader={post.date}
           />
           <div style={{ display: "flex", justifyContent: "space-around" }}>
             <CardHeader
               avatar={
-                <CardActionArea><Avatar className={classes.avatar}><Favorite /></Avatar></CardActionArea>
+                <CardActionArea onClick={() => handleLike(post.id)}><Avatar className={classes.avatar}><Favorite /></Avatar></CardActionArea>
               }
               title={post.likes}
             />

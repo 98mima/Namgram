@@ -7,6 +7,22 @@ export async function getPosts(userId: string) {
     })
 }
 
+export async function likePost(userId: string, imageId: string) {
+    return axios.post<{imageId: string, personId: string}>(`image/like`, {
+        imageId, personId: userId
+    }).then(res => {
+        return res.data;
+    })
+}
+
+export async function dislikePost(userId: string, imageId: string) {
+    return axios.post<{imageId: string, personId: string}>(`image/dislike`, {
+        imageId, personId: userId
+    }).then(res => {
+        return res.data;
+    })
+}
+
 export async function getFollowerPosts(userId: string) {
     return axios.get<{message: string, Data: IImage[]}>(`image/byFollowings/${userId}`)
         .then(res => res.data.Data);

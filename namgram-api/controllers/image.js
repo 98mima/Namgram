@@ -88,7 +88,7 @@ async function findCreator(node) {
             const user = _manyPeople(result)
             session.close();
     
-            return user[0].username})
+            return user[0]})
             .catch(err => {
                 console.log(err)
             })

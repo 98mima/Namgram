@@ -33,6 +33,15 @@ const redisUrl = 'redis://127.0.0.1:6379';
 const clientR = redis.createClient(redisUrl);
 clientR.get = util.promisify(clientR.get);
 
+const express = require('express');
+const app = express();
+var server = require('http').createServer(app)
+const io = require("socket.io")(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+});
 
 function findProps(node) {
     try{
@@ -448,17 +457,17 @@ exports.like = async (req, res) => {
             personId: req.body.personId,
             imageId: req.body.imageId
         })
-        session.close();
-
-        let session = driver.session();
-        const rel = await session.run('MATCH (n:Image {id: $id}) RETURN n', {
-            id: req.body.imageId
+        let image = await session.run('MATCH (image:Image {id: $imageId}) RETURN image', {
+            imageId: req.body.imageId
         })
+        image = _manyImages(image)[0]
+        const creator = await findCreator(image)
+        // console.log(creator)
         session.close();
 
-        
-        console.log(rel.records[0].get("id"));
-        //clientR.GET()
+        //console.log(rel.records[0].get("id"));
+        let socketId = await clientR.GET("client:" + creator.id)
+        io.to(socketId).emit("notification", "nesto")
 
         res.status(200)
             .json({ message: "Like" })

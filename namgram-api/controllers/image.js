@@ -450,7 +450,14 @@ exports.like = async (req, res) => {
         })
         session.close();
 
-        console.log(rel)
+        let session = driver.session();
+        const rel = await session.run('MATCH (n:Image {id: $id}) RETURN n', {
+            id: req.body.imageId
+        })
+        session.close();
+
+        
+        console.log(rel.records[0].get("id"));
         //clientR.GET()
 
         res.status(200)

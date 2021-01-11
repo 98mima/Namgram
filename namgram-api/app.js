@@ -47,6 +47,7 @@ const io = require("socket.io")(server, {
     }
 });
 
+const redisUrl = 'redis://127.0.0.1:6379';
 const clientR = redis.createClient(redisUrl);
 io.on("connection", (socket) => {
     clientR.SET("socket:" + socket.handshake.query.userId, socket.id);

@@ -10,19 +10,45 @@ export async function getPosts(userId: string) {
 }
 
 export async function likePost(userId: string, imageId: string) {
-    return axios.post<{imageId: string, personId: string}>(`image/like`, {
-        imageId, personId: userId
-    }).then(res => {
-        return res.data;
+  return axios
+    .post<{ imageId: string; personId: string }>(`image/like`, {
+      imageId,
+      personId: userId,
     })
+    .then((res) => {
+      return res.data;
+    });
+}
+export async function removeLike(userId: string, imageId: string) {
+  return axios
+    .post<{ imageId: string; personId: string }>(`image/removeLike`, {
+      imageId,
+      personId: userId,
+    })
+    .then((res) => {
+      return res.data;
+    });
 }
 
 export async function dislikePost(userId: string, imageId: string) {
-    return axios.post<{imageId: string, personId: string}>(`image/dislike`, {
-        imageId, personId: userId
-    }).then(res => {
-        return res.data;
+  return axios
+    .post<{ imageId: string; personId: string }>(`image/dislike`, {
+      imageId,
+      personId: userId,
     })
+    .then((res) => {
+      return res.data;
+    });
+}
+export async function removedisLike(userId: string, imageId: string) {
+  return axios
+    .post<{ imageId: string; personId: string }>(`image/removedisLike`, {
+      imageId,
+      personId: userId,
+    })
+    .then((res) => {
+      return res.data;
+    });
 }
 
 export async function getFollowerPosts(userId: string) {
@@ -54,23 +80,3 @@ export async function uploadPost(uploadForm: IPostUpload) {
 //       return res.data;
 //     });
 // }
-export async function like(personId: string, postId: string) {
-  return axios
-    .post<{ personId: string; postId: string }>("post/like", {
-      personId: personId,
-      postId: postId,
-    })
-    .then((res) => {
-      return res.data;
-    });
-}
-export async function dislike(personId: string, postId: string) {
-  return axios
-    .post<{ personId: string; postId: string }>("post/dislike", {
-      personId: personId,
-      postId: postId,
-    })
-    .then((res) => {
-      return res.data;
-    });
-}

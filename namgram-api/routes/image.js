@@ -49,7 +49,9 @@ router.get('/mostLikedF/:userId', imageController.getMostLikedF);
 router.get('/mostHatedF/:userId', imageController.getMostHatedF);
 router.get('/mostCommentedF/:userId', imageController.getMostCommentedF);
 router.post('/like', imageController.like);
+router.post('/removeLike', imageController.removeLike);
 router.post('/dislike', imageController.dislike);
+router.post('/removedisLike', imageController.removeDislike);
 
 router.post('/add', uploadStrategy, async (req, res) => {
     try {

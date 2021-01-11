@@ -5,7 +5,12 @@ const dotenv = require('dotenv');
 const redis = require('redis');
 const app = express();
 var http = require('http').Server(app)
-var io = require('socket.io-client')(http)
+var io = require('socket.io-client')(http, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+})
 var realtime = require('./real_time')
 // const redisUrl = 'redis://127.0.0.1:6379';
 // const client = redis.createClient(redisUrl);
@@ -45,10 +50,13 @@ const port = 8080;
 app.listen(port, function () {
     console.log('Server radi na portu ' + port)
 })
-let socket = io.connect("http://localhost:8000")
-socket.on("welcome", (data) => {
-    console.log("received", data)
-})
+// let socket = io.connect("http://localhost:8080")
+// socket.on("connection", (data) => {
+//     console.log("received", data)
+// })
+io.on("connection", (socket => {
+    console.log("bajo")
+}))
 
 module.exports = app;
 

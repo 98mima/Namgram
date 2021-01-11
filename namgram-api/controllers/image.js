@@ -457,6 +457,29 @@ exports.like = async (req, res) => {
         console.log(err);
     }
 };
+exports.removeLike = async (req, res) => {
+    try {
+        let session = driver.session();
+        let like = await session.run('match (a:Person {id:$personId})-[r:like]->(image:Image {id:$imageId}) return r ', {
+            personId: req.body.personId,
+            imageId: req.body.imageId
+        })
+        if (like) {
+            await session.run('match (a:Person {id:$personId})-[r:like]->(image:Image {id:$imageId}) delete r', {
+                personId: req.body.personId,
+                imageId: req.body.imageId
+            })
+        }
+        session.close();
+
+        res.status(200)
+            .json({ message: "Like obrisan" })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
 
 exports.dislike = async (req, res) => {
     try {
@@ -468,6 +491,29 @@ exports.dislike = async (req, res) => {
         session.close();
         res.status(200)
             .json({ message: "Disike", rel })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+exports.removeDislike = async (req, res) => {
+    try {
+        let session = driver.session();
+        let dislike = await session.run('match (a:Person {id:$personId})-[r:dislike]->(image:Image {id:$imageId}) return r ', {
+            personId: req.body.personId,
+            imageId: req.body.imageId
+        })
+        if (dislike) {
+            await session.run('match (a:Person {id:$personId})-[r:dislike]->(image:Image {id:$imageId}) delete r', {
+                personId: req.body.personId,
+                imageId: req.body.imageId
+            })
+        }
+        session.close();
+
+        res.status(200)
+            .json({ message: "dislike obrisan" })
     }
     catch (err) {
         res.json({ success: false });

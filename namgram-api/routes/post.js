@@ -15,7 +15,9 @@ router.get('/mostHated/:userId', postController.getMostHated);
 router.get('/mostCommented/:userId', postController.getMostCommented);
 router.post('/add', postController.createPost);
 router.post('/like', postController.like);
+router.post('/removeLike', postController.removeLike);
 router.post('/dislike', postController.dislike);
+router.post('/removeDislike', postController.removeDislike);
 router.delete('/delete', postController.deletePost);
 
 module.exports = router;

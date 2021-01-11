@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IBasicPost, IImage, IPost, IPostUpload } from "../models/post";
+import { IImage, IPost, IPostUpload } from "../models/post";
 
 export async function getPosts(userId: string) {
   return axios
@@ -10,19 +10,45 @@ export async function getPosts(userId: string) {
 }
 
 export async function likePost(userId: string, imageId: string) {
-    return axios.post<{imageId: string, personId: string}>(`image/like`, {
-        imageId, personId: userId
-    }).then(res => {
-        return res.data;
+  return axios
+    .post<{ imageId: string; personId: string }>(`image/like`, {
+      imageId,
+      personId: userId,
     })
+    .then((res) => {
+      return res.data;
+    });
+}
+export async function removeLike(userId: string, imageId: string) {
+  return axios
+    .post<{ imageId: string; personId: string }>(`image/removeLike`, {
+      imageId,
+      personId: userId,
+    })
+    .then((res) => {
+      return res.data;
+    });
 }
 
 export async function dislikePost(userId: string, imageId: string) {
-    return axios.post<{imageId: string, personId: string}>(`image/dislike`, {
-        imageId, personId: userId
-    }).then(res => {
-        return res.data;
+  return axios
+    .post<{ imageId: string; personId: string }>(`image/dislike`, {
+      imageId,
+      personId: userId,
     })
+    .then((res) => {
+      return res.data;
+    });
+}
+export async function removedisLike(userId: string, imageId: string) {
+  return axios
+    .post<{ imageId: string; personId: string }>(`image/removedisLike`, {
+      imageId,
+      personId: userId,
+    })
+    .then((res) => {
+      return res.data;
+    });
 }
 
 export async function getFollowerPosts(userId: string) {
@@ -44,33 +70,13 @@ export async function uploadPost(uploadForm: IPostUpload) {
   });
 }
 
-export async function uploadBasicPost(uploadForm: IBasicPost) {
-  return axios
-    .post<{ content: string; personId: string }>("post/add", {
-      content: uploadForm.content,
-      personId: uploadForm.personId,
-    })
-    .then((res) => {
-      return res.data;
-    });
-}
-export async function like(personId: string, postId: string) {
-  return axios
-    .post<{ personId: string; postId: string }>("post/like", {
-      personId: personId,
-      postId: postId,
-    })
-    .then((res) => {
-      return res.data;
-    });
-}
-export async function dislike(personId: string, postId: string) {
-  return axios
-    .post<{ personId: string; postId: string }>("post/dislike", {
-      personId: personId,
-      postId: postId,
-    })
-    .then((res) => {
-      return res.data;
-    });
-}
+// export async function uploadBasicPost(uploadForm: IBasicPost) {
+//   return axios
+//     .post<{ content: string; personId: string }>("post/add", {
+//       content: uploadForm.content,
+//       personId: uploadForm.personId,
+//     })
+//     .then((res) => {
+//       return res.data;
+//     });
+// }

@@ -1,29 +1,34 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from "react";
 
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Collapse from '@material-ui/core/Collapse';
-import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import { red } from '@material-ui/core/colors';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import Favorite from '@material-ui/icons/FavoriteBorder'
-import { CardActionArea, Grid } from '@material-ui/core';
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import clsx from "clsx";
+import Card from "@material-ui/core/Card";
+import CardHeader from "@material-ui/core/CardHeader";
+import CardMedia from "@material-ui/core/CardMedia";
+import CardContent from "@material-ui/core/CardContent";
+import CardActions from "@material-ui/core/CardActions";
+import Collapse from "@material-ui/core/Collapse";
+import Avatar from "@material-ui/core/Avatar";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import { red } from "@material-ui/core/colors";
+import FavoriteIcon from "@material-ui/icons/Favorite";
+import ShareIcon from "@material-ui/icons/Share";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import Favorite from "@material-ui/icons/FavoriteBorder";
+import { CardActionArea, Grid } from "@material-ui/core";
 
-import { IImage } from '../../models/post'
-import { width, maxHeight, height } from '@material-ui/system';
-import { dislikePost, likePost } from '../../services/posts';
-import { RootState } from '../../redux';
-import { useSelector } from 'react-redux';
+import { IImage } from "../../models/post";
+import { width, maxHeight, height } from "@material-ui/system";
+import {
+  dislikePost,
+  likePost,
+  removedisLike,
+  removeLike,
+} from "../../services/posts";
+import { RootState } from "../../redux";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -85,8 +90,16 @@ function Post(props: { post: IImage }) {
   const auth = useSelector((state: RootState) => state.auth.auth);
 
   const [likes, setLikes] = useState(0);
+  const [dislikes, setdisLikes] = useState(0);
   const [alreadyLiked, setAlreadyLiked] = useState(false);
   const [alreadyDisliked, setAlreadyDisliked] = useState(false);
+
+  useEffect(() => {
+    setLikes(props.post.likes);
+    setdisLikes(props.post.dislikes);
+
+    return () => {};
+  }, []);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -94,20 +107,21 @@ function Post(props: { post: IImage }) {
 
   const handleLike = (imageId: string) => {
     if (!alreadyLiked && !alreadyDisliked) {
-      likePost(auth?.id as string, post.id).then((res) => {
+      likePost(auth?.id as string, imageId).then((res) => {
         setLikes((prevLikes) => prevLikes + 1);
         setAlreadyLiked(true);
       });
     } else if (!alreadyLiked && alreadyDisliked) {
-      unDisLikeQuestion(question.id).then((res) => {
-        likeQuestion(question.id).then((res) => {
-          setLikes((prevLikes) => prevLikes + 2);
+      removedisLike(auth?.id as string, imageId).then((res) => {
+        likePost(auth?.id as string, imageId).then((res) => {
+          setLikes((prevLikes) => prevLikes + 1);
+          setdisLikes((prevDislikes) => prevDislikes - 1);
           setAlreadyLiked(true);
           setAlreadyDisliked(false);
         });
       });
     } else if (alreadyLiked) {
-      unLikeQuestion(question.id).then((res) => {
+      removeLike(auth?.id as string, imageId).then((res) => {
         setLikes((prevLikes) => prevLikes - 1);
         setAlreadyLiked(false);
       });
@@ -116,21 +130,22 @@ function Post(props: { post: IImage }) {
 
   const handleDislike = (imageId: string) => {
     if (!alreadyLiked && !alreadyDisliked) {
-      dislikePost(question.id, imageId).then((res) => {
-        setLikes((prevLikes) => prevLikes - 1);
+      dislikePost(auth?.id as string, imageId).then((res) => {
+        setdisLikes((prevDislikes) => prevDislikes + 1);
         setAlreadyDisliked(true);
       });
     } else if (alreadyLiked && !alreadyDisliked) {
-      unLikeQuestion(question.id).then((res) => {
-        disLikeQuestion(question.id).then((res) => {
-          setLikes((prevLikes) => prevLikes - 2);
+      removeLike(auth?.id as string, imageId).then((res) => {
+        dislikePost(auth?.id as string, imageId).then((res) => {
+          setLikes((prevLikes) => prevLikes - 1);
+          setdisLikes((prevDislikes) => prevDislikes + 1);
           setAlreadyLiked(false);
           setAlreadyDisliked(true);
         });
       });
     } else if (alreadyDisliked) {
-      unDisLikeQuestion(question.id).then((res) => {
-        setLikes((prevLikes) => prevLikes + 1);
+      removedisLike(auth?.id as string, imageId).then((res) => {
+        setdisLikes((prevdisLikes) => prevdisLikes - 1);
         setAlreadyDisliked(false);
       });
     }
@@ -142,29 +157,32 @@ function Post(props: { post: IImage }) {
         <Card className={classes.root}>
           <CardHeader
             avatar={
-              <Avatar aria-label="recipe" className={classes.avatar}>
+              <Avatar aria-label="recipe">
                 {/* <img style={{ maxHeight: '100%' }} src={post.user.image} /> */}
               </Avatar>
             }
-            
             subheader={post.date}
           />
           <div style={{ display: "flex", justifyContent: "space-around" }}>
             <CardHeader
               avatar={
-                <CardActionArea onClick={() => handleLike(post.id)}><Avatar className={classes.avatar}><Favorite /></Avatar></CardActionArea>
-              }
-              title={post.likes}
-            />
-            <CardHeader
-              avatar={
-                <CardActionArea>
-                  <Avatar color="primary" className={classes.avatar}>
+                <CardActionArea onClick={() => handleLike(post.id)}>
+                  <Avatar color={alreadyLiked ? "primary" : "default"}>
                     <Favorite />
                   </Avatar>
                 </CardActionArea>
               }
-              title={post.dislikes}
+              title={likes}
+            />
+            <CardHeader
+              avatar={
+                <CardActionArea onClick={() => handleDislike(post.id)}>
+                  <Avatar color="primary">
+                    <Favorite />
+                  </Avatar>
+                </CardActionArea>
+              }
+              title={dislikes}
             />
           </div>
 
@@ -178,7 +196,7 @@ function Post(props: { post: IImage }) {
           <CardContent>
             <Typography variant="body2" color="textSecondary" component="p">
               This impressive paella is a perfect party dish and a fun meal to
-              cook together with your
+              cook together with you r
             </Typography>
           </CardContent>
         </Card>

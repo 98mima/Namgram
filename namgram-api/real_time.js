@@ -3,7 +3,7 @@ module.exports = function(server){
     var redis = require("redis")
     var client = redis.createClient()
 
-    client.subscribe("posts")
+    client.subscribe("likes")
 
     client.on("message", function (channel, message) {
         console.log(message)

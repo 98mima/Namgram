@@ -107,7 +107,7 @@ async function findCreator(node) {
             const user = _manyPeople(result)
             session.close();
     
-            return user[0].username})
+            return user[0]})
             .catch(err => {
                 console.log(err)
             })
@@ -341,7 +341,7 @@ exports.getByPostId = async (req, res) => {
         post.creator = await findCreator(post)
         Data = post
         
-        client.publish("posts", "Data.toString()")
+        //client.publish("posts", "Data.toString()")
 
         session.close();
         res.status(200)
@@ -426,9 +426,19 @@ exports.like = async (req, res) => {
             personId: req.body.personId,
             postId: req.body.postId
         })
+        let post = await session.run('match (post:Post {id:$postId}) return post ', {
+            personId: req.body.personId,
+            postId: req.body.postId
+        })
         session.close();
+        post = _manyPosts(post)[0]
+        const creator = await findCreator(post)
 
-        client.publish("posts", "lajkovao sam")
+        //const channel = "post" + creator.id
+
+        const Data = {liker: req.body.personId, post: req.body.postId, creator: creator.id } 
+        client.publish("likes", Data.toString())
+        // console.log(Data)
 
         res.status(200)
             .json({ message: "Like postavljen", rel })

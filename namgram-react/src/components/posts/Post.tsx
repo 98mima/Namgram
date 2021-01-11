@@ -1,26 +1,29 @@
-import React from 'react'
+import React, { useState } from "react";
 
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Collapse from '@material-ui/core/Collapse';
-import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import { red } from '@material-ui/core/colors';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import Favorite from '@material-ui/icons/FavoriteBorder'
-import { CardActionArea, Grid } from '@material-ui/core';
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import clsx from "clsx";
+import Card from "@material-ui/core/Card";
+import CardHeader from "@material-ui/core/CardHeader";
+import CardMedia from "@material-ui/core/CardMedia";
+import CardContent from "@material-ui/core/CardContent";
+import CardActions from "@material-ui/core/CardActions";
+import Collapse from "@material-ui/core/Collapse";
+import Avatar from "@material-ui/core/Avatar";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import { red } from "@material-ui/core/colors";
+import FavoriteIcon from "@material-ui/icons/Favorite";
+import ShareIcon from "@material-ui/icons/Share";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import Favorite from "@material-ui/icons/FavoriteBorder";
+import { CardActionArea, Grid } from "@material-ui/core";
 
-import { IImage } from '../../models/post'
-import { width, maxHeight, height } from '@material-ui/system';
+import { IImage } from "../../models/post";
+import { width, maxHeight, height } from "@material-ui/system";
+import { like } from "../../services/posts";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,47 +35,46 @@ const useStyles = makeStyles((theme: Theme) =>
       maxHeight: "500px",
     },
     img: {
-      maxWidth: '100%',
-      height: 'auto',
+      maxWidth: "100%",
+      height: "auto",
     },
     imgContainer: {
-      width: '100%',
-      maxWidth: '500px',
+      width: "100%",
+      maxWidth: "500px",
     },
 
     levo: {
-      display: 'flex',
-      maxWidth: 'auto',
-      maxHeight: '100%'
+      display: "flex",
+      maxWidth: "auto",
+      maxHeight: "100%",
     },
 
     root: {
-      display: 'flex',
-      maxWidth: '345px',
-      flexDirection: 'column',
-      width: '100%'
+      display: "flex",
+      maxWidth: "345px",
+      flexDirection: "column",
+      width: "100%",
       // marginRight: '0',
-      // width: "100%" 
-
+      // width: "100%"
     },
     media: {
       height: 0,
-      paddingTop: '56.25%', // 16:9
+      paddingTop: "56.25%", // 16:9
     },
     expand: {
-      transform: 'rotate(0deg)',
-      marginLeft: 'auto',
-      transition: theme.transitions.create('transform', {
+      transform: "rotate(0deg)",
+      marginLeft: "auto",
+      transition: theme.transitions.create("transform", {
         duration: theme.transitions.duration.shortest,
       }),
     },
     expandOpen: {
-      transform: 'rotate(180deg)',
+      transform: "rotate(180deg)",
     },
     avatar: {
       backgroundColor: red[500],
     },
-  }),
+  })
 );
 
 function Post(props: { post: IImage }) {
@@ -80,9 +82,58 @@ function Post(props: { post: IImage }) {
 
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
+  const auth = useSelector((state: RootState) => state.auth.auth);
+
+  const [likes, setLikes] = useState(0);
+  const [alreadyLiked, setAlreadyLiked] = useState(false);
+  const [alreadyDisliked, setAlreadyDisliked] = useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+  };
+
+  const handleLike = () => {
+    if (!alreadyLiked && !alreadyDisliked) {
+      like(auth?.id as string, post.id).then((res) => {
+        setLikes((prevLikes) => prevLikes + 1);
+        setAlreadyLiked(true);
+      });
+    } else if (!alreadyLiked && alreadyDisliked) {
+      unDisLikeQuestion(question.id).then((res) => {
+        likeQuestion(question.id).then((res) => {
+          setLikes((prevLikes) => prevLikes + 2);
+          setAlreadyLiked(true);
+          setAlreadyDisliked(false);
+        });
+      });
+    } else if (alreadyLiked) {
+      unLikeQuestion(question.id).then((res) => {
+        setLikes((prevLikes) => prevLikes - 1);
+        setAlreadyLiked(false);
+      });
+    }
+  };
+
+  const handleDislike = () => {
+    if (!alreadyLiked && !alreadyDisliked) {
+      disLikeQuestion(question.id).then((res) => {
+        setLikes((prevLikes) => prevLikes - 1);
+        setAlreadyDisliked(true);
+      });
+    } else if (alreadyLiked && !alreadyDisliked) {
+      unLikeQuestion(question.id).then((res) => {
+        disLikeQuestion(question.id).then((res) => {
+          setLikes((prevLikes) => prevLikes - 2);
+          setAlreadyLiked(false);
+          setAlreadyDisliked(true);
+        });
+      });
+    } else if (alreadyDisliked) {
+      unDisLikeQuestion(question.id).then((res) => {
+        setLikes((prevLikes) => prevLikes + 1);
+        setAlreadyDisliked(false);
+      });
+    }
   };
 
   return (
@@ -100,13 +151,21 @@ function Post(props: { post: IImage }) {
           <div style={{ display: "flex", justifyContent: "space-around" }}>
             <CardHeader
               avatar={
-                <CardActionArea><Avatar className={classes.avatar}><Favorite /></Avatar></CardActionArea>
+                <CardActionArea onClick={handleLike}>
+                  <Avatar className={classes.avatar}>
+                    <Favorite />
+                  </Avatar>
+                </CardActionArea>
               }
               title={post.likes}
             />
             <CardHeader
               avatar={
-                <CardActionArea><Avatar color="primary" className={classes.avatar}><Favorite /></Avatar></CardActionArea>
+                <CardActionArea>
+                  <Avatar color="primary" className={classes.avatar}>
+                    <Favorite />
+                  </Avatar>
+                </CardActionArea>
               }
               title={post.dislikes}
             />
@@ -114,15 +173,16 @@ function Post(props: { post: IImage }) {
 
           <CardContent>
             <Typography variant="body2" color="textSecondary" component="p">
-              This impressive paella is a perfect party dish and a fun meal to cook together with your
-              guests. Add 1 cup of frozen peas along with the mussels, if you like.
-          </Typography>
+              This impressive paella is a perfect party dish and a fun meal to
+              cook together with your guests. Add 1 cup of frozen peas along
+              with the mussels, if you like.
+            </Typography>
           </CardContent>
           <CardContent>
             <Typography variant="body2" color="textSecondary" component="p">
-              This impressive paella is a perfect party dish and a fun meal to cook together with your
-
-          </Typography>
+              This impressive paella is a perfect party dish and a fun meal to
+              cook together with your
+            </Typography>
           </CardContent>
         </Card>
       </div>
@@ -130,11 +190,8 @@ function Post(props: { post: IImage }) {
       <div className={classes.imgContainer}>
         <img className={classes.img} src={post.sasToken} />
       </div>
-    </div >
-
-
-
+    </div>
   );
 }
 
-export default Post
+export default Post;

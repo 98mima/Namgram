@@ -436,8 +436,8 @@ exports.like = async (req, res) => {
 
         //const channel = "post" + creator.id
 
-        const Data = {liker: req.body.personId, post: req.body.postId, creator: creator.id } 
-        client.publish("likes", Data.toString())
+        //const Data = {liker: req.body.personId, post: req.body.postId, creator: creator.id } 
+       // client.publish("likes", Data.toString())
         // console.log(Data)
 
         res.status(200)

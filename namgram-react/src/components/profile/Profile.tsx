@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useHistory, Link } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
@@ -16,7 +16,7 @@ import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 
 import { useSelector, useDispatch } from "react-redux";
-import { loadProfile } from "../../redux/profile/actions";
+import { CLEAR_PROFILE, loadProfile } from "../../redux/profile/actions";
 import { RootState } from "../../redux";
 import { follow, unfollow, getFollowers } from "../../services/profile";
 import {
@@ -84,6 +84,9 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
+  button: {
+    textDecoration: "none",
+  },
 }));
 
 function Profile() {
@@ -99,7 +102,7 @@ function Profile() {
 
   const [openFollowers, setOpenFollowers] = React.useState(false);
   const [openFollowing, setOpenFollowing] = React.useState(false);
-  const [change, setChange] = React.useState(false);
+  const [change, setChange] = React.useState([]);
 
   useEffect(() => {
     if (!profile) {
@@ -141,15 +144,17 @@ function Profile() {
     unfollow(username1 as string, username2 as string);
     setIsFollowing(false);
   };
-  const handleFollowFromList = (username: string) => {
-    const username1 = auth?.username;
-    const username2 = username;
-    follow(username1 as string, username2 as string);
+  const visit = (id: string) => {
+    history.push(`/profile/${id}`);
   };
   const handleUnFollowFromList = (username: string) => {
     const username1 = auth?.username;
     const username2 = username;
     unfollow(username1 as string, username2 as string);
+  };
+  const openInNewTab = (url: string) => {
+    const newWindow = window.open(url, "_blank", "noopener,noreferrer");
+    if (newWindow) newWindow.opener = null;
   };
 
   const checkMyProfile = () => {
@@ -221,36 +226,24 @@ function Profile() {
                               primary={person.username}
                               secondary={person.name + " " + person.lastname}
                             />
-                            {person.id != auth?.id &&
-                              following(person.username) && (
-                                <Button
-                                  type="submit"
-                                  variant="contained"
-                                  color="secondary"
-                                  onClick={() =>
-                                    handleUnFollowFromList(
-                                      person.username as string
-                                    )
-                                  }
-                                >
-                                  Unfollow
-                                </Button>
-                              )}
-                            {person.id != auth?.id &&
-                              !following(person.username) && (
-                                <Button
-                                  type="submit"
-                                  variant="contained"
-                                  color="primary"
-                                  onClick={() =>
-                                    handleFollowFromList(
-                                      person.username as string
-                                    )
-                                  }
-                                >
-                                  Follow
-                                </Button>
-                              )}
+
+                            <Link
+                              className={classes.button}
+                              to={`/profile/${person.id}`}
+                            >
+                              <Button
+                                type="submit"
+                                variant="contained"
+                                color="secondary"
+                                onClick={() =>
+                                  openInNewTab(
+                                    `http://localhost:3000/profile/${person.id}`
+                                  )
+                                }
+                              >
+                                Visit
+                              </Button>
+                            </Link>
                           </ListItem>
                         ))}
                       </List>
@@ -288,36 +281,23 @@ function Profile() {
                               secondary={person.name + " " + person.lastname}
                             />
 
-                            {person.id != auth?.id &&
-                              following(person.username) && (
-                                <Button
-                                  type="submit"
-                                  variant="contained"
-                                  color="secondary"
-                                  onClick={() =>
-                                    handleUnFollowFromList(
-                                      person.username as string
-                                    )
-                                  }
-                                >
-                                  Unfollow
-                                </Button>
-                              )}
-                            {person.id != auth?.id &&
-                              !following(person.username) && (
-                                <Button
-                                  type="submit"
-                                  variant="contained"
-                                  color="primary"
-                                  onClick={() =>
-                                    handleFollowFromList(
-                                      person.username as string
-                                    )
-                                  }
-                                >
-                                  Follow
-                                </Button>
-                              )}
+                            <Link
+                              className={classes.button}
+                              to={`/profile/${person.id}`}
+                            >
+                              <Button
+                                type="submit"
+                                variant="contained"
+                                color="secondary"
+                                onClick={() =>
+                                  openInNewTab(
+                                    `http://localhost:3000/profile/${person.id}`
+                                  )
+                                }
+                              >
+                                Visit
+                              </Button>
+                            </Link>
                           </ListItem>
                         ))}
                       </List>

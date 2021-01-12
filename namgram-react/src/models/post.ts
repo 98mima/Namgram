@@ -15,6 +15,7 @@ export interface IComment {
   id: string;
   content: string;
   date: Date;
+  creator: IUser;
 }
 
 export interface IImage {
@@ -36,8 +37,7 @@ export interface IPostUpload {
   caption: string;
 }
 
-
-export interface INotification{
-  liker: string,
-  post: string
+export interface INotification {
+  liker: string;
+  post: string;
 }

@@ -6,11 +6,11 @@ import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
+import Typography from "@material-ui/core/Typography";
 import CardActions from "@material-ui/core/CardActions";
 import Collapse from "@material-ui/core/Collapse";
 import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
 import { red } from "@material-ui/core/colors";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import ShareIcon from "@material-ui/icons/Share";
@@ -24,6 +24,7 @@ import {
   CircularProgress,
   Fab,
   Grid,
+  Link,
   Paper,
   TextField,
 } from "@material-ui/core";
@@ -51,6 +52,7 @@ import { RootState } from "../../redux";
 import { useSelector, useDispatch } from "react-redux";
 import { Socket } from "socket.io-client";
 import { ADD_NOTIFICATION } from "../../redux/auth/actions";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -86,8 +88,10 @@ const useStyles = makeStyles((theme: Theme) =>
       // width: "100%"
     },
     comments: {
+      display: "flex",
+      flexDirection: "column",
       width: "100%",
-      maxWidth: 360,
+      maxWidth: 500,
       backgroundColor: theme.palette.background.paper,
     },
     media: {
@@ -150,6 +154,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
   const [expanded, setExpanded] = React.useState(false);
   const auth = useSelector((state: RootState) => state.auth.auth);
   const loading = useSelector((state: RootState) => state.ui.loading);
+  const history = useHistory();
 
   const [likes, setLikes] = useState(0);
   const [dislikes, setdisLikes] = useState(0);
@@ -187,6 +192,9 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
         setComments([...comments, res]);
       });
     }
+  };
+  const handleClick = (userId: string) => {
+    history.push(`/profile/${userId}`);
   };
 
   const handleExpandClick = () => {
@@ -260,9 +268,11 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
         <Card className={classes.root}>
           <CardHeader
             avatar={
-              <Avatar aria-label="recipe">
-                {/* <img style={{ maxHeight: '100%' }} src={post.user.image} /> */}
-              </Avatar>
+              <CardActionArea onClick={() => handleClick(post.creator.id)}>
+                <Avatar aria-label="recipe">
+                  {/* <img style={{ maxHeight: '100%' }} src={post.user.image} /> */}
+                </Avatar>
+              </CardActionArea>
             }
             title={post.creator.username}
             subheader={post.date}
@@ -321,12 +331,18 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
                   {comments.map((comment) => (
                     <ListItem key={comment.id}>
                       <ListItemAvatar>
-                        <Avatar></Avatar>
+                        <CardActionArea
+                          onClick={() => handleClick(post.creator.id)}
+                        >
+                          <Avatar></Avatar>
+                        </CardActionArea>
                       </ListItemAvatar>
+
                       <ListItemText
-                        primary={comment.content}
-                        secondary={comment.date}
+                        primary={comment.creator.username}
+                        secondary={comment.content}
                       />
+                      <Typography>{comment.date}</Typography>
                     </ListItem>
                   ))}
                   <ListItem>

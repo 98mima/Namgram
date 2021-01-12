@@ -135,7 +135,8 @@ function Post(props: { post: IImage }) {
   };
 
   const handleLike = (imageId: string) => {
-    console.log(alreadyLiked, alreadyDisliked);
+    console.log("ALEARDY LIKED", alreadyLiked);
+    console.log("ALEARDY DISLIKED", alreadyDisliked);
     if (!alreadyLiked && !alreadyDisliked) {
       likePost(auth?.id as string, imageId).then((res) => {
         setLikes((prevLikes) => prevLikes + 1);
@@ -199,7 +200,7 @@ function Post(props: { post: IImage }) {
             <CardHeader
               avatar={
                 <CardActionArea onClick={() => handleLike(post.id)}>
-                  <Avatar color={alreadyLiked ? "primary" : "default"}>
+                  <Avatar className={alreadyLiked ? classes.avatar : ""}>
                     <Favorite />
                   </Avatar>
                 </CardActionArea>

@@ -62,7 +62,6 @@ exports.get = async (req, res) => {
             id: req.params.id
         })
         const pic = _manyimage(image)
-        console.log(pic)
         const Data = person.records[0].get('n').properties;
 
         const blobName = pic[0].blobName
@@ -78,9 +77,7 @@ exports.get = async (req, res) => {
         ).toString();
 
         const sasUrl = blobClient.url + "?" + blobSAS;
-        Data.sasToken = sasUrl
-
-
+        Data.profilePic = sasUrl
 
         session.close();
         res.status(200)

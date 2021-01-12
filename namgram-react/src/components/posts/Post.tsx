@@ -118,7 +118,6 @@ function Post(props: { post: IImage }) {
     setAlreadyDisliked(props.post.ifDisliked);
     setLikes(props.post.likes);
     setdisLikes(props.post.dislikes);
-    console.log(props.post.ifLiked, props.post.ifDisliked);
 
     return () => {};
   }, []);
@@ -128,6 +127,9 @@ function Post(props: { post: IImage }) {
   };
   const handleOpenComments = (imageId: string) => {
     setOpenComments(true);
+    getComments(imageId).then((res) => {
+      setComments(res);
+    });
   };
 
   const handleCloseComments = () => {
@@ -135,13 +137,10 @@ function Post(props: { post: IImage }) {
   };
 
   const handleLike = (imageId: string) => {
-    console.log("ALEARDY LIKED", alreadyLiked);
-    console.log("ALEARDY DISLIKED", alreadyDisliked);
     if (!alreadyLiked && !alreadyDisliked) {
       likePost(auth?.id as string, imageId).then((res) => {
         setLikes((prevLikes) => prevLikes + 1);
         setAlreadyLiked(true);
-        console.log("ovde1");
       });
     } else if (!alreadyLiked && alreadyDisliked) {
       removedisLike(auth?.id as string, imageId).then((res) => {
@@ -156,7 +155,6 @@ function Post(props: { post: IImage }) {
       removeLike(auth?.id as string, imageId).then((res) => {
         setLikes((prevLikes) => prevLikes - 1);
         setAlreadyLiked(false);
-        console.log("ovde3");
       });
     }
   };
@@ -194,6 +192,7 @@ function Post(props: { post: IImage }) {
                 {/* <img style={{ maxHeight: '100%' }} src={post.user.image} /> */}
               </Avatar>
             }
+            title={post.creator.username}
             subheader={post.date}
           />
           <div style={{ display: "flex", justifyContent: "space-around" }}>
@@ -210,7 +209,7 @@ function Post(props: { post: IImage }) {
             <CardHeader
               avatar={
                 <CardActionArea onClick={() => handleDislike(post.id)}>
-                  <Avatar color="primary">
+                  <Avatar className={alreadyDisliked ? classes.avatar : ""}>
                     <Favorite />
                   </Avatar>
                 </CardActionArea>
@@ -220,10 +219,9 @@ function Post(props: { post: IImage }) {
           </div>
 
           <CardContent>
-            <Typography variant="body2" color="textSecondary" component="p">
-              This impressive paella is a perfect party dish and a fun meal to
-              cook together with your guests. Add 1 cup of frozen peas along
-              with the mussels, if you like.
+            <Typography variant="body2" color="textPrimary">
+              {post.content +
+                "SLAVISA KURAC saddddddddddddddd asdassadsad asdsadas asdas asdsad asda sd"}
             </Typography>
           </CardContent>
           <CardContent>
@@ -244,19 +242,19 @@ function Post(props: { post: IImage }) {
             >
               <Fade in={openComments}>
                 <List className={classes.root}>
-                  {/* {post.comments.map((comment) => (
+                  {comments.map((comment) => (
                     <ListItem key={comment.id}>
                       <ListItemAvatar>
                         <Avatar></Avatar>
                       </ListItemAvatar>
                       <ListItemText
-                        primary={person.username}
-                        secondary={person.name + " " + person.lastname}
+                        primary={comment.date}
+                        secondary={comment.content}
                       />
 
                       <Typography>KOMENTAR</Typography>
                     </ListItem>
-                  ))} */}
+                  ))}
                 </List>
               </Fade>
             </Modal>

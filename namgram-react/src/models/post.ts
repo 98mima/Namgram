@@ -1,3 +1,5 @@
+import { IUser } from "./user";
+
 export interface IPost {
   user: {
     id: string;
@@ -25,6 +27,7 @@ export interface IImage {
   comments: number;
   ifLiked: boolean;
   ifDisliked: boolean;
+  creator: IUser;
 }
 
 export interface IPostUpload {

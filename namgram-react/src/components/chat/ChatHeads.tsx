@@ -57,7 +57,7 @@ function ChatHeads() {
                     {chatHeads && chatHeads.map((user: IUser) => 
                         <ListItem button key={user.id}>
                             <ListItemIcon>
-                                <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
+                                <Avatar alt="Remy Sharp" src={user.profilePic} />
                             </ListItemIcon>
                             <ListItemText primary={`${user.name} ${user.lastname}`}>Remy Sharp</ListItemText>
                             <ListItemText secondary={user.username}></ListItemText>

@@ -9,6 +9,7 @@ const Person = module.exports = function (_node) {
         "name": _node.properties['name'],
         "lastname": _node.properties['lastname'],
         "password": _node.properties['password'],
+        "profilePic": _node.properties['profilePic']
     })
   
 };

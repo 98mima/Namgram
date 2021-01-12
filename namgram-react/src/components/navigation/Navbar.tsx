@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-import { Button, createStyles, fade, makeStyles, Theme } from '@material-ui/core';
+import { Avatar, Button, createStyles, fade, makeStyles, Theme } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -282,7 +282,8 @@ function Navbar() {
             onClick={handleProfileMenuOpen}
             color="inherit"
           >
-            <AccountCircle />
+            {/* <AccountCircle /> */}
+            <Avatar src={auth.profilePic} />
           </IconButton> </div>}
           </div>
           <div className={classes.sectionMobile}>

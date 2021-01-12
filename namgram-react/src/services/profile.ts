@@ -5,7 +5,7 @@ export async function getProfile(userId: string) {
   return axios
     .get<{ message: string; Data: IUser }>(`person/byId/${userId}`)
     .then((res) => {
-      const { id, birthday, lastname, name, username } = res.data.Data;
+      const { id, birthday, lastname, name, username, profilePic } = res.data.Data;
       const profile: IProfile = {
         id,
         birthday,
@@ -15,6 +15,7 @@ export async function getProfile(userId: string) {
         followers: [],
         following: [],
         posts: [],
+        profilePic
       };
       return profile;
     });

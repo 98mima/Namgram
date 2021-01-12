@@ -7,7 +7,8 @@ export interface IUser{
     id: string,
     email: string,
     lastname: string,
-    username: string
+    username: string,
+    profilePic: string
 }
 
 export interface IProfile {
@@ -18,5 +19,6 @@ export interface IProfile {
     birthday: Date,
     followers: IUser[],
     following: IUser[],
-    posts: IImage[]
+    posts: IImage[],
+    profilePic: string
 }

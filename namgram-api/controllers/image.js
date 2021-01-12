@@ -34,6 +34,7 @@ const clientR = redis.createClient(redisUrl);
 clientR.get = util.promisify(clientR.get);
 
 const express = require('express');
+const post = require('../models/post');
 const app = express();
 var server = require('http').createServer(app)
 const io = require("socket.io")(server, {
@@ -106,7 +107,33 @@ async function findCreator(node) {
         console.log(err)
     }
 }
+async function findIfLiked(node, userId) {
+    try{
+        let session = driver.session();
 
+        const query = [
+            'MATCH (image:Image {id: $id})<-[r1:like]-(person:Person {id:$userId}) return r1'
+        ].join('\n')
+
+        return session.readTransaction(txc =>
+            txc.run(query, {
+                id: node.id,
+                userId: userId
+            }))
+            .then( result => {  
+                session.close();
+            if(result.records[0])
+                return "true"
+            else
+                return "false"})
+            .catch(err => {
+                console.log(err)
+            })
+    }
+    catch (err){
+        console.log(err)
+    }
+}
 function _manyImages(neo4jResult) {
     return neo4jResult.records.map(r => new Image(r.get('image')))
 }
@@ -236,17 +263,25 @@ exports.getByFollowings = async (req, res) => {
                   cerds 
                 ).toString();
               
-                  const sasUrl= blobClient.url+"?"+blobSAS;         
-              image.sasToken = sasUrl
+            const sasUrl = blobClient.url + "?" + blobSAS;
+            image.sasToken = sasUrl
         })
 
+        
+        let ifLiked = []
+        ifLiked = await Promise.all(
+            Data.map(post => {
+                return post.ifLiked = findIfLiked(post, req.params.userId)
+            }))
         let creators = []
         creators = await Promise.all(
             Data.map(post => {
-            return post.creator = findCreator(post)
-        }))
-        Data.map((post, index) =>
-            post.creator = creators[index])
+                return post.creator = findCreator(post)
+            }))
+        Data.map((post, index) =>{
+            post.creator = creators[index]
+            post.ifLiked = ifLiked[index]})
+
         session.close();
         res.status(200)
             .json({ message: "Prikupljeno", Data })

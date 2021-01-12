@@ -17,7 +17,16 @@ import ShareIcon from "@material-ui/icons/Share";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Favorite from "@material-ui/icons/FavoriteBorder";
-import { CardActionArea, Grid } from "@material-ui/core";
+import SendIcon from "@material-ui/icons/SendOutlined";
+import {
+  Button,
+  CardActionArea,
+  CircularProgress,
+  Fab,
+  Grid,
+  Paper,
+  TextField,
+} from "@material-ui/core";
 
 import { IComment, IImage } from "../../models/post";
 import { width, maxHeight, height } from "@material-ui/system";
@@ -31,6 +40,7 @@ import {
   Modal,
 } from "@material-ui/core";
 import {
+  addComment,
   dislikePost,
   getComments,
   likePost,
@@ -38,7 +48,8 @@ import {
   removeLike,
 } from "../../services/posts";
 import { RootState } from "../../redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { START_LOADING, STOP_LOADING } from "../../redux/ui/actions";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -69,8 +80,14 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: "345px",
       flexDirection: "column",
       width: "100%",
+
       // marginRight: '0',
       // width: "100%"
+    },
+    comments: {
+      width: "100%",
+      maxWidth: 360,
+      backgroundColor: theme.palette.background.paper,
     },
     media: {
       height: 0,
@@ -85,6 +102,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     expandOpen: {
       transform: "rotate(180deg)",
+      filter: "blur(10px)",
     },
     avatar: {
       backgroundColor: red[500],
@@ -92,7 +110,34 @@ const useStyles = makeStyles((theme: Theme) =>
     modal: {
       display: "flex",
       alignItems: "center",
+      flexWrap: "wrap",
       justifyContent: "center",
+      boxShadow: theme.shadows[5],
+      maxHeight: "100%",
+      overflow: "auto",
+      position: "absolute",
+      marginTop: 200,
+      marginBottom: 200,
+    },
+    button: {
+      display: "flex",
+      justifyContent: "center",
+      paddingBottom: 0,
+    },
+    form: {
+      display: "flex",
+      flexDirection: "row",
+      width: "100%",
+    },
+
+    btn: {
+      width: "20%",
+      height: "80%",
+      marginRight: 0,
+    },
+    input: {
+      flex: 1,
+      width: "80%",
     },
   })
 );
@@ -103,6 +148,8 @@ function Post(props: { post: IImage }) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   const auth = useSelector((state: RootState) => state.auth.auth);
+  const loading = useSelector((state: RootState) => state.ui.loading);
+  const dispatch = useDispatch();
 
   const [likes, setLikes] = useState(0);
   const [dislikes, setdisLikes] = useState(0);
@@ -112,6 +159,7 @@ function Post(props: { post: IImage }) {
   const [openComments, setOpenComments] = React.useState(false);
 
   const [comments, setComments] = React.useState<IComment[]>([]);
+  const [newComment, setNewComment] = useState("");
 
   useEffect(() => {
     setAlreadyLiked(props.post.ifLiked);
@@ -121,6 +169,25 @@ function Post(props: { post: IImage }) {
 
     return () => {};
   }, []);
+
+  const onInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    event.preventDefault();
+    setNewComment(event.currentTarget.value);
+  };
+  const onSubmit = (
+    event: React.FormEvent<HTMLFormElement>,
+    postId: string
+  ) => {
+    event.preventDefault();
+    if (newComment) {
+      const id = auth?.id as string;
+      addComment(postId, id, newComment).then((res) => {
+        setComments([...comments, res]);
+      });
+    }
+  };
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -220,13 +287,17 @@ function Post(props: { post: IImage }) {
 
           <CardContent>
             <Typography variant="body2" color="textPrimary">
-              {post.content +
-                "SLAVISA KURAC saddddddddddddddd asdassadsad asdsadas asdas asdsad asda sd"}
+              {post.content}
             </Typography>
           </CardContent>
           <CardContent>
-            <div onClick={() => handleOpenComments(post.id)}>
-              <Typography>Comments</Typography>
+            <div
+              className={classes.button}
+              onClick={() => handleOpenComments(post.id)}
+            >
+              <Button variant="contained" color="secondary">
+                Comments
+              </Button>
             </div>
             <Modal
               aria-labelledby="transition-modal-title"
@@ -241,20 +312,34 @@ function Post(props: { post: IImage }) {
               }}
             >
               <Fade in={openComments}>
-                <List className={classes.root}>
+                <List className={classes.comments}>
                   {comments.map((comment) => (
                     <ListItem key={comment.id}>
                       <ListItemAvatar>
                         <Avatar></Avatar>
                       </ListItemAvatar>
                       <ListItemText
-                        primary={comment.date}
-                        secondary={comment.content}
+                        primary={comment.content}
+                        secondary={comment.date}
                       />
-
-                      <Typography>KOMENTAR</Typography>
                     </ListItem>
                   ))}
+                  <ListItem>
+                    <form
+                      className={classes.form}
+                      noValidate
+                      onSubmit={(event) => onSubmit(event, post.id)}
+                    >
+                      <TextField
+                        label="Add a comment"
+                        onChange={onInput}
+                        className={classes.input}
+                      />
+                      <Fab type="submit" color="primary" aria-label="add">
+                        <SendIcon />
+                      </Fab>
+                    </form>
+                  </ListItem>
                 </List>
               </Fade>
             </Modal>

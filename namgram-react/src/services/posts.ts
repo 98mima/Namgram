@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IImage, IPost, IPostUpload } from "../models/post";
+import { IComment, IImage, IPost, IPostUpload } from "../models/post";
 
 export async function getPosts(userId: string) {
   return axios
@@ -74,7 +74,21 @@ export async function getComments(imageId: string) {
     .get<{ message: string; Data: IImage[] }>(`comment/byImageId/${imageId}`)
     .then((res) => res.data.Data);
 }
-
+export async function addComment(
+  imageId: string,
+  personId: string,
+  content: string
+) {
+  return axios
+    .post<{ message: string; Data: IComment }>(`comment/addToImage`, {
+      imageId: imageId,
+      personId: personId,
+      content: content,
+    })
+    .then((res) => {
+      return res.data.Data;
+    });
+}
 // export async function uploadBasicPost(uploadForm: IBasicPost) {
 //   return axios
 //     .post<{ content: string; personId: string }>("post/add", {

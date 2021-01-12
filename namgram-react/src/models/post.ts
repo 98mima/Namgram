@@ -35,3 +35,9 @@ export interface IPostUpload {
   personId: string;
   caption: string;
 }
+
+
+export interface INotification{
+  liker: string,
+  post: string
+}

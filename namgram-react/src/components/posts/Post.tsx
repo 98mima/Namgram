@@ -48,8 +48,9 @@ import {
   removeLike,
 } from "../../services/posts";
 import { RootState } from "../../redux";
-import { useDispatch, useSelector } from "react-redux";
-import { START_LOADING, STOP_LOADING } from "../../redux/ui/actions";
+import { useSelector, useDispatch } from "react-redux";
+import { Socket } from "socket.io-client";
+import { ADD_NOTIFICATION } from "../../redux/auth/actions";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -142,14 +143,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function Post(props: { post: IImage }) {
-  const { post } = props;
-
+function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
+  const { post, socket } = props;
+  const dispatch = useDispatch();
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   const auth = useSelector((state: RootState) => state.auth.auth);
   const loading = useSelector((state: RootState) => state.ui.loading);
-  const dispatch = useDispatch();
 
   const [likes, setLikes] = useState(0);
   const [dislikes, setdisLikes] = useState(0);
@@ -207,6 +207,11 @@ function Post(props: { post: IImage }) {
     if (!alreadyLiked && !alreadyDisliked) {
       likePost(auth?.id as string, imageId).then((res) => {
         setLikes((prevLikes) => prevLikes + 1);
+        socket.emit("like", {
+          liker: auth?.id,
+          liked: post.creator.id,
+          post: post.id,
+        });
         setAlreadyLiked(true);
       });
     } else if (!alreadyLiked && alreadyDisliked) {

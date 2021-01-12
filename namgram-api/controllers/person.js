@@ -126,7 +126,7 @@ exports.getByUsername = async (req, res) => {
 exports.getFollowing = async (req, res) => {
     try {
         let session = driver.session();
-        const persons = await session.run('MATCH (n:Person {username: $username})-->(person) RETURN person', {
+        const persons = await session.run('MATCH (n:Person {username: $username})-[:follows]->(person) RETURN person', {
             username: req.params.username
         })
         session.close();
@@ -143,7 +143,7 @@ exports.getFollowing = async (req, res) => {
 exports.getFollowers = async (req, res) => {
     try {
         let session = driver.session();
-        const persons = await session.run('MATCH (n:Person {username: $username})<--(person) RETURN person', {
+        const persons = await session.run('MATCH (n:Person {username: $username})<-[:follows]-(person) RETURN person', {
             username: req.params.username
         })
         session.close();

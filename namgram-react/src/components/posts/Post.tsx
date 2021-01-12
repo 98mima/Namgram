@@ -19,8 +19,17 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Favorite from "@material-ui/icons/FavoriteBorder";
 import { CardActionArea, Grid } from "@material-ui/core";
 
-import { IImage } from "../../models/post";
+import { IComment, IImage } from "../../models/post";
 import { width, maxHeight, height } from "@material-ui/system";
+import {
+  Backdrop,
+  Fade,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Modal,
+} from "@material-ui/core";
 import {
   dislikePost,
   likePost,
@@ -79,6 +88,11 @@ const useStyles = makeStyles((theme: Theme) =>
     avatar: {
       backgroundColor: red[500],
     },
+    modal: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
   })
 );
 
@@ -94,6 +108,10 @@ function Post(props: { post: IImage }) {
   const [alreadyLiked, setAlreadyLiked] = useState(false);
   const [alreadyDisliked, setAlreadyDisliked] = useState(false);
 
+  const [openComments, setOpenComments] = React.useState(false);
+
+  const [comments, setComments] = React.useState<IComment[]>([]);
+
   useEffect(() => {
     setLikes(props.post.likes);
     setdisLikes(props.post.dislikes);
@@ -103,6 +121,13 @@ function Post(props: { post: IImage }) {
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+  };
+  const handleOpenComments = () => {
+    setOpenComments(true);
+  };
+
+  const handleCloseComments = () => {
+    setOpenComments(false);
   };
 
   const handleLike = (imageId: string) => {
@@ -194,10 +219,39 @@ function Post(props: { post: IImage }) {
             </Typography>
           </CardContent>
           <CardContent>
-            <Typography variant="body2" color="textSecondary" component="p">
-              This impressive paella is a perfect party dish and a fun meal to
-              cook together with you r
-            </Typography>
+            <div onClick={handleOpenComments}>
+              <Typography>Comments</Typography>
+            </div>
+            <Modal
+              aria-labelledby="transition-modal-title"
+              aria-describedby="transition-modal-description"
+              className={classes.modal}
+              open={openComments}
+              onClose={handleCloseComments}
+              closeAfterTransition
+              BackdropComponent={Backdrop}
+              BackdropProps={{
+                timeout: 500,
+              }}
+            >
+              <Fade in={openComments}>
+                <List className={classes.root}>
+                  {/* {post.comments.map((comment) => (
+                    <ListItem key={comment.id}>
+                      <ListItemAvatar>
+                        <Avatar></Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={person.username}
+                        secondary={person.name + " " + person.lastname}
+                      />
+
+                      <Typography>KOMENTAR</Typography>
+                    </ListItem>
+                  ))} */}
+                </List>
+              </Fade>
+            </Modal>
           </CardContent>
         </Card>
       </div>

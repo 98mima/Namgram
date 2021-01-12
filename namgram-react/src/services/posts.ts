@@ -69,6 +69,11 @@ export async function uploadPost(uploadForm: IPostUpload) {
     headers: { "Content-Type": "multipart/form-data" },
   });
 }
+export async function getComments(imageId: string) {
+  return axios
+    .get<{ message: string; Data: IImage[] }>(`comment/byImageId/${imageId}`)
+    .then((res) => res.data.Data);
+}
 
 // export async function uploadBasicPost(uploadForm: IBasicPost) {
 //   return axios

@@ -1,4 +1,5 @@
 const Comment = require('../models/comment');
+const Person = require('../models/person');
 const uuid = require('node-uuid');
 let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
@@ -14,30 +15,57 @@ client.get = util.promisify(client.get);
 function _manyComments(neo4jResult) {
     return neo4jResult.records.map(r => new Comment(r.get('comment')))
 }
-
-exports.getByPost = async (req, res) => {
+function _manyPeople(neo4jResult) {
+    return neo4jResult.records.map(r => new Person(r.get('person')))
+  }
+async function findCreator(postId) {
     try{
         let session = driver.session();
 
         const query = [
-            'MATCH (post:Post {id: $id})<-[r1:commented]-(n:Person) return r1 as comment'
+            'MATCH (post:Post {id: $id})<-[r1:commented]-(person:Person) return person'
         ].join('\n')
 
         return session.readTransaction(txc =>
             txc.run(query, {
-                id: req.params.postId
+                id: postId
             }))
             .then( result => {  
-            const listOfComments = _manyComments(result)
-            
-            session.close();
-            const Data = listOfComments
-    
-            res.status(200)
-            .json({ Data })})
+            const user = _manyPeople(result)
+                session.close();
+                return user[0]
+            })
             .catch(err => {
                 console.log(err)
             })
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+
+exports.getByPost = async (req, res) => {
+    try {
+        let session = driver.session();
+
+        const comments = await session.run('MATCH (post:Post {id: $id})<-[r1:commented]-(n:Person) return r1 as comment', {
+            id: req.params.postId
+        });
+        const p = _manyComments(comments)
+        session.close();
+
+        let Data = []
+        let creators = []
+
+        creators = await Promise.all(
+            p.map(post => {
+                return post.creator = findCreator(req.params.postId)
+            }))
+        p.map((post, index) =>
+            post.creator = creators[index])
+
+        res.status(200)
+            .json({ message: "Prikupljeno", p })
     }
     catch (err){
         res.json({ success: false });
@@ -74,6 +102,42 @@ exports.getByImage = async (req, res) => {
         console.log(err)
     }
 }
+exports.addToPost = async (req, res) => {
+    try {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        today = dd + '.' + mm + '.' + yyyy;
+
+        let session = driver.session();
+        const query = [
+            'match (p:Post), (a:Person) \
+             where p.id = $postId and a.id = $personId\
+             create (p)<-[comment:commented {date:$date, content:$content}]-(a) \
+             RETURN comment'
+        ].join('\n')
+
+        const com = await session.writeTransaction(txc =>
+            txc.run(query, {
+                date: today,
+                content: req.body.content,
+                personId: req.body.personId,
+                postId: req.body.postId
+            }))
+
+        const comment = _manyComments(com)
+        const Data = comment[0]
+
+        session.close();
+        res.status(200)
+            .json({ message: "Kreiran komentar", Data })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
 exports.addToImage = async (req, res) => {
     try {
         var today = new Date();
@@ -110,40 +174,5 @@ exports.addToImage = async (req, res) => {
         console.log(err);
     }
 };
-exports.add = async (req, res) => {
-    try {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-        today = dd + '.' + mm + '.' + yyyy;
 
-        let session = driver.session();
-        const query = [
-            'match (p:Post), (a:Person) \
-             where p.id = $postId and a.id = $personId\
-             create (p)<-[comment:commented {date:$date, content:$content}]-(a) \
-             RETURN comment'
-        ].join('\n')
-
-        const com = await session.writeTransaction(txc =>
-            txc.run(query, {
-                date: today,
-                content: req.body.content,
-                personId: req.body.personId,
-                postId: req.body.postId
-            }))
-
-        const comment = _manyComments(com)
-        const Data = comment[0]
-
-        session.close();
-        res.status(200)
-            .json({ message: "Kreiran komentar", Data })
-    }
-    catch (err) {
-        res.json({ success: false });
-        console.log(err);
-    }
-};
 

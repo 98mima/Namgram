@@ -116,7 +116,60 @@ async function findCreator(node) {
         console.log(err)
     }
 }
+async function findIfLiked(node, userId) {
+    try{
+        let session = driver.session();
 
+        const query = [
+            'MATCH (post:Post {id: $id})<-[r1:like]-(person:Person {id:$userId}) return r1'
+        ].join('\n')
+
+        return session.readTransaction(txc =>
+            txc.run(query, {
+                id: node.id,
+                userId: userId
+            }))
+            .then( result => {  
+                session.close();
+            if(result.records[0])
+                return "true"
+            else
+                return "false"})
+            .catch(err => {
+                console.log(err)
+            })
+    }
+    catch (err){
+        console.log(err)
+    }
+}
+async function findIfDisliked(node, userId) {
+    try{
+        let session = driver.session();
+
+        const query = [
+            'MATCH (post:Post {id: $id})<-[r1:dislike]-(person:Person {id:$userId}) return r1'
+        ].join('\n')
+
+        return session.readTransaction(txc =>
+            txc.run(query, {
+                id: node.id,
+                userId: userId
+            }))
+            .then( result => {  
+                session.close();
+            if(result.records[0])
+                return "true"
+            else
+                return "false"})
+            .catch(err => {
+                console.log(err)
+            })
+    }
+    catch (err){
+        console.log(err)
+    }
+}
 //ovde ne mogu da se prikazu komentari, vec samo njihov broj
 //tako da kad se klikne na broj komentara onda treba da izadju komentari za taj post
 exports.getAll = async (req, res) => {
@@ -158,23 +211,35 @@ exports.getByFollowings = async (req, res) => {
             id: req.params.userId
         })
         const posts = _manyPosts(posts1)
-        session.close();
-
+        
         let creators = []
         let Data = []
+        let ifLiked = []
+        let ifDisliked = []
 
+      
         Data = await Promise.all(posts.map(p => {
             return findProps(p)
         }))
-
+        ifLiked = await Promise.all(
+            Data.map(post => {
+                return post.ifLiked = findIfLiked(post, req.params.userId)
+            }))
+        ifDisliked = await Promise.all(
+            Data.map(post => {
+                return post.ifDisliked = findIfDisliked(post, req.params.userId)
+            }))
         creators = await Promise.all(
             Data.map(post => {
-            return post.creator = findCreator(post)
-        }))
+                return post.creator = findCreator(post)
+            }))
 
-        Data.map((post, index) =>
-             post.creator = creators[index])
-
+        Data.map((post, index) => {
+            post.creator = creators[index]
+            post.ifLiked = ifLiked[index]
+            post.ifDisliked = ifDisliked[index]
+        })
+        session.close();
         res.status(200)
             .json({ message: "Prikupljeno", Data })
     }

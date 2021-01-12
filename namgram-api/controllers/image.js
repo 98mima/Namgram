@@ -134,6 +134,33 @@ async function findIfLiked(node, userId) {
         console.log(err)
     }
 }
+async function findIfDisliked(node, userId) {
+    try{
+        let session = driver.session();
+
+        const query = [
+            'MATCH (image:Image {id: $id})<-[r1:dislike]-(person:Person {id:$userId}) return r1'
+        ].join('\n')
+
+        return session.readTransaction(txc =>
+            txc.run(query, {
+                id: node.id,
+                userId: userId
+            }))
+            .then( result => {  
+                session.close();
+            if(result.records[0])
+                return "true"
+            else
+                return "false"})
+            .catch(err => {
+                console.log(err)
+            })
+    }
+    catch (err){
+        console.log(err)
+    }
+}
 function _manyImages(neo4jResult) {
     return neo4jResult.records.map(r => new Image(r.get('image')))
 }
@@ -267,11 +294,15 @@ exports.getByFollowings = async (req, res) => {
             image.sasToken = sasUrl
         })
 
-        
         let ifLiked = []
+        let ifDisliked = []
         ifLiked = await Promise.all(
             Data.map(post => {
                 return post.ifLiked = findIfLiked(post, req.params.userId)
+            }))
+        ifDisliked = await Promise.all(
+            Data.map(post => {
+                return post.ifDisliked = findIfDisliked(post, req.params.userId)
             }))
         let creators = []
         creators = await Promise.all(
@@ -280,7 +311,9 @@ exports.getByFollowings = async (req, res) => {
             }))
         Data.map((post, index) =>{
             post.creator = creators[index]
-            post.ifLiked = ifLiked[index]})
+            post.ifLiked = ifLiked[index]
+            post.ifDisliked = ifDisliked[index]
+        })
 
         session.close();
         res.status(200)

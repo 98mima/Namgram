@@ -20,7 +20,8 @@ function Posts() {
     const classes= useStyles();
     const dispatch = useDispatch();
     const posts = useSelector((state: RootState) => state.posts.posts);
-    const auth = useSelector((state: RootState) => state.auth.auth)
+    const auth = useSelector((state: RootState) => state.auth.auth);
+    const socket = useSelector((state: RootState) => state.auth.socket)
 
     useEffect(() => {
         if(auth) dispatch(loadPosts(auth?.id as string));
@@ -32,7 +33,7 @@ function Posts() {
         <React.Fragment>
             <div className={classes.container}>
                 {loading && <CircularProgress size={'20vw'} className={classes.loading} />}
-                {posts && posts.map(post => <Post key={post.id} post={post} />)}
+                {posts && posts.map(post => <Post key={post.id} socket={socket as SocketIOClient.Socket} post={post} />)}
             </div>
         </React.Fragment>
     )

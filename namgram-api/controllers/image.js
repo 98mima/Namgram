@@ -123,9 +123,9 @@ async function findIfLiked(node, userId) {
             .then( result => {  
                 session.close();
             if(result.records[0])
-                return "true"
+                return true
             else
-                return "false"})
+                return false})
             .catch(err => {
                 console.log(err)
             })
@@ -150,9 +150,9 @@ async function findIfDisliked(node, userId) {
             .then( result => {  
                 session.close();
             if(result.records[0])
-                return "true"
+                return true
             else
-                return "false"})
+                return false})
             .catch(err => {
                 console.log(err)
             })
@@ -534,8 +534,7 @@ exports.like = async (req, res) => {
         session.close();
 
         //console.log(rel.records[0].get("id"));
-        let socketId = await clientR.GET("client:" + creator.id)
-        io.to(socketId).emit("notification", "nesto")
+
 
         res.status(200)
             .json({ message: "Like" })

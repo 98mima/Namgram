@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
@@ -8,6 +8,10 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../redux';
+import { loadChatHeads } from '../../redux/chat/actions';
+import {IUser} from '../../models/user'
 
 const useStyles = makeStyles({
     table: {
@@ -31,42 +35,34 @@ const useStyles = makeStyles({
 
 function ChatHeads() {
     const classes = useStyles();
+    const auth = useSelector((state: RootState) => state.auth.auth);
+    const chatHeads = useSelector((state: RootState) => state.chat.chatHeads);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if(auth) dispatch(loadChatHeads(auth.username));
+        return () => {
+        }
+    }, [auth])
 
     return (
             <Grid item xs={3} className={classes.borderRight500}>
-                <List>
-                    <ListItem button key="RemySharp">
-                        <ListItemIcon>
-                        <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
-                        </ListItemIcon>
-                        <ListItemText primary="John Wick"></ListItemText>
-                    </ListItem>
-                </List>
+
                 <Divider />
                 <Grid item xs={12} style={{padding: '10px'}}>
                     <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
                 </Grid>
                 <Divider />
                 <List>
-                    <ListItem button key="RemySharp">
-                        <ListItemIcon>
-                            <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
-                        </ListItemIcon>
-                        <ListItemText primary="Remy Sharp">Remy Sharp</ListItemText>
-                        <ListItemText secondary="online"></ListItemText>
-                    </ListItem>
-                    <ListItem button key="Alice">
-                        <ListItemIcon>
-                            <Avatar alt="Alice" src="https://material-ui.com/static/images/avatar/3.jpg" />
-                        </ListItemIcon>
-                        <ListItemText primary="Alice">Alice</ListItemText>
-                    </ListItem>
-                    <ListItem button key="CindyBaker">
-                        <ListItemIcon>
-                            <Avatar alt="Cindy Baker" src="https://material-ui.com/static/images/avatar/2.jpg" />
-                        </ListItemIcon>
-                        <ListItemText primary="Cindy Baker">Cindy Baker</ListItemText>
-                    </ListItem>
+                    {chatHeads && chatHeads.map((user: IUser) => 
+                        <ListItem button key={user.id}>
+                            <ListItemIcon>
+                                <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
+                            </ListItemIcon>
+                            <ListItemText primary={`${user.name} ${user.lastname}`}>Remy Sharp</ListItemText>
+                            <ListItemText secondary={user.username}></ListItemText>
+                        </ListItem>
+                    )}
                 </List>
             </Grid>
     )

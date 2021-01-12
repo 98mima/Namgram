@@ -47,10 +47,18 @@ const io = require("socket.io")(server, {
     }
 });
 
+const util = require('util')
 const redisUrl = 'redis://127.0.0.1:6379';
 const clientR = redis.createClient(redisUrl);
+clientR.get = util.promisify(clientR.get);
 io.on("connection", (socket) => {
-    clientR.SET("socket:" + socket.handshake.query.userId, socket.id);
+    clientR.set("socket:" + socket.handshake.query.userId, socket.id);
+    console.log(socket.handshake.query.userId, socket.id);
+    socket.on("like", (socket) => {
+        clientR.get(`socket:${socket.liked}`).then(socketId => {
+            io.to(socketId).emit("notification", socket);
+        })
+    })
     //clients[socket.handshake.query.userId] = socket.id;
     // io.to(socket.id).emit("chat", "I just met you");
 

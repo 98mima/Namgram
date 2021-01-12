@@ -113,6 +113,8 @@ function Navbar() {
     const dispatch = useDispatch();
 
     const auth = useSelector((state: RootState) => state.auth.auth);
+    const socket = useSelector((state: RootState) => state.auth.socket);
+    const notifications = useSelector((state: RootState) => state.auth.notifications);
 
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -267,8 +269,8 @@ function Navbar() {
               </Badge>
             </IconButton>
             </Link>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={17} color="secondary">
+            <IconButton aria-label="show new notifications" color="inherit">
+              <Badge badgeContent={notifications.length} color="secondary">
                 <NotificationsIcon />
               </Badge>
             </IconButton>

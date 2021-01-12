@@ -7,10 +7,14 @@ import axios, { AxiosError } from 'axios'
 import io from 'socket.io-client';
 import { getUserById } from "../../services/user";
 import { getFollowers, getFollowing } from "../../services/profile";
+import { INotification } from "../../models/post";
 
 export const SET_AUTH = 'SET_AUTH';
 export const CLEAR_AUTH = 'CLEAR_AUTH';
 export const SET_SOCKET = 'SET_SOCKET';
+
+export const ADD_NOTIFICATION = 'ADD_NOTIFICATION'
+export const CLEAR_NOTIFICATIONS = "CLEAR_NOTIFICATIONS"
 
 export interface SetAuthAction {
   type: typeof SET_AUTH,
@@ -26,7 +30,17 @@ export interface SetSocketAction {
   payload: SocketIOClient.Socket
 }
 
+export interface AddNotificationsAction {
+  type: typeof ADD_NOTIFICATION,
+  payload: INotification
+}
+
+export interface ClearNotificationsAction {
+  type: typeof CLEAR_NOTIFICATIONS
+}
+
 export type AuthActionTypes = SetAuthAction | ClearAuthAction | SetSocketAction
+| AddNotificationsAction | ClearNotificationsAction
 
 export const authUser = () => (dispatch: any) => {
  
@@ -41,11 +55,10 @@ export const authUser = () => (dispatch: any) => {
           const following = res[2];
 
           const socket = io("ws://localhost:8000", {query: `userId=${user.id}`});
-          // socket.emit("join", {name: decodedToken.id}, (err: any) => {
-          //   if(err) alert(err);
-          // });
-          socket.on("chat", (message: any) => {
-            socket.emit("like", user.id);
+          socket.on("notification", (message: any) => {
+            console.log(message);
+            dispatch({type: ADD_NOTIFICATION, 
+              payload: {post: message.post, liker: message.liker}});
           })
           dispatch({type: SET_SOCKET, payload: socket});
           

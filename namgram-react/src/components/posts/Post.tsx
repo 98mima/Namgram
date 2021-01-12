@@ -19,16 +19,28 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Favorite from "@material-ui/icons/FavoriteBorder";
 import { CardActionArea, Grid } from "@material-ui/core";
 
-import { IImage } from "../../models/post";
+import { IComment, IImage } from "../../models/post";
 import { width, maxHeight, height } from "@material-ui/system";
 import {
+  Backdrop,
+  Fade,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Modal,
+} from "@material-ui/core";
+import {
   dislikePost,
+  getComments,
   likePost,
   removedisLike,
   removeLike,
 } from "../../services/posts";
 import { RootState } from "../../redux";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { Socket } from "socket.io-client";
+import { ADD_NOTIFICATION } from "../../redux/auth/actions";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -79,12 +91,17 @@ const useStyles = makeStyles((theme: Theme) =>
     avatar: {
       backgroundColor: red[500],
     },
+    modal: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
   })
 );
 
-function Post(props: { post: IImage }) {
-  const { post } = props;
-
+function Post(props: { post: IImage, socket: SocketIOClient.Socket }) {
+  const { post, socket } = props;
+  const dispatch = useDispatch();
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   const auth = useSelector((state: RootState) => state.auth.auth);
@@ -94,7 +111,13 @@ function Post(props: { post: IImage }) {
   const [alreadyLiked, setAlreadyLiked] = useState(false);
   const [alreadyDisliked, setAlreadyDisliked] = useState(false);
 
+  const [openComments, setOpenComments] = React.useState(false);
+
+  const [comments, setComments] = React.useState<IComment[]>([]);
+
   useEffect(() => {
+    setAlreadyLiked(props.post.ifLiked);
+    setAlreadyDisliked(props.post.ifDisliked);
     setLikes(props.post.likes);
     setdisLikes(props.post.dislikes);
 
@@ -104,11 +127,22 @@ function Post(props: { post: IImage }) {
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+  const handleOpenComments = (imageId: string) => {
+    setOpenComments(true);
+    getComments(imageId).then((res) => {
+      setComments(res);
+    });
+  };
+
+  const handleCloseComments = () => {
+    setOpenComments(false);
+  };
 
   const handleLike = (imageId: string) => {
     if (!alreadyLiked && !alreadyDisliked) {
       likePost(auth?.id as string, imageId).then((res) => {
         setLikes((prevLikes) => prevLikes + 1);
+        socket.emit("like", {liker: auth?.id, liked: post.creator.id, post: post.id});
         setAlreadyLiked(true);
       });
     } else if (!alreadyLiked && alreadyDisliked) {
@@ -161,13 +195,14 @@ function Post(props: { post: IImage }) {
                 {/* <img style={{ maxHeight: '100%' }} src={post.user.image} /> */}
               </Avatar>
             }
+            title={post.creator.username}
             subheader={post.date}
           />
           <div style={{ display: "flex", justifyContent: "space-around" }}>
             <CardHeader
               avatar={
                 <CardActionArea onClick={() => handleLike(post.id)}>
-                  <Avatar color={alreadyLiked ? "primary" : "default"}>
+                  <Avatar className={alreadyLiked ? classes.avatar : ""}>
                     <Favorite />
                   </Avatar>
                 </CardActionArea>
@@ -177,7 +212,7 @@ function Post(props: { post: IImage }) {
             <CardHeader
               avatar={
                 <CardActionArea onClick={() => handleDislike(post.id)}>
-                  <Avatar color="primary">
+                  <Avatar className={alreadyDisliked ? classes.avatar : ""}>
                     <Favorite />
                   </Avatar>
                 </CardActionArea>
@@ -187,17 +222,45 @@ function Post(props: { post: IImage }) {
           </div>
 
           <CardContent>
-            <Typography variant="body2" color="textSecondary" component="p">
-              This impressive paella is a perfect party dish and a fun meal to
-              cook together with your guests. Add 1 cup of frozen peas along
-              with the mussels, if you like.
+            <Typography variant="body2" color="textPrimary">
+              {post.content +
+                "SLAVISA KURAC saddddddddddddddd asdassadsad asdsadas asdas asdsad asda sd"}
             </Typography>
           </CardContent>
           <CardContent>
-            <Typography variant="body2" color="textSecondary" component="p">
-              This impressive paella is a perfect party dish and a fun meal to
-              cook together with you r
-            </Typography>
+            <div onClick={() => handleOpenComments(post.id)}>
+              <Typography>Comments</Typography>
+            </div>
+            <Modal
+              aria-labelledby="transition-modal-title"
+              aria-describedby="transition-modal-description"
+              className={classes.modal}
+              open={openComments}
+              onClose={handleCloseComments}
+              closeAfterTransition
+              BackdropComponent={Backdrop}
+              BackdropProps={{
+                timeout: 500,
+              }}
+            >
+              <Fade in={openComments}>
+                <List className={classes.root}>
+                  {comments.map((comment) => (
+                    <ListItem key={comment.id}>
+                      <ListItemAvatar>
+                        <Avatar></Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={comment.date}
+                        secondary={comment.content}
+                      />
+
+                      <Typography>KOMENTAR</Typography>
+                    </ListItem>
+                  ))}
+                </List>
+              </Fade>
+            </Modal>
           </CardContent>
         </Card>
       </div>

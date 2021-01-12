@@ -12,13 +12,12 @@ import Grid from "@material-ui/core/Grid";
 import GridList from "@material-ui/core/GridList";
 import GridListTile from "@material-ui/core/GridListTile";
 
-import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 
 import { useSelector, useDispatch } from "react-redux";
-import { CLEAR_PROFILE, loadProfile } from "../../redux/profile/actions";
+import { loadProfile } from "../../redux/profile/actions";
 import { RootState } from "../../redux";
-import { follow, unfollow, getFollowers } from "../../services/profile";
+import { follow, unfollow } from "../../services/profile";
 import {
   Backdrop,
   Fade,
@@ -102,7 +101,6 @@ function Profile() {
 
   const [openFollowers, setOpenFollowers] = React.useState(false);
   const [openFollowing, setOpenFollowing] = React.useState(false);
-  const [change, setChange] = React.useState([]);
 
   useEffect(() => {
     if (!profile) {
@@ -110,7 +108,7 @@ function Profile() {
     }
     if (
       profile &&
-      auth?.following.some((user) => user.username == profile?.username)
+      auth?.following.some((user) => user.username === profile?.username)
     ) {
       setIsFollowing(true);
     } else {
@@ -123,7 +121,7 @@ function Profile() {
     if (
       profile &&
       username &&
-      auth?.following.some((user) => user.username == username)
+      auth?.following.some((user) => user.username === username)
     )
       return true;
     else return false;
@@ -160,7 +158,7 @@ function Profile() {
   const checkMyProfile = () => {
     if (!auth) return false;
     else {
-      return profile?.id == auth?.id;
+      return profile?.id === auth?.id;
     }
   };
   const handleOpenFollowers = () => {

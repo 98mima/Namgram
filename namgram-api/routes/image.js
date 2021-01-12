@@ -97,6 +97,41 @@ router.post('/add', uploadStrategy, async (req, res) => {
         res.json({ message: err.message });
     }
 });
+router.post('/addProfilePic', uploadStrategy, async (req, res) => {
+    try {
+        const personId = req.body.personId
+        
+        const blobName = await getBlobName(req.file.fieldname);
+        const stream = await getStream(req.file.buffer);
+        const containerClient = await blobServiceClient.getContainerClient(containerName2);
+        const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+
+        let session = driver.session();
+        const query = [
+            'match (a:Person {id:$personId}) \
+            merge (a)-[r:created]->(b:Image {id:$id, person:$personId, blobName:$blobName}) \
+            '
+        ].join('\n')
+
+        const d = await session.writeTransaction(txc =>
+            txc.run(query, {
+                id: uuid.v4(),
+                personId: personId,
+                blobName: blobName
+            }))
+
+        const Data1 = _manyImages(d)
+         const Data = Data1[0]
+        await blockBlobClient.uploadStream(stream,
+            uploadOptions.bufferSize, uploadOptions.maxBuffers,
+            { blobHTTPHeaders: { blobContentType: "image/jpeg" } });
+
+        session.close();
+        res.json({ message: 'File uploaded to Azure Blob storage.', Data });
+    } catch (err) {
+        res.json({ message: err.message });
+    }
+});
 
 
 module.exports = router;

@@ -18,21 +18,49 @@ function _manyComments(neo4jResult) {
 function _manyPeople(neo4jResult) {
     return neo4jResult.records.map(r => new Person(r.get('person')))
   }
-async function findCreator(postId) {
+async function findCreator(postId, content) {
     try{
         let session = driver.session();
 
         const query = [
-            'MATCH (post:Post {id: $id})<-[r1:commented]-(person:Person) return person'
+            'MATCH (post:Post {id: $id})<-[r1:commented {content:$content}]-(person:Person) return person'
         ].join('\n')
 
         return session.readTransaction(txc =>
             txc.run(query, {
-                id: postId
+                id: postId,
+                content: content
             }))
             .then( result => {  
             const user = _manyPeople(result)
                 session.close();
+                return user[0]
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+async function findCreatorForImageComm(postId, content) {
+    try{
+        let session = driver.session();
+
+        const query = [
+            'MATCH (image:Image {id: $id})<-[r1:commented {content:$content}]-(person:Person) return person'
+        ].join('\n')
+
+        return session.readTransaction(txc =>
+            txc.run(query, {
+                id: postId,
+                content: content
+            }))
+            .then( result => {  
+            const user = _manyPeople(result)
+                session.close();
+                console.log(user[0])
                 return user[0]
             })
             .catch(err => {
@@ -59,7 +87,7 @@ exports.getByPost = async (req, res) => {
 
         creators = await Promise.all(
             p.map(post => {
-                return post.creator = findCreator(req.params.postId)
+                return post.creator = findCreator(req.params.postId, post.content)
             }))
         p.map((post, index) =>
             post.creator = creators[index])
@@ -76,26 +104,24 @@ exports.getByImage = async (req, res) => {
     try{
         let session = driver.session();
 
-        const query = [
-            'MATCH (image:Image {id: $id})<-[r1:commented]-(n:Person) return r1 as comment'
-        ].join('\n')
+        const comments = await session.run('MATCH (image:Image {id: $id})<-[r1:commented]-(n:Person) return r1 as comment', {
+            id: req.params.imageId
+        });
+        const p = _manyComments(comments)
+        session.close();
 
-        return session.readTransaction(txc =>
-            txc.run(query, {
-                id: req.params.imageId
+        let Data = []
+        let creators = []
+
+        creators = await Promise.all(
+            p.map(post => {
+                return post.creator = findCreatorForImageComm(req.params.imageId, post.content)
             }))
-            .then( result => {  
-            const listOfComments = _manyComments(result)
-            
-            session.close();
-            const Data = listOfComments
-            console.log(req.params.imageId)
-    
-            res.status(200)
-            .json({ Data })})
-            .catch(err => {
-                console.log(err)
-            })
+        p.map((post, index) =>
+            post.creator = creators[index])
+
+        res.status(200)
+            .json({ message: "Prikupljeno", p })
     }
     catch (err){
         res.json({ success: false });

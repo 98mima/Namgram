@@ -40,7 +40,7 @@ import {
 import { RootState } from "../../redux";
 import { useSelector, useDispatch } from "react-redux";
 import { Socket } from "socket.io-client";
-import { INC_NOTIFICATIONS } from "../../redux/auth/actions";
+import { ADD_NOTIFICATION } from "../../redux/auth/actions";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

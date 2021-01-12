@@ -7,12 +7,13 @@ import axios, { AxiosError } from 'axios'
 import io from 'socket.io-client';
 import { getUserById } from "../../services/user";
 import { getFollowers, getFollowing } from "../../services/profile";
+import { INotification } from "../../models/post";
 
 export const SET_AUTH = 'SET_AUTH';
 export const CLEAR_AUTH = 'CLEAR_AUTH';
 export const SET_SOCKET = 'SET_SOCKET';
 
-export const INC_NOTIFICATIONS = 'INC_NOTIFICATIONS'
+export const ADD_NOTIFICATION = 'ADD_NOTIFICATION'
 export const CLEAR_NOTIFICATIONS = "CLEAR_NOTIFICATIONS"
 
 export interface SetAuthAction {
@@ -29,8 +30,9 @@ export interface SetSocketAction {
   payload: SocketIOClient.Socket
 }
 
-export interface IncrementNotificationsAction {
-  type: typeof INC_NOTIFICATIONS
+export interface AddNotificationsAction {
+  type: typeof ADD_NOTIFICATION,
+  payload: INotification
 }
 
 export interface ClearNotificationsAction {
@@ -38,7 +40,7 @@ export interface ClearNotificationsAction {
 }
 
 export type AuthActionTypes = SetAuthAction | ClearAuthAction | SetSocketAction
-| IncrementNotificationsAction | ClearNotificationsAction
+| AddNotificationsAction | ClearNotificationsAction
 
 export const authUser = () => (dispatch: any) => {
  
@@ -53,11 +55,10 @@ export const authUser = () => (dispatch: any) => {
           const following = res[2];
 
           const socket = io("ws://localhost:8000", {query: `userId=${user.id}`});
-          // socket.emit("join", {name: decodedToken.id}, (err: any) => {
-          //   if(err) alert(err);
-          // });
           socket.on("notification", (message: any) => {
-            dispatch({type: INC_NOTIFICATIONS});
+            console.log(message);
+            dispatch({type: ADD_NOTIFICATION, 
+              payload: {post: message.post, liker: message.liker}});
           })
           dispatch({type: SET_SOCKET, payload: socket});
           

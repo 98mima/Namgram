@@ -55,10 +55,8 @@ io.on("connection", (socket) => {
     clientR.set("socket:" + socket.handshake.query.userId, socket.id);
     console.log(socket.handshake.query.userId, socket.id);
     socket.on("like", (socket) => {
-        console.log(socket);
         clientR.get(`socket:${socket.liked}`).then(socketId => {
-            console.log(socketId)
-            io.to(socketId).emit("notification", "nesto");
+            io.to(socketId).emit("notification", socket);
         })
     })
     //clients[socket.handshake.query.userId] = socket.id;

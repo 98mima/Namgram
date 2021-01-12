@@ -269,8 +269,8 @@ function Navbar() {
               </Badge>
             </IconButton>
             </Link>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={notifications} color="secondary">
+            <IconButton aria-label="show new notifications" color="inherit">
+              <Badge badgeContent={notifications.length} color="secondary">
                 <NotificationsIcon />
               </Badge>
             </IconButton>

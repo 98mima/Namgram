@@ -72,6 +72,7 @@ function SigninForm() {
 
     const loading = useSelector((state: RootState) => state.ui.loading);
     const error = useSelector((state: RootState) => state.ui.error);
+    //@ts-ignore
     const auth = useSelector((state: RootState) => state.auth.auth);
     
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

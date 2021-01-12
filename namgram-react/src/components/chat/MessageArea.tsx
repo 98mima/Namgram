@@ -8,7 +8,6 @@ import  Divider  from '@material-ui/core/Divider';
 import  Fab   from '@material-ui/core/Fab';
 import  TextField  from '@material-ui/core/TextField';
 import SendIcon from '@material-ui/icons/SendOutlined'
-import useChat from '../../services/chatHooks';
 
 const useStyles = makeStyles({
     table: {
@@ -33,33 +32,31 @@ const useStyles = makeStyles({
 function MessageArea(props: {roomId: string}) {
     const classes = useStyles();
     const [newMessage, setNewMessage] = useState("");
-    const { messages, sendMessage } = useChat(props.roomId);
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNewMessage(event.currentTarget.value);
     }
 
     const handleSendMessage = () => {
-        sendMessage(newMessage);
         setNewMessage("");
       };
     
     return (
             <Grid item xs={9}>
                 <List className={classes.messageArea}>
-                    {messages.map((message, i) => (
+                    {/* {messages.map((message, i) => (
                     <ListItem key={i}>
                          <Grid container>
                              <Grid item xs={12}>
-                                 {/*//@ts-ignore*/}
+                                 
                                  <ListItemText primary={message.body}></ListItemText>
                              </Grid>
-                             {/* <Grid item xs={12}>
+                              <Grid item xs={12}>
                                  <ListItemText secondary="09:30"></ListItemText>
-                             </Grid> */}
+                             </Grid> 
                          </Grid>
                      </ListItem>
-                    ))}
+                    ))} */}
                 </List>
                 <Divider />
                 <Grid container style={{padding: '20px'}}>

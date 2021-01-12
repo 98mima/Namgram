@@ -23,6 +23,8 @@ export interface IImage {
   likes: number;
   dislikes: number;
   comments: number;
+  ifLiked: boolean;
+  ifDisliked: boolean;
 }
 
 export interface IPostUpload {

@@ -32,6 +32,7 @@ import {
 } from "@material-ui/core";
 import {
   dislikePost,
+  getComments,
   likePost,
   removedisLike,
   removeLike,
@@ -113,8 +114,11 @@ function Post(props: { post: IImage }) {
   const [comments, setComments] = React.useState<IComment[]>([]);
 
   useEffect(() => {
+    setAlreadyLiked(props.post.ifLiked);
+    setAlreadyDisliked(props.post.ifDisliked);
     setLikes(props.post.likes);
     setdisLikes(props.post.dislikes);
+    console.log(props.post.ifLiked, props.post.ifDisliked);
 
     return () => {};
   }, []);
@@ -122,7 +126,7 @@ function Post(props: { post: IImage }) {
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-  const handleOpenComments = () => {
+  const handleOpenComments = (imageId: string) => {
     setOpenComments(true);
   };
 
@@ -131,10 +135,12 @@ function Post(props: { post: IImage }) {
   };
 
   const handleLike = (imageId: string) => {
+    console.log(alreadyLiked, alreadyDisliked);
     if (!alreadyLiked && !alreadyDisliked) {
       likePost(auth?.id as string, imageId).then((res) => {
         setLikes((prevLikes) => prevLikes + 1);
         setAlreadyLiked(true);
+        console.log("ovde1");
       });
     } else if (!alreadyLiked && alreadyDisliked) {
       removedisLike(auth?.id as string, imageId).then((res) => {
@@ -149,6 +155,7 @@ function Post(props: { post: IImage }) {
       removeLike(auth?.id as string, imageId).then((res) => {
         setLikes((prevLikes) => prevLikes - 1);
         setAlreadyLiked(false);
+        console.log("ovde3");
       });
     }
   };
@@ -219,7 +226,7 @@ function Post(props: { post: IImage }) {
             </Typography>
           </CardContent>
           <CardContent>
-            <div onClick={handleOpenComments}>
+            <div onClick={() => handleOpenComments(post.id)}>
               <Typography>Comments</Typography>
             </div>
             <Modal

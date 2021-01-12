@@ -44,8 +44,8 @@ export const authUser = () => (dispatch: any) => {
           // socket.emit("join", {name: decodedToken.id}, (err: any) => {
           //   if(err) alert(err);
           // });
-          socket.on("chat", (message: any) => {
-            socket.emit("like", user.id);
+          socket.on("notification", (message: any) => {
+            console.log("Lajkic")
           })
           dispatch({type: SET_SOCKET, payload: socket});
           

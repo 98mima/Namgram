@@ -113,6 +113,7 @@ function Navbar() {
     const dispatch = useDispatch();
 
     const auth = useSelector((state: RootState) => state.auth.auth);
+    const socket = useSelector((state: RootState) => state.auth.socket);
 
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

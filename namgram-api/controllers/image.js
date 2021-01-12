@@ -534,8 +534,7 @@ exports.like = async (req, res) => {
         session.close();
 
         //console.log(rel.records[0].get("id"));
-        let socketId = await clientR.GET("client:" + creator.id)
-        io.to(socketId).emit("notification", "nesto")
+
 
         res.status(200)
             .json({ message: "Like" })

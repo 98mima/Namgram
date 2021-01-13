@@ -592,7 +592,23 @@ exports.removeDislike = async (req, res) => {
         console.log(err);
     }
 };
-
+exports.deleteImage = async (req, res) => {
+    let session = driver.session();
+    try {
+        const rel = await session.run('match (a:Person)-[r]->(image:Image {id:$imageId}) delete r ', {
+            imageId: req.body.imageId
+        })
+        p = await session.run('MATCH (image:Image {id: $imageId}) DELETE image', {
+            imageId: req.body.imageId
+        });
+        res.status(200)
+            .json({ message: "Obrisan" });
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+}
 
 
 

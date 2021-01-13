@@ -50,6 +50,7 @@ router.post('/like', imageController.like);
 router.post('/removeLike', imageController.removeLike);
 router.post('/dislike', imageController.dislike);
 router.post('/removedisLike', imageController.removeDislike);
+router.delete('/deleteImage', imageController.deleteImage);
 
 router.post('/add', uploadStrategy, async (req, res) => {
     try {

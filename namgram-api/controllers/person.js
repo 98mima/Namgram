@@ -58,7 +58,7 @@ exports.get = async (req, res) => {
         const person = await session.run('MATCH (n:Person {id: $id}) RETURN n', {
             id: req.params.id
         });
-        const image = await session.run('MATCH (n:Person {id: $id})-[r:created]->(image:Image {person:$id}) RETURN image', {
+        const image = await session.run('MATCH (image:Image {person:$id}) RETURN image', {
             id: req.params.id
         })
         const pic = _manyimage(image)

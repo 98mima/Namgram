@@ -53,10 +53,20 @@ const clientR = redis.createClient(redisUrl);
 clientR.get = util.promisify(clientR.get);
 io.on("connection", (socket) => {
     clientR.set("socket:" + socket.handshake.query.userId, socket.id);
-    console.log(socket.handshake.query.userId, socket.id);
+    //console.log(socket.handshake.query.userId, socket.id);
     socket.on("like", (socket) => {
         clientR.get(`socket:${socket.liked}`).then(socketId => {
-            io.to(socketId).emit("notification", socket);
+            io.to(socketId).emit("liked", socket);
+        })
+    })
+    socket.on("dislike", (socket) => {
+        clientR.get(`socket:${socket.disliked}`).then(socketId => {
+            io.to(socketId).emit("disliked", socket);
+        })
+    })
+    socket.on("comment", (socket) => {
+        clientR.get(`socket:${socket.commented}`).then(socketId => {
+            io.to(socketId).emit("commented", socket);
         })
     })
     //clients[socket.handshake.query.userId] = socket.id;

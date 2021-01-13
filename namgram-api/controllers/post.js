@@ -580,11 +580,9 @@ exports.removeDislike = async (req, res) => {
 exports.deletePost = async (req, res) => {
     let session = driver.session();
     try {
-        const rel = await session.run('match (a:Person {id:$personId})-[r:created]->(b:Post {id:$postId}) delete r ', {
-            personId: req.body.personId,
+        const rel = await session.run('match (a:Person)-[r]->(post:Post {id:$postId}) delete r ', {
             postId: req.body.postId
         })
-
         p = await session.run('MATCH (post:Post {id: $postId}) DELETE post', {
             postId: req.body.postId
         });

@@ -8,3 +8,15 @@ export async function signin(user: ISignin){
 export async function signup(user: ISignup) {
     return axios.post<ISignupRes>("auth/register", user).then(d => d.data);
 }
+
+export async function changeProfilePicture(userId: string, image: File) {
+    const formData = new FormData();
+    formData.append("image", image);
+    formData.append("personId", userId);
+    return axios({
+      method: "post",
+      url: "image/addProfilePic",
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  }

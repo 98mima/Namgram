@@ -309,9 +309,9 @@ function Profile() {
                 type="submit"
                 variant="contained"
                 color="primary"
-                onClick={handleEdit}
+                onClick={() => {history.push("/editProfile")}}
               >
-                Izmeni profil
+                Change profile
               </Button>
             )}
             {!checkMyProfile() && !isFollowing && (

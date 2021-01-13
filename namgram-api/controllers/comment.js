@@ -1,13 +1,11 @@
 const Comment = require('../models/comment');
 const Person = require('../models/person');
-const uuid = require('node-uuid');
 let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
 const _ = require('lodash');
 let driver = neo4j.driver("bolt://0.0.0.0:7687", neo4j.auth.basic(creds.neo4jusername, creds.neo4jpw));
 const util = require('util')
 const redis = require('redis');
-const { concat } = require('lodash');
 const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
 client.get = util.promisify(client.get);
@@ -82,9 +80,7 @@ exports.getByPost = async (req, res) => {
         const p = _manyComments(comments)
         session.close();
 
-        let Data = []
         let creators = []
-
         creators = await Promise.all(
             p.map(post => {
                 return post.creator = findCreator(req.params.postId, post.content)
@@ -110,9 +106,7 @@ exports.getByImage = async (req, res) => {
         const p = _manyComments(comments)
         session.close();
 
-        let Data = []
         let creators = []
-
         creators = await Promise.all(
             p.map(post => {
                 return post.creator = findCreatorForImageComm(req.params.imageId, post.content)

@@ -21,8 +21,6 @@ const getStream = require('into-stream');
 const containerName2 = 'namgram1609522522970';
 const ONE_MEGABYTE = 1024 * 1024;
 const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
-const ONE_MINUTE = 60 * 1000;
-
 const sharedKeyCredential = new StorageSharedKeyCredential(
     process.env.AZURE_STORAGE_ACCOUNT_NAME,
     process.env.AZURE_STORAGE_ACCOUNT_ACCESS_KEY);
@@ -60,10 +58,10 @@ router.post('/add', uploadStrategy, async (req, res) => {
         var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
         var yyyy = today.getFullYear();
         today = dd + '.' + mm + '.' + yyyy;
-    
+
         const content = req.body.caption
         const personId = req.body.personId
-        
+
         const blobName = await getBlobName(req.file.fieldname);
         const stream = await getStream(req.file.buffer);
         const containerClient = await blobServiceClient.getContainerClient(containerName2);
@@ -86,7 +84,7 @@ router.post('/add', uploadStrategy, async (req, res) => {
             }))
 
         const Data1 = _manyImages(d)
-         const Data = Data1[0]
+        const Data = Data1[0]
         await blockBlobClient.uploadStream(stream,
             uploadOptions.bufferSize, uploadOptions.maxBuffers,
             { blobHTTPHeaders: { blobContentType: "image/jpeg" } });
@@ -100,7 +98,7 @@ router.post('/add', uploadStrategy, async (req, res) => {
 router.post('/addProfilePic', uploadStrategy, async (req, res) => {
     try {
         const personId = req.body.personId
-        
+
         const blobName = await getBlobName(req.file.fieldname);
         const stream = await getStream(req.file.buffer);
         const containerClient = await blobServiceClient.getContainerClient(containerName2);
@@ -121,7 +119,7 @@ router.post('/addProfilePic', uploadStrategy, async (req, res) => {
             }))
 
         const Data1 = _manyImages(d)
-         const Data = Data1[0]
+        const Data = Data1[0]
         await blockBlobClient.uploadStream(stream,
             uploadOptions.bufferSize, uploadOptions.maxBuffers,
             { blobHTTPHeaders: { blobContentType: "image/jpeg" } });

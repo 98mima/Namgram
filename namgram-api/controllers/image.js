@@ -1,16 +1,13 @@
 const Image = require('../models/image');
 const Person = require('../models/person');
-const uuid = require('node-uuid');
 let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
 const _ = require('lodash');
 let driver = neo4j.driver("bolt://0.0.0.0:7687", neo4j.auth.basic(creds.neo4jusername, creds.neo4jpw));
-const { concat } = require('lodash');
-const multer = require('multer');
 var storage = require("@azure/storage-blob")
-const accountname ="namgram";
+const accountname = "namgram";
 const key = "b9/PjmImjnORF1berLyRe3OYyAO0dDGcTbqIYm5AkCm8tqYukKm/umiUPWLJujc2n+zPFwKbKKNFZAZm8kqWhA==";
-const cerds = new storage.StorageSharedKeyCredential(accountname,key);
+const cerds = new storage.StorageSharedKeyCredential(accountname, key);
 const {
     BlobServiceClient,
     StorageSharedKeyCredential,
@@ -25,7 +22,7 @@ const blobServiceClient = new BlobServiceClient(
     pipeline
 );
 const containerName = 'namgram1609522522970';
-const client =blobServiceClient.getContainerClient(containerName)
+const client = blobServiceClient.getContainerClient(containerName)
 
 const util = require('util')
 const redis = require('redis');
@@ -34,18 +31,17 @@ const clientR = redis.createClient(redisUrl);
 clientR.get = util.promisify(clientR.get);
 
 const express = require('express');
-const post = require('../models/post');
 const app = express();
 var server = require('http').createServer(app)
 const io = require("socket.io")(server, {
     cors: {
-      origin: "*",
-      methods: ["GET", "POST"]
+        origin: "*",
+        methods: ["GET", "POST"]
     }
 });
 
 function findProps(node) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -64,26 +60,27 @@ function findProps(node) {
             txc.run(query, {
                 id: node.id
             }))
-            .then( result => {  
-            const Data1 = _manyImages(result)
-            Data1[0].likes = result.records[0].get('count').low
-            Data1[0].dislikes = result.records[1].get('count').low
-            Data1[0].comments = result.records[2].get('count').low
-            const Data = Data1[0]
-            session.close();
-    
-            return Data})
+            .then(result => {
+                const Data1 = _manyImages(result)
+                Data1[0].likes = result.records[0].get('count').low
+                Data1[0].dislikes = result.records[1].get('count').low
+                Data1[0].comments = result.records[2].get('count').low
+                const Data = Data1[0]
+                session.close();
+
+                return Data
+            })
             .catch(err => {
                 console.log(err)
             })
     }
-    catch (err){
+    catch (err) {
         console.log(err)
     }
 }
 
 async function findCreator(node) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -94,21 +91,22 @@ async function findCreator(node) {
             txc.run(query, {
                 id: node.id
             }))
-            .then( result => {  
-            const user = _manyPeople(result)
-            session.close();
-    
-            return user[0]})
+            .then(result => {
+                const user = _manyPeople(result)
+                session.close();
+
+                return user[0]
+            })
             .catch(err => {
                 console.log(err)
             })
     }
-    catch (err){
+    catch (err) {
         console.log(err)
     }
 }
 async function findIfLiked(node, userId) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -120,22 +118,23 @@ async function findIfLiked(node, userId) {
                 id: node.id,
                 userId: userId
             }))
-            .then( result => {  
+            .then(result => {
                 session.close();
-            if(result.records[0])
-                return true
-            else
-                return false})
+                if (result.records[0])
+                    return true
+                else
+                    return false
+            })
             .catch(err => {
                 console.log(err)
             })
     }
-    catch (err){
+    catch (err) {
         console.log(err)
     }
 }
 async function findIfDisliked(node, userId) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -147,17 +146,18 @@ async function findIfDisliked(node, userId) {
                 id: node.id,
                 userId: userId
             }))
-            .then( result => {  
+            .then(result => {
                 session.close();
-            if(result.records[0])
-                return true
-            else
-                return false})
+                if (result.records[0])
+                    return true
+                else
+                    return false
+            })
             .catch(err => {
                 console.log(err)
             })
     }
-    catch (err){
+    catch (err) {
         console.log(err)
     }
 }
@@ -166,7 +166,7 @@ function _manyImages(neo4jResult) {
 }
 function _manyPeople(neo4jResult) {
     return neo4jResult.records.map(r => new Person(r.get('person')))
-  }
+}
 
 exports.getAll = async (req, res) => {
     try {
@@ -181,28 +181,28 @@ exports.getAll = async (req, res) => {
         }))
         Data1.map(image => {
             const containerClient = blobServiceClient.getContainerClient(containerName);
-                const blobName = image.blobName
-                const blobClient = client.getBlobClient(blobName);
-                const blobSAS = storage.generateBlobSASQueryParameters({
-                    containerName, 
-                    blobName: blobName, 
-                    permissions: storage.BlobSASPermissions.parse("racwd"), 
-                    startsOn: new Date(),
-                    expiresOn: new Date(new Date().valueOf() + 86400)
-                  },
-                  cerds 
-                ).toString();
-              
-                  const sasUrl= blobClient.url+"?"+blobSAS;         
-              image.sasToken = sasUrl
+            const blobName = image.blobName
+            const blobClient = client.getBlobClient(blobName);
+            const blobSAS = storage.generateBlobSASQueryParameters({
+                containerName,
+                blobName: blobName,
+                permissions: storage.BlobSASPermissions.parse("racwd"),
+                startsOn: new Date(),
+                expiresOn: new Date(new Date().valueOf() + 86400)
+            },
+                cerds
+            ).toString();
+
+            const sasUrl = blobClient.url + "?" + blobSAS;
+            image.sasToken = sasUrl
         })
         session.close();
 
         let creators = []
         creators = await Promise.all(
             Data1.map(post => {
-            return post.creator = findCreator(post)
-        }))
+                return post.creator = findCreator(post)
+            }))
         Data1.map((post, index) =>
             post.creator = creators[index])
 
@@ -229,28 +229,26 @@ exports.getByPerson = async (req, res) => {
             return findProps(p)
         }))
         Data1.map(image => {
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-                const blobName = image.blobName
-                const blobClient = client.getBlobClient(blobName);
-                const blobSAS = storage.generateBlobSASQueryParameters({
-                    containerName, 
-                    blobName: blobName, 
-                    permissions: storage.BlobSASPermissions.parse("racwd"), 
-                    startsOn: new Date(),
-                    expiresOn: new Date(new Date().valueOf() + 86400)
-                  },
-                  cerds 
-                ).toString();
-              
-                  const sasUrl= blobClient.url+"?"+blobSAS;         
-              image.sasToken = sasUrl
+            const blobName = image.blobName
+            const blobClient = client.getBlobClient(blobName);
+            const blobSAS = storage.generateBlobSASQueryParameters({
+                containerName,
+                blobName: blobName,
+                permissions: storage.BlobSASPermissions.parse("racwd"),
+                startsOn: new Date(),
+                expiresOn: new Date(new Date().valueOf() + 86400)
+            },
+                cerds
+            ).toString();
+            const sasUrl = blobClient.url + "?" + blobSAS;
+            image.sasToken = sasUrl
         })
 
         let creators = []
         creators = await Promise.all(
             Data1.map(post => {
-            return post.creator = findCreator(post)
-        }))
+                return post.creator = findCreator(post)
+            }))
         Data1.map((post, index) =>
             post.creator = creators[index])
 
@@ -266,7 +264,7 @@ exports.getByPerson = async (req, res) => {
 exports.getByFollowings = async (req, res) => {
     try {
         let session = driver.session();
-   
+
         const images1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(image:Image) return image', {
             id: req.params.userId
         })
@@ -277,19 +275,18 @@ exports.getByFollowings = async (req, res) => {
         }))
 
         Data.map(image => {
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-                const blobName = image.blobName
-                const blobClient = client.getBlobClient(blobName);
-                const blobSAS = storage.generateBlobSASQueryParameters({
-                    containerName, 
-                    blobName: blobName, 
-                    permissions: storage.BlobSASPermissions.parse("racwd"), 
-                    startsOn: new Date(),
-                    expiresOn: new Date(new Date().valueOf() + 86400)
-                  },
-                  cerds 
-                ).toString();
-              
+            const blobName = image.blobName
+            const blobClient = client.getBlobClient(blobName);
+            const blobSAS = storage.generateBlobSASQueryParameters({
+                containerName,
+                blobName: blobName,
+                permissions: storage.BlobSASPermissions.parse("racwd"),
+                startsOn: new Date(),
+                expiresOn: new Date(new Date().valueOf() + 86400)
+            },
+                cerds
+            ).toString();
+
             const sasUrl = blobClient.url + "?" + blobSAS;
             image.sasToken = sasUrl
         })
@@ -309,7 +306,7 @@ exports.getByFollowings = async (req, res) => {
             Data.map(post => {
                 return post.creator = findCreator(post)
             }))
-        Data.map((post, index) =>{
+        Data.map((post, index) => {
             post.creator = creators[index]
             post.ifLiked = ifLiked[index]
             post.ifDisliked = ifDisliked[index]
@@ -346,28 +343,27 @@ exports.getMostLikedF = async (req, res) => {
         }))
 
         Data.map(image => {
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-                const blobName = image.blobName
-                const blobClient = client.getBlobClient(blobName);
-                const blobSAS = storage.generateBlobSASQueryParameters({
-                    containerName, 
-                    blobName: blobName, 
-                    permissions: storage.BlobSASPermissions.parse("racwd"), 
-                    startsOn: new Date(),
-                    expiresOn: new Date(new Date().valueOf() + 86400)
-                  },
-                  cerds 
-                ).toString();
-                  const sasUrl= blobClient.url+"?"+blobSAS;         
-              image.sasToken = sasUrl
+            const blobName = image.blobName
+            const blobClient = client.getBlobClient(blobName);
+            const blobSAS = storage.generateBlobSASQueryParameters({
+                containerName,
+                blobName: blobName,
+                permissions: storage.BlobSASPermissions.parse("racwd"),
+                startsOn: new Date(),
+                expiresOn: new Date(new Date().valueOf() + 86400)
+            },
+                cerds
+            ).toString();
+            const sasUrl = blobClient.url + "?" + blobSAS;
+            image.sasToken = sasUrl
         })
         session.close();
 
         let creators = []
         creators = await Promise.all(
             Data.map(post => {
-            return post.creator = findCreator(post)
-        }))
+                return post.creator = findCreator(post)
+            }))
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -394,12 +390,10 @@ exports.getMostHatedF = async (req, res) => {
     try {
         const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "imageD" }));
         const cacheValue = await clientR.get(key)
-        //ako je u redisu
         if (cacheValue) {
             const Data2 = JSON.parse(cacheValue)
             return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
         }
-        //ako nije
         let session = driver.session();
         const images1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(image:Image) return image', {
             id: req.params.userId
@@ -411,27 +405,26 @@ exports.getMostHatedF = async (req, res) => {
         }))
 
         Data.map(image => {
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-                const blobName = image.blobName
-                const blobClient = client.getBlobClient(blobName);
-                const blobSAS = storage.generateBlobSASQueryParameters({
-                    containerName, 
-                    blobName: blobName, 
-                    permissions: storage.BlobSASPermissions.parse("racwd"), 
-                    startsOn: new Date(),
-                    expiresOn: new Date(new Date().valueOf() + 86400)
-                  },
-                  cerds 
-                ).toString();
-                  const sasUrl= blobClient.url+"?"+blobSAS;         
-              image.sasToken = sasUrl
+            const blobName = image.blobName
+            const blobClient = client.getBlobClient(blobName);
+            const blobSAS = storage.generateBlobSASQueryParameters({
+                containerName,
+                blobName: blobName,
+                permissions: storage.BlobSASPermissions.parse("racwd"),
+                startsOn: new Date(),
+                expiresOn: new Date(new Date().valueOf() + 86400)
+            },
+                cerds
+            ).toString();
+            const sasUrl = blobClient.url + "?" + blobSAS;
+            image.sasToken = sasUrl
         })
         session.close();
         let creators = []
         creators = await Promise.all(
             Data.map(post => {
-            return post.creator = findCreator(post)
-        }))
+                return post.creator = findCreator(post)
+            }))
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -458,12 +451,10 @@ exports.getMostCommentedF = async (req, res) => {
     try {
         const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "imageC" }));
         const cacheValue = await clientR.get(key)
-        //ako je u redisu
         if (cacheValue) {
             const Data2 = JSON.parse(cacheValue)
             return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
         }
-        //ako nije
         let session = driver.session();
         const images1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(image:Image) return image', {
             id: req.params.userId
@@ -476,26 +467,26 @@ exports.getMostCommentedF = async (req, res) => {
 
         Data.map(image => {
             const containerClient = blobServiceClient.getContainerClient(containerName);
-                const blobName = image.blobName
-                const blobClient = client.getBlobClient(blobName);
-                const blobSAS = storage.generateBlobSASQueryParameters({
-                    containerName, 
-                    blobName: blobName, 
-                    permissions: storage.BlobSASPermissions.parse("racwd"), 
-                    startsOn: new Date(),
-                    expiresOn: new Date(new Date().valueOf() + 86400)
-                  },
-                  cerds 
-                ).toString();
-                  const sasUrl= blobClient.url+"?"+blobSAS;         
-              image.sasToken = sasUrl
+            const blobName = image.blobName
+            const blobClient = client.getBlobClient(blobName);
+            const blobSAS = storage.generateBlobSASQueryParameters({
+                containerName,
+                blobName: blobName,
+                permissions: storage.BlobSASPermissions.parse("racwd"),
+                startsOn: new Date(),
+                expiresOn: new Date(new Date().valueOf() + 86400)
+            },
+                cerds
+            ).toString();
+            const sasUrl = blobClient.url + "?" + blobSAS;
+            image.sasToken = sasUrl
         })
         session.close();
         let creators = []
         creators = await Promise.all(
             Data.map(post => {
-            return post.creator = findCreator(post)
-        }))
+                return post.creator = findCreator(post)
+            }))
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -529,13 +520,7 @@ exports.like = async (req, res) => {
             imageId: req.body.imageId
         })
         image = _manyImages(image)[0]
-        const creator = await findCreator(image)
-        // console.log(creator)
         session.close();
-
-        //console.log(rel.records[0].get("id"));
-
-
         res.status(200)
             .json({ message: "Like" })
     }

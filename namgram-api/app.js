@@ -42,8 +42,8 @@ app.use('/chat', chatRoutes);
 
 const io = require("socket.io")(server, {
     cors: {
-      origin: "*",
-      methods: ["GET", "POST"]
+        origin: "*",
+        methods: ["GET", "POST"]
     }
 });
 

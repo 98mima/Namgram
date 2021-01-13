@@ -63,21 +63,24 @@ exports.get = async (req, res) => {
         })
         const pic = _manyimage(image)
         const Data = person.records[0].get('n').properties;
+        if (image.records[0]) {
+            const blobName = pic[0].blobName
+            const blobClient = clientBlob.getBlobClient(blobName);
+            const blobSAS = storage.generateBlobSASQueryParameters({
+                containerName,
+                blobName: blobName,
+                permissions: storage.BlobSASPermissions.parse("racwd"),
+                startsOn: new Date(),
+                expiresOn: new Date(new Date().valueOf() + 86400)
+            },
+                cerds
+            ).toString();
 
-        const blobName = pic[0].blobName
-        const blobClient = clientBlob.getBlobClient(blobName);
-        const blobSAS = storage.generateBlobSASQueryParameters({
-            containerName,
-            blobName: blobName,
-            permissions: storage.BlobSASPermissions.parse("racwd"),
-            startsOn: new Date(),
-            expiresOn: new Date(new Date().valueOf() + 86400)
-        },
-            cerds
-        ).toString();
-
-        const sasUrl = blobClient.url + "?" + blobSAS;
-        Data.profilePic = sasUrl
+            const sasUrl = blobClient.url + "?" + blobSAS;
+            Data.profilePic = sasUrl
+        }
+        else
+            Data.profilePic = "false"
 
         session.close();
         res.status(200)

@@ -30,7 +30,7 @@ export interface IAuth {
     lastname: string,
     username: string,
     email: string,
-    picture: string,
+    profilePic: string,
     followers: IUser[],
     following: IUser[]
 }

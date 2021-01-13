@@ -71,8 +71,8 @@ export async function uploadPost(uploadForm: IPostUpload) {
 }
 export async function getComments(imageId: string) {
   return axios
-    .get<{ message: string; Data: IImage[] }>(`comment/byImageId/${imageId}`)
-    .then((res) => res.data.Data);
+    .get<{ message: string; p: IImage[] }>(`comment/byImageId/${imageId}`)
+    .then((res) => res.data.p);
 }
 export async function addComment(
   imageId: string,

@@ -185,7 +185,7 @@ function Profile() {
           <div className={classes.container}>
             <Avatar
               className={classes.avatar}
-              src="https://miro.medium.com/max/10368/1*o8tTGo3vsocTKnCUyz0wHA.jpeg"
+              src={profile?.profilePic}
             ></Avatar>
 
             <br />

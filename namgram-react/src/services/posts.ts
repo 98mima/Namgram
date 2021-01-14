@@ -1,6 +1,14 @@
 import axios from "axios";
 import { IComment, IImage, IPost, IPostUpload } from "../models/post";
 
+export async function getPost(id: string) {
+  return axios
+    .get<{ message: string; Data1: IImage }>(`image/${id}`)
+    .then((res) => {
+      return res.data.Data1;
+    });
+}
+
 export async function getPosts(userId: string) {
   return axios
     .get<{ message: string; Data1: IImage[] }>(`image/byId/${userId}`)
@@ -89,13 +97,10 @@ export async function addComment(
       return res.data.Data;
     });
 }
-// export async function uploadBasicPost(uploadForm: IBasicPost) {
-//   return axios
-//     .post<{ content: string; personId: string }>("post/add", {
-//       content: uploadForm.content,
-//       personId: uploadForm.personId,
-//     })
-//     .then((res) => {
-//       return res.data;
-//     });
-// }
+export async function deletePost(imageId: string) {
+  return axios
+    .delete<{ imageId: string }>("image/deleteImage/" + imageId)
+    .then((res) => {
+      return res.data;
+    });
+}

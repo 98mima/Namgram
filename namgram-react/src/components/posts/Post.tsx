@@ -22,6 +22,11 @@ import {
   Button,
   CardActionArea,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Fab,
   Grid,
   Link,
@@ -42,6 +47,7 @@ import {
 } from "@material-ui/core";
 import {
   addComment,
+  deletePost,
   dislikePost,
   getComments,
   likePost,
@@ -53,6 +59,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { Socket } from "socket.io-client";
 import { ADD_NOTIFICATION } from "../../redux/auth/actions";
 import { useHistory } from "react-router-dom";
+import { IAuth } from "../../models/auth";
+import { IUser } from "../../models/user";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -144,8 +152,15 @@ const useStyles = makeStyles((theme: Theme) =>
       flex: 1,
       width: "80%",
     },
+    deleteBtn: {
+      color: "red",
+    },
   })
 );
+//@ts-ignore
+function PaperComponent(props) {
+  return <Paper {...props} />;
+}
 
 function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
   const { post, socket } = props;
@@ -166,12 +181,21 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
   const [comments, setComments] = React.useState<IComment[]>([]);
   const [newComment, setNewComment] = useState("");
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   useEffect(() => {
     setAlreadyLiked(props.post.ifLiked);
     setAlreadyDisliked(props.post.ifDisliked);
     setLikes(props.post.likes);
     setdisLikes(props.post.dislikes);
-
     return () => {};
   }, []);
 
@@ -186,10 +210,39 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
     postId: string
   ) => {
     event.preventDefault();
+    console.log(comments);
     if (newComment) {
       const id = auth?.id as string;
       addComment(postId, id, newComment).then((res) => {
-        setComments([...comments, res]);
+        console.log(res);
+        const id = Math.random().toString();
+
+        const user: IUser = {
+          //@ts-ignore
+          id: auth?.id,
+          //@ts-ignore
+          email: auth?.email,
+          //@ts-ignore
+          lastname: auth?.lastname,
+          //@ts-ignore
+          name: auth?.name,
+          //@ts-ignore
+          username: auth?.username,
+          //@ts-ignore
+          password: "1",
+          //@ts-ignore
+          profilePic: auth?.profilePic,
+          //@ts-ignore
+          birthday: new Date(),
+        };
+        const com: IComment = {
+          id: id,
+          content: res.content,
+          date: res.date,
+          creator: user,
+        };
+        setComments([...comments, com]);
+        setNewComment("");
       });
     }
   };
@@ -197,9 +250,9 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
     history.push(`/profile/${userId}`);
   };
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
+  // const handleExpandClick = () => {
+  //   setExpanded(!expanded);
+  // };
   const handleOpenComments = (imageId: string) => {
     setOpenComments(true);
     getComments(imageId).then((res) => {
@@ -209,6 +262,11 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
 
   const handleCloseComments = () => {
     setOpenComments(false);
+  };
+
+  const handleDelete = (imageId: string) => {
+    deletePost(imageId);
+    history.push(`/profile/${auth?.id}`);
   };
 
   const handleLike = (imageId: string) => {
@@ -269,7 +327,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
           <CardHeader
             avatar={
               <CardActionArea onClick={() => handleClick(post.creator.id)}>
-                <Avatar aria-label="recipe">
+                <Avatar aria-label="recipe" src={post.creator.profilePic}>
                   {/* <img style={{ maxHeight: '100%' }} src={post.user.image} /> */}
                 </Avatar>
               </CardActionArea>
@@ -365,6 +423,43 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               </Fade>
             </Modal>
           </CardContent>
+          {auth?.id == post.creator.id && (
+            <CardContent className={classes.button}>
+              <Button
+                variant="contained"
+                className={classes.deleteBtn}
+                onClick={handleClickOpen}
+              >
+                Delete
+              </Button>
+              <Dialog
+                open={open}
+                onClose={handleClose}
+                PaperComponent={PaperComponent}
+                aria-labelledby="draggable-dialog-title"
+              >
+                <DialogTitle
+                  style={{ cursor: "move" }}
+                  id="draggable-dialog-title"
+                >
+                  Delete Post
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                    Are you sure you want to delete this post?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button autoFocus onClick={handleClose} color="primary">
+                    No
+                  </Button>
+                  <Button onClick={() => handleDelete(post.id)} color="primary">
+                    Yes
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </CardContent>
+          )}
         </Card>
       </div>
 

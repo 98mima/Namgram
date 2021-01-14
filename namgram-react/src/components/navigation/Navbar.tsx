@@ -1,38 +1,78 @@
-import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-import { Avatar, Button, createStyles, fade, makeStyles, Theme } from '@material-ui/core';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import InputBase from '@material-ui/core/InputBase';
-import Badge from '@material-ui/core/Badge';
-import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
-import MenuIcon from '@material-ui/icons/Menu';
-import SearchIcon from '@material-ui/icons/Search';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import MailIcon from '@material-ui/icons/Mail';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
-import { useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../redux';
-import { logoutAction } from '../../redux/auth/actions';
-import { AddCircleRounded } from '@material-ui/icons';
+import {
+  Avatar,
+  Button,
+  createStyles,
+  fade,
+  makeStyles,
+  Theme,
+} from "@material-ui/core";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import InputBase from "@material-ui/core/InputBase";
+import Badge from "@material-ui/core/Badge";
+import MenuItem from "@material-ui/core/MenuItem";
+import Menu from "@material-ui/core/Menu";
+import AutoComplete from "@material-ui/lab/AutoComplete";
+import MenuIcon from "@material-ui/icons/Menu";
+import SearchIcon from "@material-ui/icons/Search";
+import AccountCircle from "@material-ui/icons/AccountCircle";
+import MailIcon from "@material-ui/icons/Mail";
+import NotificationsIcon from "@material-ui/icons/Notifications";
+import MoreIcon from "@material-ui/icons/MoreVert";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import { useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux";
+import { logoutAction } from "../../redux/auth/actions";
+import { AddCircleRounded, LocationDisabledSharp } from "@material-ui/icons";
+import { DebounceInput } from "react-debounce-input";
+import { IUser } from "../../models/user";
+import { getProfileByUsername } from "../../services/profile";
+import TextField from "@material-ui/core/TextField/TextField";
+import _ from "lodash";
 
-
+import {
+  Avatar,
+  Button,
+  createStyles,
+  fade,
+  makeStyles,
+  Theme,
+} from "@material-ui/core";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import InputBase from "@material-ui/core/InputBase";
+import Badge from "@material-ui/core/Badge";
+import MenuItem from "@material-ui/core/MenuItem";
+import Menu from "@material-ui/core/Menu";
+import MenuIcon from "@material-ui/icons/Menu";
+import SearchIcon from "@material-ui/icons/Search";
+import AccountCircle from "@material-ui/icons/AccountCircle";
+import MailIcon from "@material-ui/icons/Mail";
+import NotificationsIcon from "@material-ui/icons/Notifications";
+import MoreIcon from "@material-ui/icons/MoreVert";
+import { useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux";
+import { logoutAction } from "../../redux/auth/actions";
+import { AddCircleRounded } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     link: {
       textDecoration: "none",
-      color: "inherit"
+      color: "inherit",
     },
-    btn:{
-      color: 'white',
-      paddingRight: '1rem'
+    btn: {
+      color: "white",
+      paddingRight: "1rem",
     },
     grow: {
       flexGrow: 1,
@@ -41,58 +81,58 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: theme.spacing(2),
     },
     title: {
-      display: 'none',
-      [theme.breakpoints.up('sm')]: {
-        display: 'block',
+      display: "none",
+      [theme.breakpoints.up("sm")]: {
+        display: "block",
       },
     },
     search: {
-      position: 'relative',
+      position: "relative",
       borderRadius: theme.shape.borderRadius,
       backgroundColor: fade(theme.palette.common.white, 0.15),
-      '&:hover': {
+      "&:hover": {
         backgroundColor: fade(theme.palette.common.white, 0.25),
       },
       marginRight: theme.spacing(2),
       marginLeft: 0,
-      width: '100%',
-      [theme.breakpoints.up('sm')]: {
+      width: "100%",
+      [theme.breakpoints.up("sm")]: {
         marginLeft: theme.spacing(3),
-        width: 'auto',
+        width: "auto",
       },
     },
     searchIcon: {
       padding: theme.spacing(0, 2),
-      height: '100%',
-      position: 'absolute',
-      pointerEvents: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      height: "100%",
+      position: "absolute",
+      pointerEvents: "none",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
     },
     inputRoot: {
-      color: 'inherit',
+      color: "inherit",
     },
     inputInput: {
       padding: theme.spacing(1, 1, 1, 0),
       // vertical padding + font size from searchIcon
       paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-      transition: theme.transitions.create('width'),
-      width: '100%',
-      [theme.breakpoints.up('md')]: {
-        width: '20ch',
+      transition: theme.transitions.create("width"),
+      width: "100%",
+      [theme.breakpoints.up("md")]: {
+        width: "20ch",
       },
     },
     sectionDesktop: {
-      display: 'none',
-      [theme.breakpoints.up('md')]: {
-        display: 'flex',
+      display: "none",
+      [theme.breakpoints.up("md")]: {
+        display: "flex",
       },
     },
     sectionMobile: {
-      display: 'flex',
-      [theme.breakpoints.up('md')]: {
-        display: 'none',
+      display: "flex",
+      [theme.breakpoints.up("md")]: {
+        display: "none",
       },
     },
     logo: {
@@ -102,69 +142,77 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "70px",
       "&:hover": {
         background: "rgb(220, 220, 220, 50)",
-        cursor: "pointer"
-      }
-    }
-  }),
+        cursor: "pointer",
+      },
+    },
+  })
 );
 
 function Navbar() {
-    const history = useHistory();
-    const dispatch = useDispatch();
+  const history = useHistory();
+  const dispatch = useDispatch();
 
-    const auth = useSelector((state: RootState) => state.auth.auth);
-    const socket = useSelector((state: RootState) => state.auth.socket);
-    const notifications = useSelector((state: RootState) => state.auth.notifications);
+  const [searchResults, setSearchResults] = useState<IUser[]>([]);
 
-    const classes = useStyles();
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
+  const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [
+    mobileMoreAnchorEl,
+    setMobileMoreAnchorEl,
+  ] = React.useState<null | HTMLElement>(null);
 
-    const isMenuOpen = Boolean(anchorEl);
-    const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [
+    mobileMoreAnchorEl,
+    setMobileMoreAnchorEl,
+  ] = React.useState<null | HTMLElement>(null);
 
-    const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-    const handleMobileMenuClose = () => {
-        setMobileMoreAnchorEl(null);
-    };
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-        handleMobileMenuClose();
-    };
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
 
-    const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setMobileMoreAnchorEl(event.currentTarget);
-    };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
 
-    const handleMyProfile = () => {
-      history.push('/profile/' + auth?.id as string);
-      handleMenuClose();
-    }
+  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
 
-    const handleLogout = () => {
-      dispatch(logoutAction());
-      handleMenuClose();
-    }
+  const handleMyProfile = () => {
+    history.push(("/profile/" + auth?.id) as string);
+    handleMenuClose();
+  };
 
-    const handleHome = () => {
-      if(auth) history.push("/posts");
-      else history.push("/");
-    }
+  const handleLogout = () => {
+    dispatch(logoutAction());
+    handleMenuClose();
+  };
 
+  const searchUsers = (username: any) => {
+    getProfileByUsername(username).then((profile) => {
+      setSearchResults([profile]);
+    });
+  };
 
-  const menuId = 'primary-search-account-menu';
+  const menuId = "primary-search-account-menu";
 
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
       id={menuId}
       keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
@@ -173,14 +221,14 @@ function Navbar() {
     </Menu>
   );
 
-  const mobileMenuId = 'primary-search-account-menu-mobile';
+  const mobileMenuId = "primary-search-account-menu-mobile";
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
       id={mobileMenuId}
       keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
@@ -213,78 +261,112 @@ function Navbar() {
       </MenuItem>
     </Menu>
   );
-    return (
-        <div className={classes.grow}>
+  return (
+    <div className={classes.grow}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
+          {/* <IconButton
             edge="start"
             className={classes.menuButton}
             color="inherit"
             aria-label="open drawer"
           >
-            <MenuIcon />
-          </IconButton>
+            <MenuIcon /> 
+          </IconButton> */}
           <Link to="/" className={classes.link}>
-          <img className={classes.logo} 
-          src="https://cdn.discordapp.com/attachments/777890574253817889/792441180054749224/e52d18ae-4e0c-40cf-8d30-07396304f4e0_200x200.png" />
+            <img
+              className={classes.logo}
+              src="https://cdn.discordapp.com/attachments/777890574253817889/792441180054749224/e52d18ae-4e0c-40cf-8d30-07396304f4e0_200x200.png"
+            />
           </Link>
           {/* <Typography className={classes.title} variant="h6" noWrap>
             namgram
           </Typography> */}
           <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
+            <AutoComplete
               classes={{
                 root: classes.inputRoot,
                 input: classes.inputInput,
               }}
-              inputProps={{ 'aria-label': 'search' }}
+              style={{ width: 200 }}
+              options={searchResults}
+              renderOption={(profile) => {
+                if (profile)
+                  return (
+                    <div
+                      onClick={() => {
+                        history.push("/profile/" + profile.id);
+                      }}
+                    >
+                      <Avatar src={profile.profilePic} />
+                      {"    " + profile.username}
+                    </div>
+                  );
+                else return <React.Fragment>Not found</React.Fragment>;
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="" variant="standard" />
+              )}
+              onInputChange={(event, newValue) => searchUsers(newValue)}
+              onClick={() => {
+                console.log("klik");
+              }}
+              getOptionLabel={(profile: IUser | undefined) => {
+                return profile ? profile.username : "Not found";
+              }}
             />
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            {!auth ? 
-            <div>
-              <Link to="/signin" style={{textDecoration: 'none'}}>
-                <Button className={classes.btn} variant='outlined' color='primary'>Sign in</Button>
-              </Link>
-              <Link to="/signup" style={{textDecoration: 'none'}}>
-                <Button variant='contained' color='secondary'>Sign up</Button>
-              </Link>
-            </div> : 
-            <div>
-              <Link className={classes.link} to="/posts/create">
-              <IconButton aria-label="Add new image" color="inherit">
-                <AddCircleRounded />
-              </IconButton>
-              </Link>
-              <Link className={classes.link} to="/chat">
-               <IconButton aria-label="Chat" color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            </Link>
-            <IconButton aria-label="show new notifications" color="inherit">
-              <Badge badgeContent={notifications.length} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-            edge="end"
-            aria-label="account of current user"
-            aria-controls={menuId}
-            aria-haspopup="true"
-            onClick={handleProfileMenuOpen}
-            color="inherit"
-          >
-            {/* <AccountCircle /> */}
-            <Avatar src={auth.profilePic} />
-          </IconButton> </div>}
+            {!auth ? (
+              <div>
+                <Link to="/signin" style={{ textDecoration: "none" }}>
+                  <Button
+                    className={classes.btn}
+                    variant="outlined"
+                    color="primary"
+                  >
+                    Sign in
+                  </Button>
+                </Link>
+                <Link to="/signup" style={{ textDecoration: "none" }}>
+                  <Button variant="contained" color="secondary">
+                    Sign up
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div>
+                <Link className={classes.link} to="/posts/create">
+                  <IconButton aria-label="Add new image" color="inherit">
+                    <AddCircleRounded />
+                  </IconButton>
+                </Link>
+                <Link className={classes.link} to="/chat">
+                  <IconButton aria-label="Chat" color="inherit">
+                    <Badge badgeContent={4} color="secondary">
+                      <MailIcon />
+                    </Badge>
+                  </IconButton>
+                </Link>
+                <IconButton aria-label="show new notifications" color="inherit">
+                  <Badge badgeContent={notifications.length} color="secondary">
+                    <NotificationsIcon />
+                  </Badge>
+                </IconButton>
+                <IconButton
+                  edge="end"
+                  aria-label="account of current user"
+                  aria-controls={menuId}
+                  aria-haspopup="true"
+                  onClick={handleProfileMenuOpen}
+                  color="inherit"
+                >
+                  {/* <AccountCircle /> */}
+                  <Avatar src={auth.profilePic} />
+                </IconButton>{" "}
+              </div>
+            )}
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
@@ -302,7 +384,7 @@ function Navbar() {
       {renderMobileMenu}
       {renderMenu}
     </div>
-    )
+  );
 }
 
-export default Navbar
+export default Navbar;

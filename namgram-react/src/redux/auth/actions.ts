@@ -55,8 +55,8 @@ export const authUser = () => (dispatch: any) => {
           const following = res[2];
 
           const socket = io("ws://localhost:8000", {query: `userId=${user.id}`});
-          socket.on("notification", (message: any) => {
-            console.log(message);
+          //Da se poradi
+          socket.on("liked", (message: any) => {
             dispatch({type: ADD_NOTIFICATION, 
               payload: {post: message.post, liker: message.liker}});
           })

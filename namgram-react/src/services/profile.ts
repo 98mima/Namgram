@@ -21,6 +21,10 @@ export async function getProfile(userId: string) {
     });
 }
 
+export async function getProfileByUsername(username: string){
+  return axios.get<{message: string, Data: IUser}>(`person/byUsername/${username}`).then(res => res.data.Data)
+}
+
 export async function getFollowers(username: string) {
   return axios
     .get<{ message: string; Data: IUser[] }>(`person/getFollowers/${username}`)

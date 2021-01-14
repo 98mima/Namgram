@@ -40,6 +40,7 @@ function _manyImages(neo4jResult) {
     return neo4jResult.records.map(r => new Image(r.get('image')))
 }
 
+router.get('/:id', imageController.get);
 router.get('/getAll', imageController.getAll)
 router.get('/byId/:id', imageController.getByPerson);
 router.get('/byFollowings/:userId', imageController.getByFollowings);
@@ -50,7 +51,7 @@ router.post('/like', imageController.like);
 router.post('/removeLike', imageController.removeLike);
 router.post('/dislike', imageController.dislike);
 router.post('/removedisLike', imageController.removeDislike);
-router.delete('/deleteImage', imageController.deleteImage);
+router.delete('/deleteImage/:imageId', imageController.deleteImage);
 
 router.post('/add', uploadStrategy, async (req, res) => {
     try {
@@ -107,9 +108,14 @@ router.post('/addProfilePic', uploadStrategy, async (req, res) => {
 
         let session = driver.session();
         const query = [
+<<<<<<< HEAD
             'match (a:Person {id:$personId}) \
             merge (a)-[r]->(b:Image {id:$id, person:$personId, blobName:$blobName}) \
             '
+=======
+            
+            'create (b:Image {id:$id, person:$personId, blobName:$blobName})'
+>>>>>>> 5ba7365edcfc11249cbc8101dcd3d9af6475e843
         ].join('\n')
 
         const d = await session.writeTransaction(txc =>

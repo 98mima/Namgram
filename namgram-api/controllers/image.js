@@ -168,6 +168,54 @@ function _manyPeople(neo4jResult) {
     return neo4jResult.records.map(r => new Person(r.get('person')))
 }
 
+exports.get = async (req, res) => {
+    try {
+        let session = driver.session();
+
+        const im = await session.run('MATCH (image:Image {id: $id}) RETURN image', {
+            id: req.params.id
+        });
+        const p = _manyImages(im)
+
+        Data1 = await Promise.all(p.map(p => {
+            return findProps(p)
+        }))
+        Data1.map(image => {
+            const containerClient = blobServiceClient.getContainerClient(containerName);
+            const blobName = image.blobName
+            const blobClient = client.getBlobClient(blobName);
+            const blobSAS = storage.generateBlobSASQueryParameters({
+                containerName,
+                blobName: blobName,
+                permissions: storage.BlobSASPermissions.parse("racwd"),
+                startsOn: new Date(),
+                expiresOn: new Date(new Date().valueOf() + 86400)
+            },
+                cerds
+            ).toString();
+
+            const sasUrl = blobClient.url + "?" + blobSAS;
+            image.sasToken = sasUrl
+        })
+        session.close();
+
+        let creators = []
+        creators = await Promise.all(
+            Data1.map(post => {
+                return post.creator = findCreator(post)
+            }))
+        Data1.map((post, index) =>
+            post.creator = creators[index])
+
+        res.status(200)
+            .json({ message: "Prikupljeno", Data1: Data1[0] })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+}
+
 exports.getAll = async (req, res) => {
     try {
         let session = driver.session();

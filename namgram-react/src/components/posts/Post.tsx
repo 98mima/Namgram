@@ -269,8 +269,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
           <CardHeader
             avatar={
               <CardActionArea onClick={() => handleClick(post.creator.id)}>
-                <Avatar aria-label="recipe">
-                  {/* <img style={{ maxHeight: '100%' }} src={post.user.image} /> */}
+                <Avatar aria-label="recipe" src={post.creator.profilePic}>
                 </Avatar>
               </CardActionArea>
             }

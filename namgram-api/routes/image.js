@@ -40,6 +40,7 @@ function _manyImages(neo4jResult) {
     return neo4jResult.records.map(r => new Image(r.get('image')))
 }
 
+router.get('/:id', imageController.get);
 router.get('/getAll', imageController.getAll)
 router.get('/byId/:id', imageController.getByPerson);
 router.get('/byFollowings/:userId', imageController.getByFollowings);

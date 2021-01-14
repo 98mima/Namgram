@@ -148,6 +148,8 @@ exports.addToPost = async (req, res) => {
 
         const comment = _manyComments(com)
         const Data = comment[0]
+        Data.postId = req.body.postId
+        Data.creator = req.body.personId
 
         session.close();
         res.status(200)
@@ -184,6 +186,8 @@ exports.addToImage = async (req, res) => {
 
         const comment = _manyComments(com)
         const Data = comment[0]
+        Data.postId = req.body.imageId
+        Data.creator = req.body.personId
 
         session.close();
         res.status(200)

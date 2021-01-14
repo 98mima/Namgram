@@ -108,14 +108,8 @@ router.post('/addProfilePic', uploadStrategy, async (req, res) => {
 
         let session = driver.session();
         const query = [
-<<<<<<< HEAD
-            'match (a:Person {id:$personId}) \
-            merge (a)-[r]->(b:Image {id:$id, person:$personId, blobName:$blobName}) \
-            '
-=======
             
             'create (b:Image {id:$id, person:$personId, blobName:$blobName})'
->>>>>>> 5ba7365edcfc11249cbc8101dcd3d9af6475e843
         ].join('\n')
 
         const d = await session.writeTransaction(txc =>

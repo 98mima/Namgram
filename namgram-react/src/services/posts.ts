@@ -1,6 +1,14 @@
 import axios from "axios";
 import { IComment, IImage, IPost, IPostUpload } from "../models/post";
 
+export async function getPost(id: string) {
+  return axios
+    .get<{ message: string; Data1: IImage }>(`image/${id}`)
+    .then((res) => {
+      return res.data.Data1;
+    });
+}
+
 export async function getPosts(userId: string) {
   return axios
     .get<{ message: string; Data1: IImage[] }>(`image/byId/${userId}`)

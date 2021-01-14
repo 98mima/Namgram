@@ -644,10 +644,10 @@ exports.deleteImage = async (req, res) => {
     let session = driver.session();
     try {
         const rel = await session.run('match (a:Person)-[r]->(image:Image {id:$imageId}) delete r ', {
-            imageId: req.body.imageId
+            imageId: req.params.imageId
         })
         p = await session.run('MATCH (image:Image {id: $imageId}) DELETE image', {
-            imageId: req.body.imageId
+            imageId: req.params.imageId
         });
         res.status(200)
             .json({ message: "Obrisan" });

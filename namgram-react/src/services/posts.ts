@@ -97,13 +97,10 @@ export async function addComment(
       return res.data.Data;
     });
 }
-// export async function uploadBasicPost(uploadForm: IBasicPost) {
-//   return axios
-//     .post<{ content: string; personId: string }>("post/add", {
-//       content: uploadForm.content,
-//       personId: uploadForm.personId,
-//     })
-//     .then((res) => {
-//       return res.data;
-//     });
-// }
+export async function deletePost(imageId: string) {
+  return axios
+    .delete<{ imageId: string }>("image/deleteImage/" + imageId)
+    .then((res) => {
+      return res.data;
+    });
+}

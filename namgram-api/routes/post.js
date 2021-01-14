@@ -18,6 +18,6 @@ router.post('/like', postController.like);
 router.post('/removeLike', postController.removeLike);
 router.post('/dislike', postController.dislike);
 router.post('/removeDislike', postController.removeDislike);
-router.delete('/delete', postController.deletePost);
+router.post('/delete', postController.deletePost);
 
 module.exports = router;

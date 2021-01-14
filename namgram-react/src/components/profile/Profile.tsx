@@ -105,6 +105,8 @@ function Profile() {
   useEffect(() => {
     if (!profile) {
       dispatch(loadProfile(id));
+    } else if(profile.id !== id){
+      dispatch(loadProfile(id));
     }
     if (
       profile &&
@@ -115,7 +117,7 @@ function Profile() {
       setIsFollowing(false);
     }
     return () => {};
-  }, [auth, profile]);
+  }, [auth, profile, id]);
 
   const following = (username: string) => {
     if (

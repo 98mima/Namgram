@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Avatar, Button, createStyles, fade, makeStyles, Theme } from '@material-ui/core';
@@ -10,17 +10,24 @@ import InputBase from '@material-ui/core/InputBase';
 import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import AutoComplete from '@material-ui/lab/AutoComplete';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux';
 import { logoutAction } from '../../redux/auth/actions';
-import { AddCircleRounded } from '@material-ui/icons';
+import { AddCircleRounded, LocationDisabledSharp } from '@material-ui/icons';
+import { DebounceInput } from 'react-debounce-input';
+import { IUser } from '../../models/user';
+import { getProfileByUsername } from '../../services/profile';
+import TextField from '@material-ui/core/TextField/TextField';
+import _ from 'lodash'
 
 
 
@@ -116,6 +123,8 @@ function Navbar() {
     const socket = useSelector((state: RootState) => state.auth.socket);
     const notifications = useSelector((state: RootState) => state.auth.notifications);
 
+    const [searchResults, setSearchResults] = useState<IUser[]>([]);
+
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -155,6 +164,11 @@ function Navbar() {
       else history.push("/");
     }
 
+    const searchUsers = (username: any) =>{
+        getProfileByUsername(username).then(profile => {
+          setSearchResults([profile]);
+        })
+    }
 
   const menuId = 'primary-search-account-menu';
 
@@ -233,17 +247,30 @@ function Navbar() {
             namgram
           </Typography> */}
           <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-            />
+            <AutoComplete 
+            classes={{
+              root: classes.inputRoot,
+              input: classes.inputInput,
+            }}
+            style={{ width: 200 }}
+            options={searchResults}
+            renderOption={(profile) => {
+              if(profile)
+                return (<div onClick={() => {history.push("/profile/" + profile.id)}}>
+                          <Avatar src={profile.profilePic} />
+                          {"    "+profile.username}
+                        </div>)
+              else
+                  return(<React.Fragment>Not found</React.Fragment>)
+            }
+            }
+             renderInput={(params) => 
+             (<TextField {...params} label="" variant="standard" />)
+          }
+             onInputChange={(event, newValue) => searchUsers(newValue)}
+             onClick={() => {console.log("klik")}}
+             getOptionLabel={(profile: IUser | undefined) => {return profile ? profile.username : "Not found"}}
+              />
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>

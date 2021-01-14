@@ -250,9 +250,9 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
     history.push(`/profile/${userId}`);
   };
 
-  // const handleExpandClick = () => {
-  //   setExpanded(!expanded);
-  // };
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
   const handleOpenComments = (imageId: string) => {
     setOpenComments(true);
     getComments(imageId).then((res) => {
@@ -390,7 +390,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
                     <ListItem key={comment.id}>
                       <ListItemAvatar>
                         <CardActionArea
-                          onClick={() => handleClick(post.creator.id)}
+                          onClick={() => handleClick(comment.creator.id)}
                         >
                           <Avatar></Avatar>
                         </CardActionArea>

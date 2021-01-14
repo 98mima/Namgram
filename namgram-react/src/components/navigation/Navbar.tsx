@@ -36,34 +36,6 @@ import { getProfileByUsername } from "../../services/profile";
 import TextField from "@material-ui/core/TextField/TextField";
 import _ from "lodash";
 
-import {
-  Avatar,
-  Button,
-  createStyles,
-  fade,
-  makeStyles,
-  Theme,
-} from "@material-ui/core";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import InputBase from "@material-ui/core/InputBase";
-import Badge from "@material-ui/core/Badge";
-import MenuItem from "@material-ui/core/MenuItem";
-import Menu from "@material-ui/core/Menu";
-import MenuIcon from "@material-ui/icons/Menu";
-import SearchIcon from "@material-ui/icons/Search";
-import AccountCircle from "@material-ui/icons/AccountCircle";
-import MailIcon from "@material-ui/icons/Mail";
-import NotificationsIcon from "@material-ui/icons/Notifications";
-import MoreIcon from "@material-ui/icons/MoreVert";
-import { useHistory } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux";
-import { logoutAction } from "../../redux/auth/actions";
-import { AddCircleRounded } from "@material-ui/icons";
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     link: {
@@ -152,14 +124,13 @@ function Navbar() {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const [searchResults, setSearchResults] = useState<IUser[]>([]);
+  const auth = useSelector((state: RootState) => state.auth.auth);
+  const socket = useSelector((state: RootState) => state.auth.socket);
+  const notifications = useSelector(
+    (state: RootState) => state.auth.notifications
+  );
 
-  const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [
-    mobileMoreAnchorEl,
-    setMobileMoreAnchorEl,
-  ] = React.useState<null | HTMLElement>(null);
+  const [searchResults, setSearchResults] = useState<IUser[]>([]);
 
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -196,6 +167,11 @@ function Navbar() {
   const handleLogout = () => {
     dispatch(logoutAction());
     handleMenuClose();
+  };
+
+  const handleHome = () => {
+    if (auth) history.push("/posts");
+    else history.push("/");
   };
 
   const searchUsers = (username: any) => {
@@ -265,14 +241,14 @@ function Navbar() {
     <div className={classes.grow}>
       <AppBar position="static">
         <Toolbar>
-          {/* <IconButton
+          <IconButton
             edge="start"
             className={classes.menuButton}
             color="inherit"
             aria-label="open drawer"
           >
-            <MenuIcon /> 
-          </IconButton> */}
+            <MenuIcon />
+          </IconButton>
           <Link to="/" className={classes.link}>
             <img
               className={classes.logo}

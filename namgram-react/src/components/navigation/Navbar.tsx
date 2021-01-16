@@ -5,10 +5,12 @@ import {
   Avatar,
   Button,
   createStyles,
+  Fade,
   fade,
   makeStyles,
   Theme,
 } from "@material-ui/core";
+import Popper from "@material-ui/core/Popper";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
@@ -33,8 +35,12 @@ import { AddCircleRounded, LocationDisabledSharp } from "@material-ui/icons";
 import { DebounceInput } from "react-debounce-input";
 import { IUser } from "../../models/user";
 import { getProfileByUsername } from "../../services/profile";
+import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField/TextField";
 import _ from "lodash";
+import { getUserById } from "../../services/user";
+import { getPost } from "../../services/posts";
+import { INotification } from "../../models/post";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -121,6 +127,31 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function Navbar() {
+  const [anchorNotif, setAnchorNotif] = React.useState<null | HTMLElement>(
+    null
+  );
+
+  const handleNotificationOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setNotifs([]);
+    notifications.map((not) => {
+      getUserById(not.liker).then((res) => {
+        getPost(not.post).then((res2) => {
+          let n: INotification = {
+            liker: res.Data.username,
+            post: res2.id,
+          };
+          setNotifs([...notifs, n]);
+        });
+      });
+    });
+    console.log(notifs);
+    setAnchorNotif(anchorNotif ? null : event.currentTarget);
+  };
+  const [notifs, setNotifs] = React.useState<INotification[]>([]);
+
+  const open = Boolean(anchorNotif);
+  const id = open ? "transitions-popper" : undefined;
+
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -162,6 +193,9 @@ function Navbar() {
   const handleMyProfile = () => {
     history.push(("/profile/" + auth?.id) as string);
     handleMenuClose();
+  };
+  const handeNewPost = () => {
+    history.push("/posts/create");
   };
 
   const handleLogout = () => {
@@ -209,21 +243,45 @@ function Navbar() {
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <IconButton aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="secondary">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
+        <Link className={classes.link} to="/posts/create">
+          <IconButton aria-label="Add new image" color="inherit">
+            <AddCircleRounded />
+          </IconButton>
+        </Link>
+        <p>Add post</p>
       </MenuItem>
       <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
-          <Badge badgeContent={11} color="secondary">
+        <Link className={classes.link} to="/chat">
+          <IconButton aria-label="Chat" color="inherit">
+            <Badge badgeContent={4} color="secondary">
+              <MailIcon />
+            </Badge>
+          </IconButton>
+        </Link>
+        <p>Messages</p>
+      </MenuItem>
+      {/* <MenuItem>
+        <IconButton
+          aria-describedby={id}
+          type="button"
+          onClick={handleNotificationOpen}
+          color="inherit"
+          aria-label="show new notifications"
+        >
+          <Badge badgeContent={notifications.length} color="secondary">
             <NotificationsIcon />
           </Badge>
+          <Popper id={id} open={open} anchorEl={anchorNotif} transition>
+            {({ TransitionProps }) => (
+              <Fade {...TransitionProps} timeout={350}>
+                <div>The content of the Popper.</div>
+              </Fade>
+            )}
+          </Popper>
         </IconButton>
         <p>Notifications</p>
-      </MenuItem>
+      </MenuItem> */}
+
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           aria-label="account of current user"
@@ -325,10 +383,41 @@ function Navbar() {
                     </Badge>
                   </IconButton>
                 </Link>
-                <IconButton aria-label="show new notifications" color="inherit">
+                <IconButton
+                  aria-describedby={id}
+                  type="button"
+                  onClick={handleNotificationOpen}
+                  color="inherit"
+                  aria-label="show new notifications"
+                >
                   <Badge badgeContent={notifications.length} color="secondary">
                     <NotificationsIcon />
                   </Badge>
+                  {/* <Popper id={id} open={open} anchorEl={anchorNotif} transition>
+                    {({ TransitionProps }) => (
+                      <Fade {...TransitionProps} timeout={350}>
+                        {notifs.map((not) => (
+                          // <Typography key={i}>{not.liker} sadsad</Typography>
+                        ))}
+                      </Fade>
+                    )}
+                  </Popper> */}
+                  {/* <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorNotif}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Typography >The content of the Popover.</Typography>
+      </Popover> */}
                 </IconButton>
                 <IconButton
                   edge="end"

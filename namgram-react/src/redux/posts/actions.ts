@@ -1,6 +1,6 @@
 import { IImage, IPost } from "../../models/post";
 import { IUser } from "../../models/user";
-import { getFollowerPosts, getPosts } from "../../services/posts";
+import { getFollowerPosts, getPosts, getPopularPosts } from "../../services/posts";
 import { SET_ERROR, START_LOADING, STOP_LOADING } from "../ui/actions";
 
 export const SET_POSTS = "SET_POSTS"
@@ -27,3 +27,14 @@ export const loadPosts = (userId: string) => (dispatch: any) => {
         dispatch({type: SET_ERROR, payload: err})
     })
   };
+
+export const loadPopularPosts = (userId: string) => (dispatch: any) => {
+    dispatch({type: START_LOADING});
+    getPopularPosts(userId).then(posts => {
+        dispatch({type: SET_POSTS, payload: posts});
+        dispatch({type: STOP_LOADING});
+    }).catch(err => {
+        dispatch({type: STOP_LOADING});
+        dispatch({type: SET_ERROR, payload: err})
+    })
+}

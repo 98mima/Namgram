@@ -55,11 +55,12 @@ router.delete('/deleteImage/:imageId', imageController.deleteImage);
 
 router.post('/add', uploadStrategy, async (req, res) => {
     try {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-        today = dd + '.' + mm + '.' + yyyy;
+        // var today = new Date();
+        // var dd = String(today.getDate()).padStart(2, '0');
+        // var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        // var yyyy = today.getFullYear();
+        // today = dd + '.' + mm + '.' + yyyy;
+        const now = new Date();
 
         const content = req.body.caption
         const personId = req.body.personId
@@ -79,7 +80,7 @@ router.post('/add', uploadStrategy, async (req, res) => {
         const d = await session.writeTransaction(txc =>
             txc.run(query, {
                 id: uuid.v4(),
-                date: today,
+                date: now.toUTCString(),
                 content: content,
                 personId: personId,
                 blobName: blobName

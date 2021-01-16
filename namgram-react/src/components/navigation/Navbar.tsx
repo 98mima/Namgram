@@ -37,6 +37,7 @@ import { IUser } from "../../models/user";
 import { getProfileByUsername } from "../../services/profile";
 import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField/TextField";
+import WhatshotIcon from '@material-ui/icons/Whatshot';
 import _ from "lodash";
 import { getUserById } from "../../services/user";
 import { getPost } from "../../services/posts";
@@ -350,6 +351,11 @@ function Navbar() {
               }}
             />
           </div>
+          <Link className={classes.link} to="/hot">
+                  <IconButton aria-label="Whats hot?" color="inherit">
+                    <WhatshotIcon />
+                  </IconButton>
+          </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             {!auth ? (

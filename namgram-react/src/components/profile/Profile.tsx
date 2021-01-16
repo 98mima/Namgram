@@ -248,8 +248,8 @@ function Profile() {
                                 variant="contained"
                                 color="secondary"
                                 onClick={() =>
-                                  openInNewTab(
-                                    `http://localhost:3000/profile/${person.id}`
+                                  visit(
+                                    person.id
                                   )
                                 }
                               >
@@ -302,9 +302,7 @@ function Profile() {
                                 variant="contained"
                                 color="secondary"
                                 onClick={() =>
-                                  openInNewTab(
-                                    `http://localhost:3000/profile/${person.id}`
-                                  )
+                                  visit(person.id)
                                 }
                               >
                                 Visit

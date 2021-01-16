@@ -293,7 +293,7 @@ function Navbar() {
               }}
             />
           </div>
-          <Link className={classes.link} to="/">
+          <Link className={classes.link} to="/hot">
                   <IconButton aria-label="Whats hot?" color="inherit">
                     <WhatshotIcon />
                   </IconButton>

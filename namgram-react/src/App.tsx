@@ -18,6 +18,7 @@ import CreatePost from './components/posts/CreatePost';
 import Chat from './components/chat/Chat';
 import EditProfile from './components/profile/EditProfile';
 import SinglePost from './components/posts/SinglePost';
+import Hot from './components/posts/Hot';
 
 
 
@@ -35,6 +36,7 @@ function App() {
             <Route path="/editProfile" component={EditProfile} />
             <Route path="/posts/create" component={CreatePost} />
             <Route path="/posts" component={Posts} />
+            <Route path="/hot" component={Hot} />
             <Route path="/post/:id" component={SinglePost} />
             <Route path="/chat" component={Chat} />
             <Route path="/" component={Home} />

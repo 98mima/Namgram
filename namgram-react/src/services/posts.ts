@@ -105,6 +105,10 @@ export async function deletePost(imageId: string) {
     });
 }
 
-export async function getPopularPosts() {
-  
+export async function getPopularPosts(userId: string) {
+  return axios
+    .get<{ message: string; Data1: IImage[] }>(`image/mostLikedF/${userId}`)
+    .then((res) => {
+      return res.data.Data1;
+    });
 }

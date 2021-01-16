@@ -401,7 +401,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
                         primary={comment.creator.username}
                         secondary={comment.content}
                       />
-                      <Typography>{comment.date}</Typography>
+                      <Typography>{moment(comment.date).fromNow()}</Typography>
                     </ListItem>
                   ))}
                   <ListItem>

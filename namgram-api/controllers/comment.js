@@ -100,10 +100,11 @@ exports.getByImage = async (req, res) => {
     try{
         let session = driver.session();
 
-        const comments = await session.run('MATCH (image:Image {id: $id})<-[r1:commented]-(n:Person) return r1 as comment', {
+        const comments = await session.run('MATCH (image:Image {id: $id})<-[r1:commented]-(n:Person) return r1 as comment ORDER BY r1.date', {
             id: req.params.imageId
         });
         const p = _manyComments(comments)
+        console.log(p)
         session.close();
 
         let creators = []
@@ -162,11 +163,11 @@ exports.addToPost = async (req, res) => {
 };
 exports.addToImage = async (req, res) => {
     try {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-        today = dd + '.' + mm + '.' + yyyy;
+        var now = new Date();
+        // var dd = String(today.getDate()).padStart(2, '0');
+        // var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        // var yyyy = today.getFullYear();
+        // today = dd + '.' + mm + '.' + yyyy;
 
         let session = driver.session();
         const query = [
@@ -178,7 +179,7 @@ exports.addToImage = async (req, res) => {
 
         const com = await session.writeTransaction(txc =>
             txc.run(query, {
-                date: today,
+                date: now.toUTCString(),
                 content: req.body.content,
                 personId: req.body.personId,
                 imageId: req.body.imageId

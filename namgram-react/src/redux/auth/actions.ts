@@ -79,9 +79,9 @@ export const signinAction = (user: ISignin) => (dispatch: any) => {
         axios.defaults.headers.common["Authorization"] = token;
         const decodedToken: IAuth= jwtDecode(token);
 
-
+        dispatch(authUser());
        
-        dispatch({type: SET_AUTH, payload: decodedToken})
+        //dispatch({type: SET_AUTH, payload: decodedToken})
         dispatch({type: STOP_LOADING});
       })
       .catch((err : AxiosError) => {

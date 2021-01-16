@@ -104,3 +104,7 @@ export async function deletePost(imageId: string) {
       return res.data;
     });
 }
+
+export async function getPopularPosts() {
+  
+}

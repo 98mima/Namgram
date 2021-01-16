@@ -34,6 +34,7 @@ import {
   TextField,
 } from "@material-ui/core";
 
+import moment from "moment"
 import { IComment, IImage } from "../../models/post";
 import { width, maxHeight, height } from "@material-ui/system";
 import {
@@ -333,7 +334,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               </CardActionArea>
             }
             title={post.creator.username}
-            subheader={post.date}
+            subheader={moment(post.date).fromNow()}
           />
           <div style={{ display: "flex", justifyContent: "space-around" }}>
             <CardHeader

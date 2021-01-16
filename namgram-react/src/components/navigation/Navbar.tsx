@@ -34,6 +34,7 @@ import { DebounceInput } from "react-debounce-input";
 import { IUser } from "../../models/user";
 import { getProfileByUsername } from "../../services/profile";
 import TextField from "@material-ui/core/TextField/TextField";
+import WhatshotIcon from '@material-ui/icons/Whatshot';
 import _ from "lodash";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -292,6 +293,11 @@ function Navbar() {
               }}
             />
           </div>
+          <Link className={classes.link} to="/">
+                  <IconButton aria-label="Whats hot?" color="inherit">
+                    <WhatshotIcon />
+                  </IconButton>
+          </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             {!auth ? (

@@ -27,3 +27,14 @@ export const loadPosts = (userId: string) => (dispatch: any) => {
         dispatch({type: SET_ERROR, payload: err})
     })
   };
+
+export const loadPopularPosts = (userId: string) => (dispatch: any) => {
+    dispatch({type: START_LOADING});
+    getFollowerPosts(userId).then(posts => {
+        dispatch({type: SET_POSTS, payload: posts});
+        dispatch({type: STOP_LOADING});
+    }).catch(err => {
+        dispatch({type: STOP_LOADING});
+        dispatch({type: SET_ERROR, payload: err})
+    })
+}

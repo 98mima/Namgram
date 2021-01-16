@@ -20,6 +20,7 @@ router.get("/byUsername/:username", personController.getByUsername);
 router.get("/getFollowing/:username", personController.getFollowing);
 router.get("/getFollowers/:username", personController.getFollowers);
 router.get("/getRecommendedPeople/:username", personController.getRecommendedPeople);
+router.get("/getRecommendedImages/:username", personController.getRecommendedImages);
 router.post("/follow", personController.follow);
 router.post("/unfollow", personController.unfollow);
 router.delete("/delete", personController.deletePerson);

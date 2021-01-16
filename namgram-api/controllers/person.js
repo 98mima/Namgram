@@ -178,6 +178,23 @@ exports.getRecommendedPeople = async (req, res) => {
         console.log(err);
     }
 };
+exports.getRecommendedImages = async (req, res) => {
+    try {
+        let session = driver.session();
+        const persons = await session.run('MATCH (:Person {username:$username})-[:follows]->(:Person)-[:like]->(image:Image)\
+         RETURN image LIMIT 5', {
+            username: req.params.username
+        })
+        session.close();
+        const Data = _manyimage(persons)
+        res.status(200)
+            .json({ message: "Prikupljeno", Data })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
 
 exports.follow = async (req, res) => {
     try {

@@ -160,6 +160,25 @@ exports.getFollowers = async (req, res) => {
     }
 };
 
+exports.getRecommendedPeople = async (req, res) => {
+    try {
+        let session = driver.session();
+        const persons = await session.run('MATCH (p:Person {username:$username})-[:like]->(post:Post)<-[:like]-(person:Person) \
+        RETURN person \
+         LIMIT 5', {
+            username: req.params.username
+        })
+        session.close();
+        const Data = _manyPeople(persons)
+        res.status(200)
+            .json({ message: "Prikupljeno", Data })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err);
+    }
+};
+
 exports.follow = async (req, res) => {
     try {
         let session = driver.session();

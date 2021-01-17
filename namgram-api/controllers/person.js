@@ -35,6 +35,22 @@ function _manyPeople(neo4jResult) {
 function _manyimage(neo4jResult) {
     return neo4jResult.records.map(r => new Image(r.get('image')))
 }
+async function generateSAS(blobName) {
+    //const blobName = pic[0].blobName
+    const blobClient = clientBlob.getBlobClient(blobName);
+    const blobSAS = storage.generateBlobSASQueryParameters({
+        containerName,
+        blobName: blobName,
+        permissions: storage.BlobSASPermissions.parse("racwd"),
+        startsOn: new Date(),
+        expiresOn: new Date(new Date().valueOf() + 86400)
+    },
+        cerds
+    ).toString();
+
+    const sasUrl = blobClient.url + "?" + blobSAS;
+    return sasUrl
+}
 
 exports.getAll = async (req, res) => {
     try {
@@ -65,19 +81,8 @@ exports.get = async (req, res) => {
         const Data = person.records[0].get('n').properties;
         if (image.records[0]) {
             const blobName = pic[0].blobName
-            const blobClient = clientBlob.getBlobClient(blobName);
-            const blobSAS = storage.generateBlobSASQueryParameters({
-                containerName,
-                blobName: blobName,
-                permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
-                expiresOn: new Date(new Date().valueOf() + 86400)
-            },
-                cerds
-            ).toString();
-
-            const sasUrl = blobClient.url + "?" + blobSAS;
-            Data.profilePic = sasUrl
+            Data.profilePic = await generateSAS(blobName)
+            console.log(Data)
         }
         else
             Data.profilePic = "false"
@@ -181,12 +186,18 @@ exports.getRecommendedPeople = async (req, res) => {
 exports.getRecommendedImages = async (req, res) => {
     try {
         let session = driver.session();
-        const persons = await session.run('MATCH (:Person {username:$username})-[:follows]->(:Person)-[:like]->(image:Image)\
+        const images = await session.run('MATCH (:Person {username:$username})-[:follows]->(:Person)-[:like]->(image:Image)\
          RETURN image LIMIT 5', {
             username: req.params.username
         })
         session.close();
-        const Data = _manyimage(persons)
+        let Data = _manyimage(images)
+        let im = []
+        im = await Promise.all(Data.map(image => {
+            return image.sasUrl = generateSAS(image.blobName)
+        }))
+        Data.map((image, index) => 
+            image.sasUrl = im[index])
         res.status(200)
             .json({ message: "Prikupljeno", Data })
     }

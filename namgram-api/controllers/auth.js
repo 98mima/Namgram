@@ -4,10 +4,8 @@ let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
 let driver = neo4j.driver("bolt://0.0.0.0:7687", neo4j.auth.basic(creds.neo4jusername, creds.neo4jpw));
 const { registerValidation, loginValidation } = require('../validation');
-const app = require('../app');
 const uuid = require('node-uuid');
 const _ = require('lodash');
-const Person = require('../models/person');
 
 let session = driver.session();
 
@@ -24,9 +22,8 @@ exports.register = async (req, res, next) => {
   })
   console.log(emailExist);
   if (!_.isEmpty(emailExist.records) || !_.isEmpty(usernameExist.records)) {
-    return res.status(401).send('Korisnik sa takvim mejlom ili username-om vec postoji: ' + req.body.email + ' ' + req.body.username );
+    return res.status(401).send('Korisnik sa takvim mejlom ili username-om vec postoji: ' + req.body.email + ' ' + req.body.username);
   }
-  //hashing the password
   const salt = await bcryptjs.genSalt(10);
   const hashPassword = await bcryptjs.hash(req.body.password, salt);
 
@@ -70,15 +67,13 @@ exports.login = async (req, res, next) => {
   if (!validPassword)
     return res.status(401).send('Wrong Password');
 
-
-  //Create Token
-  const token = jwt.sign({ 
+  const token = jwt.sign({
     id: dbPerson.properties.id,
     username: dbPerson.properties.username,
-    email: dbPerson.properties.email, 
-    birthday: dbPerson.properties.birthday, 
-    name: dbPerson.properties.name, 
-    lastname: dbPerson.properties.lastname, 
+    email: dbPerson.properties.email,
+    birthday: dbPerson.properties.birthday,
+    name: dbPerson.properties.name,
+    lastname: dbPerson.properties.lastname,
   }, process.env.TOKEN);
   res.json({ AuthToken: token, Success: true });
 }

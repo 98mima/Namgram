@@ -23,10 +23,10 @@ function _manyComments(neo4jResult) {
 
 function _manyPeople(neo4jResult) {
     return neo4jResult.records.map(r => new Person(r.get('person')))
-  }
+}
 
 async function findProps(node) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -45,26 +45,27 @@ async function findProps(node) {
             txc.run(query, {
                 id: node.id
             }))
-            .then( result => {  
-            const Data1 = _manyPosts(result)
-            Data1[0].likes = result.records[0].get('count').low
-            Data1[0].dislikes = result.records[1].get('count').low
-            Data1[0].comments = result.records[2].get('count').low
-            const Data = Data1[0]
-            session.close();
-    
-            return Data})
+            .then(result => {
+                const Data1 = _manyPosts(result)
+                Data1[0].likes = result.records[0].get('count').low
+                Data1[0].dislikes = result.records[1].get('count').low
+                Data1[0].comments = result.records[2].get('count').low
+                const Data = Data1[0]
+                session.close();
+
+                return Data
+            })
             .catch(err => {
                 console.log(err)
             })
     }
-    catch (err){
+    catch (err) {
         console.log(err)
     }
 }
 
 function findComments(node) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -75,24 +76,25 @@ function findComments(node) {
             txc.run(query, {
                 id: node.id
             }))
-            .then( result => {  
-            const listOfComments = _manyComments(result)
-            
-            session.close();
-            console.log(listOfComments)
-    
-            return listOfComments})
+            .then(result => {
+                const listOfComments = _manyComments(result)
+
+                session.close();
+                console.log(listOfComments)
+
+                return listOfComments
+            })
             .catch(err => {
                 console.log(err)
             })
     }
-    catch (err){
+    catch (err) {
         console.log(err)
     }
 }
 
 async function findCreator(node) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -103,21 +105,22 @@ async function findCreator(node) {
             txc.run(query, {
                 id: node.id
             }))
-            .then( result => {  
-            const user = _manyPeople(result)
-            session.close();
-    
-            return user[0]})
+            .then(result => {
+                const user = _manyPeople(result)
+                session.close();
+
+                return user[0]
+            })
             .catch(err => {
                 console.log(err)
             })
     }
-    catch (err){
+    catch (err) {
         console.log(err)
     }
 }
 async function findIfLiked(node, userId) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -129,22 +132,23 @@ async function findIfLiked(node, userId) {
                 id: node.id,
                 userId: userId
             }))
-            .then( result => {  
+            .then(result => {
                 session.close();
-            if(result.records[0])
-                return "true"
-            else
-                return "false"})
+                if (result.records[0])
+                    return "true"
+                else
+                    return "false"
+            })
             .catch(err => {
                 console.log(err)
             })
     }
-    catch (err){
+    catch (err) {
         console.log(err)
     }
 }
 async function findIfDisliked(node, userId) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -156,22 +160,21 @@ async function findIfDisliked(node, userId) {
                 id: node.id,
                 userId: userId
             }))
-            .then( result => {  
+            .then(result => {
                 session.close();
-            if(result.records[0])
-                return "true"
-            else
-                return "false"})
+                if (result.records[0])
+                    return "true"
+                else
+                    return "false"
+            })
             .catch(err => {
                 console.log(err)
             })
     }
-    catch (err){
+    catch (err) {
         console.log(err)
     }
 }
-//ovde ne mogu da se prikazu komentari, vec samo njihov broj
-//tako da kad se klikne na broj komentara onda treba da izadju komentari za taj post
 exports.getAll = async (req, res) => {
     try {
         let session = driver.session();
@@ -206,18 +209,18 @@ exports.getAll = async (req, res) => {
 exports.getByFollowings = async (req, res) => {
     try {
         let session = driver.session();
-   
+
         const posts1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(post:Post) return post', {
             id: req.params.userId
         })
         const posts = _manyPosts(posts1)
-        
+
         let creators = []
         let Data = []
         let ifLiked = []
         let ifDisliked = []
 
-      
+
         Data = await Promise.all(posts.map(p => {
             return findProps(p)
         }))
@@ -273,8 +276,8 @@ exports.getMostLiked = async (req, res) => {
         }))
         creators = await Promise.all(
             Data.map(post => {
-            return post.creator = findCreator(post)
-        }))
+                return post.creator = findCreator(post)
+            }))
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -321,11 +324,11 @@ exports.getMostHated = async (req, res) => {
         }))
         creators = await Promise.all(
             Data.map(post => {
-            return post.creator = findCreator(post)
-        }))
+                return post.creator = findCreator(post)
+            }))
         Data.map((post, index) =>
             post.creator = creators[index])
-        
+
         Data.sort(function (a, b) {
             return b.dislikes - a.dislikes
         })
@@ -368,8 +371,8 @@ exports.getMostCommented = async (req, res) => {
         }))
         creators = await Promise.all(
             Data.map(post => {
-            return post.creator = findCreator(post)
-        }))
+                return post.creator = findCreator(post)
+            }))
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -405,7 +408,7 @@ exports.getByPostId = async (req, res) => {
         post.commentsList = await findComments(post)
         post.creator = await findCreator(post)
         Data = post
-        
+
         //client.publish("posts", "Data.toString()")
 
         session.close();
@@ -502,7 +505,7 @@ exports.like = async (req, res) => {
         //const channel = "post" + creator.id
 
         //const Data = {liker: req.body.personId, post: req.body.postId, creator: creator.id } 
-       // client.publish("likes", Data.toString())
+        // client.publish("likes", Data.toString())
         // console.log(Data)
 
         res.status(200)

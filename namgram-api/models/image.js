@@ -11,5 +11,4 @@ const Image = module.exports = function (_node) {
         "blobName": _node.properties['blobName'],
         "content": _node.properties['content']
     })
-  //MATCH (U:User{name:'Alice'}) set U.url="<img src="https://placekitten.com/200/300 13" alt="cat image"/>" return U
 };

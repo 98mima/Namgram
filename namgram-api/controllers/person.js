@@ -36,7 +36,6 @@ function _manyimage(neo4jResult) {
     return neo4jResult.records.map(r => new Image(r.get('image')))
 }
 async function generateSAS(blobName) {
-    //const blobName = pic[0].blobName
     const blobClient = clientBlob.getBlobClient(blobName);
     const blobSAS = storage.generateBlobSASQueryParameters({
         containerName,
@@ -196,7 +195,7 @@ exports.getRecommendedImages = async (req, res) => {
         im = await Promise.all(Data.map(image => {
             return image.sasUrl = generateSAS(image.blobName)
         }))
-        Data.map((image, index) => 
+        Data.map((image, index) =>
             image.sasUrl = im[index])
         res.status(200)
             .json({ message: "Prikupljeno", Data })

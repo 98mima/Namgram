@@ -1,18 +1,9 @@
-const path = require("path");
-
 const express = require("express");
 
 const personController = require("../controllers/person");
 
 const router = express.Router();
 
-//naci najaktivnijeg usera(koji je najvise lajkovao, omentarisao)
-
-//MATCH (u:User)
-// OPTIONAL MATCH (u)-[:AUTHORED|ASKED|COMMENTED]->()
-// RETURN u,count(*)
-// ORDER BY count(*) DESC
-// LIMIT 5
 router.get("/all", personController.getAll);
 router.get("/byId/:id", personController.get);
 router.get("/byEmail/:email", personController.getByEmail);

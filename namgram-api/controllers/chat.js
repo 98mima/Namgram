@@ -1,6 +1,5 @@
 const util = require('util')
 const redis = require('redis');
-const { concat, isObject } = require('lodash');
 const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
 //client.get = util.promisify(client.get);
@@ -20,7 +19,7 @@ var mess = []
 
 function _manyPeople(neo4jResult) {
     return neo4jResult.records.map(r => new Person(r.get('person')))
-  }
+}
 
 // client.once('ready', function () {
 //     //flush Redis
@@ -63,24 +62,6 @@ exports.getMessages = async (req, res) => {
     }
 }
 
-// exports.getActiveChatters = async (req, res) => {
-//     try {
-//         let Data = []
-//         const key = JSON.stringify(Object.assign({}, { user: req.params.username }, { collection: "chatters" }));
-//         client.get(key, function (err, reply) {
-//             if (reply) {
-//                 Data = JSON.parse(reply)
-//                 return res.status(200).json(Data)
-//             }
-//             console.log(err)
-//         })
-//     }
-//     catch (err) {
-//         res.json({ success: false });
-//         console.log(err)
-//     }
-// }
-
 exports.joinChat = async (req, res) => {
     try {
         let session = driver.session();
@@ -89,7 +70,7 @@ exports.joinChat = async (req, res) => {
         })
         session.close();
         const followers = _manyPeople(persons)
-       
+
         followers.forEach(follower => {
             let active = []
             const keyActive = JSON.stringify(Object.assign({}, { user: follower.username }, { collection: "chatters" }));
@@ -116,8 +97,10 @@ exports.joinChat = async (req, res) => {
         client.get(key, function (err, reply) {
             if (reply) {
                 Data = JSON.parse(reply)
-                return res.status(200).json({"messages": Data, "active": active,
-                "status": "OK"})
+                return res.status(200).json({
+                    "messages": Data, "active": active,
+                    "status": "OK"
+                })
             }
         })
     }
@@ -147,7 +130,7 @@ exports.leaveChat = async (req, res) => {
             active.splice(active.indexOf(req.body.username), 1)
             client.set(keyActive, JSON.stringify(active))
         });
-        
+
         res.json({ "status": "OK" })
     }
     catch (err) {
@@ -183,12 +166,12 @@ exports.sendMessage = async (req, res) => {
 }
 
 
-io.on('connection', function(socket) {
+io.on('connection', function (socket) {
     console.log("welcome")
-    socket.on('message', function(data) {
+    socket.on('message', function (data) {
         io.emit('send', data)
     });
-    socket.on('update_active_users', function(data) {
+    socket.on('update_active_users', function (data) {
         io.emit('active_users', data)
     })
 })

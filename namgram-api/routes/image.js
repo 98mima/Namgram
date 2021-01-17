@@ -109,7 +109,7 @@ router.post('/addProfilePic', uploadStrategy, async (req, res) => {
 
         let session = driver.session();
         const query = [
-            
+
             'create (b:Image {id:$id, person:$personId, blobName:$blobName})'
         ].join('\n')
 

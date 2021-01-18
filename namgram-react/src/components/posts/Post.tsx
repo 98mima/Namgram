@@ -10,6 +10,7 @@ import { red } from "@material-ui/core/colors";
 import Satisfied from "@material-ui/icons/SentimentVerySatisfiedOutlined";
 import Dissatisfied from "@material-ui/icons/SentimentDissatisfied";
 import SendIcon from "@material-ui/icons/SendOutlined";
+import Comment from "@material-ui/icons/Comment";
 
 import {
   Button,
@@ -55,11 +56,11 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignContent: "center",
-      marginTop: "5rem",
-      maxHeight: "500px",
+      marginTop: "5rem"
     },
     img: {
-      maxWidth: "100%",
+      maxWidth: "30vw",
+      minWidth: "30vw",
       height: "auto",
     },
     imgContainer: {
@@ -340,6 +341,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               onClick={() => handleOpenComments(post.id)}
             >
               <Button variant="contained" color="secondary">
+              <Comment />
                 Comments
               </Button>
             </div>

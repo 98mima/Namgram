@@ -78,7 +78,7 @@ function Posts() {
 
   useEffect(() => {
     if (auth) dispatch(loadPosts(auth?.id as string));
-    if (profiles.length == 0) {
+    if (profiles.length === 0) {
       getRecommended(auth?.username as string).then((res) => {
         setProfiles(res);
       });

@@ -189,7 +189,7 @@ exports.getRecommendedPeople = async (req, res) => {
     let session = driver.session();
     const persons = await session.run(
       'MATCH (p:Person {username:$username})-[:like]->(image:Image)<-[:like]-(person:Person) \
-        RETURN person \
+       where not (p)-[:follows]->(person) RETURN person \
          LIMIT 5', {
             username: req.params.username
         })
@@ -288,7 +288,7 @@ exports.deletePerson = async (req, res) => {
     user = await session.run("MATCH (person:Person {username: $username}) DETACH DELETE person", {
       username: req.body.username,
     });
-    res.status(200).json({ message: "Obrisan", user });
+    res.status(200).json({ message: "Obrisan"});
   } catch (err) {
     res.json({ success: false });
     console.log(err);

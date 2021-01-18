@@ -105,6 +105,24 @@ async function findCreator(node) {
         console.log(err)
     }
 }
+async function generateSAS(blobName) {
+    const blobClient = client.getBlobClient(blobName);
+    const blobSAS = storage
+      .generateBlobSASQueryParameters(
+        {
+          containerName,
+          blobName: blobName,
+          permissions: storage.BlobSASPermissions.parse("racwd"),
+          startsOn: new Date(new Date().valueOf() - 86400),
+          expiresOn: new Date(new Date().valueOf() + 86400),
+        },
+        cerds
+      )
+      .toString();
+  
+    const sasUrl = blobClient.url + "?" + blobSAS;
+    return sasUrl;
+  }
 async function findIfLiked(node, userId) {
     try {
         let session = driver.session();
@@ -203,6 +221,11 @@ exports.get = async (req, res) => {
             Data1.map(post => {
                 return post.creator = findCreator(post)
             }))
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        })) 
+        creators.map((c, index) =>
+            c.creator = pics[index])
         Data1.map((post, index) =>
             post.creator = creators[index])
 
@@ -295,6 +318,11 @@ exports.getByPerson = async (req, res) => {
             Data1.map(post => {
                 return post.creator = findCreator(post)
             }))
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index])
         Data1.map((post, index) =>
             post.creator = creators[index])
 
@@ -352,6 +380,12 @@ exports.getByFollowings = async (req, res) => {
             Data.map(post => {
                 return post.creator = findCreator(post)
             }))
+        
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index])
         Data.map((post, index) => {
             post.creator = creators[index]
             post.ifLiked = ifLiked[index]
@@ -410,6 +444,11 @@ exports.getMostLikedF = async (req, res) => {
             Data.map(post => {
                 return post.creator = findCreator(post)
             }))
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -471,6 +510,11 @@ exports.getMostHatedF = async (req, res) => {
             Data.map(post => {
                 return post.creator = findCreator(post)
             }))
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index]) 
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -532,6 +576,11 @@ exports.getMostCommentedF = async (req, res) => {
             Data.map(post => {
                 return post.creator = findCreator(post)
             }))
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 

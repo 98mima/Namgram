@@ -8,6 +8,7 @@ import io from 'socket.io-client';
 import { getUserById } from "../../services/user";
 import { getFollowers, getFollowing } from "../../services/profile";
 import { INotification } from "../../models/post";
+import { messageReceived, NEW_MESSAGE } from "../chat/actions";
 
 export const SET_AUTH = 'SET_AUTH';
 export const CLEAR_AUTH = 'CLEAR_AUTH';
@@ -56,9 +57,12 @@ export const authUser = () => (dispatch: any) => {
 
           const socket = io("ws://localhost:8000", {query: `userId=${user.id}`});
           //Da se poradi
-          socket.on("liked", (message: any) => {
+          socket.on("liked", (message: {post: string, liker: string}) => {
             dispatch({type: ADD_NOTIFICATION, 
               payload: {post: message.post, liker: message.liker}});
+          })
+          socket.on("newMessage", (message: {from: string, to: string, body: string}) => {
+            dispatch(messageReceived(message.from, message.to, message.body));
           })
           dispatch({type: SET_SOCKET, payload: socket});
           
@@ -107,7 +111,8 @@ export const signinAction = (user: ISignin) => (dispatch: any) => {
         window.localStorage.setItem('TOKEN', token);
         axios.defaults.headers.common["Authorization"] = token;
         const decodedToken: IAuth= jwtDecode(token);
-        dispatch({type: SET_AUTH, payload: decodedToken})
+        dispatch(authUser());
+        // dispatch({type: SET_AUTH, payload: decodedToken})
         dispatch({type: STOP_LOADING});
       })
       .catch((err : AxiosError) => {

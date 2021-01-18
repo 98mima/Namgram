@@ -10,8 +10,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux';
-import { loadChatHeads } from '../../redux/chat/actions';
+import { CLEAR_NEW_MESSAGES, loadChatHeads } from '../../redux/chat/actions';
 import {IUser} from '../../models/user'
+import { Link, useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles({
     table: {
@@ -35,6 +36,7 @@ const useStyles = makeStyles({
 
 function ChatHeads() {
     const classes = useStyles();
+    const history = useHistory();
     const auth = useSelector((state: RootState) => state.auth.auth);
     const chatHeads = useSelector((state: RootState) => state.chat.chatHeads);
     const dispatch = useDispatch();
@@ -55,12 +57,15 @@ function ChatHeads() {
                 <Divider />
                 <List>
                     {chatHeads && chatHeads.map((user: IUser) => 
-                        <ListItem button key={user.id}>
+                        <ListItem button key={user.id} onClick={() => {
+                            dispatch({type: CLEAR_NEW_MESSAGES});
+                            history.push(`/chat/${user.username}`)}}>
                             <ListItemIcon>
                                 <Avatar alt="Remy Sharp" src={user.profilePic} />
                             </ListItemIcon>
                             <ListItemText primary={`${user.name} ${user.lastname}`}>Remy Sharp</ListItemText>
                             <ListItemText secondary={user.username}></ListItemText>
+                            
                         </ListItem>
                     )}
                 </List>

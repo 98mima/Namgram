@@ -41,7 +41,7 @@ async function generateSAS(blobName) {
         containerName,
         blobName: blobName,
         permissions: storage.BlobSASPermissions.parse("racwd"),
-        startsOn: new Date(),
+        startsOn: new Date(new Date().valueOf() - 86400),
         expiresOn: new Date(new Date().valueOf() + 86400)
     },
         cerds

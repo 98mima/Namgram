@@ -4,6 +4,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import MessageArea from './MessageArea';
 import ChatHeads from './ChatHeads';
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles({
   chatSection: {
@@ -13,13 +14,14 @@ const useStyles = makeStyles({
 });
 
 const Chat = () => {
+  const { username } = useParams<{username: string}>();
   const classes = useStyles();
 
   return (
       <div>
         <Grid container component={Paper} className={classes.chatSection}>
             <ChatHeads />
-            <MessageArea roomId="123" />
+            {username && <MessageArea />}
         </Grid>
       </div>
   );

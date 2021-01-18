@@ -41,7 +41,7 @@ import WhatshotIcon from '@material-ui/icons/Whatshot';
 import _ from "lodash";
 import { getUserById } from "../../services/user";
 import { getPost } from "../../services/posts";
-import { INotification } from "../../models/post";
+import { IImage, INotification } from "../../models/post";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -128,36 +128,32 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function Navbar() {
-  const [anchorNotif, setAnchorNotif] = React.useState<null | HTMLElement>(
-    null
-  );
+  // const [anchorNotif, setAnchorNotif] = React.useState<null | HTMLElement>(
+  //   null
+  // );
 
   const handleNotificationOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setNotifs([]);
+    const nots: {user: IUser, image: IImage}[] = [];
     notifications.map((not) => {
-      getUserById(not.liker).then((res) => {
-        getPost(not.post).then((res2) => {
-          let n: INotification = {
-            liker: res.Data.username,
-            post: res2.id,
-          };
-          setNotifs([...notifs, n]);
-        });
-      });
+      Promise.all([getUserById(not.liker), getPost(not.post)])
+        .then((res: [{message: string, Data: IUser}, IImage]) => {
+         nots.push({user: res[0].Data, image: res[1]});
+        })
     });
-    console.log(notifs);
-    setAnchorNotif(anchorNotif ? null : event.currentTarget);
+    //Nots su notifikacije napravljene
+    //setAnchorNotif(anchorNotif ? null : event.currentTarget);
+    setNotificationAnchor(event.currentTarget);
   };
-  const [notifs, setNotifs] = React.useState<INotification[]>([]);
 
-  const open = Boolean(anchorNotif);
-  const id = open ? "transitions-popper" : undefined;
+  const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
+  const open = Boolean(notificationAnchor);
+  const id = "notif-popover";
 
   const history = useHistory();
   const dispatch = useDispatch();
 
   const auth = useSelector((state: RootState) => state.auth.auth);
-  const socket = useSelector((state: RootState) => state.auth.socket);
+  const chatNotifications = useSelector((state: RootState) => state.chat.chatNotifications);
   const notifications = useSelector(
     (state: RootState) => state.auth.notifications
   );
@@ -170,6 +166,7 @@ function Navbar() {
     mobileMoreAnchorEl,
     setMobileMoreAnchorEl,
   ] = React.useState<null | HTMLElement>(null);
+
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -214,6 +211,10 @@ function Navbar() {
       setSearchResults([profile]);
     });
   };
+
+  const handleCloseNotificationAnchor = () => {
+    setNotificationAnchor(null)
+  }
 
   const menuId = "primary-search-account-menu";
 
@@ -384,7 +385,7 @@ function Navbar() {
                 </Link>
                 <Link className={classes.link} to="/chat">
                   <IconButton aria-label="Chat" color="inherit">
-                    <Badge badgeContent={4} color="secondary">
+                    <Badge badgeContent={chatNotifications} color="secondary">
                       <MailIcon />
                     </Badge>
                   </IconButton>
@@ -408,11 +409,11 @@ function Navbar() {
                       </Fade>
                     )}
                   </Popper> */}
-                  {/* <Popover
+        <Popover
         id={id}
         open={open}
-        anchorEl={anchorNotif}
-        onClose={handleClose}
+        anchorEl={notificationAnchor}
+        onClose={handleCloseNotificationAnchor}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'center',
@@ -423,7 +424,7 @@ function Navbar() {
         }}
       >
         <Typography >The content of the Popover.</Typography>
-      </Popover> */}
+      </Popover>
                 </IconButton>
                 <IconButton
                   edge="end"

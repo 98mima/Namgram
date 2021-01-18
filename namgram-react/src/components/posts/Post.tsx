@@ -16,8 +16,11 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import ShareIcon from "@material-ui/icons/Share";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import Favorite from "@material-ui/icons/FavoriteBorder";
+//import Favorite from "@material-ui/icons/FavoriteBorder";
+import Satisfied from "@material-ui/icons/SentimentVerySatisfiedOutlined";
+import Dissatisfied from "@material-ui/icons/SentimentDissatisfied";
 import SendIcon from "@material-ui/icons/SendOutlined";
+
 import {
   Button,
   CardActionArea,
@@ -328,9 +331,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
           <CardHeader
             avatar={
               <CardActionArea onClick={() => handleClick(post.creator.id)}>
-                <Avatar aria-label="recipe" src={post.creator.profilePic}>
-                  {/* <img style={{ maxHeight: '100%' }} src={post.user.image} /> */}
-                </Avatar>
+                <Avatar src={post.creator.profilePic} />
               </CardActionArea>
             }
             title={post.creator.username}
@@ -341,7 +342,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               avatar={
                 <CardActionArea onClick={() => handleLike(post.id)}>
                   <Avatar className={alreadyLiked ? classes.avatar : ""}>
-                    <Favorite />
+                    <Satisfied />
                   </Avatar>
                 </CardActionArea>
               }
@@ -351,7 +352,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               avatar={
                 <CardActionArea onClick={() => handleDislike(post.id)}>
                   <Avatar className={alreadyDisliked ? classes.avatar : ""}>
-                    <Favorite />
+                    <Dissatisfied />
                   </Avatar>
                 </CardActionArea>
               }

@@ -187,7 +187,7 @@ exports.get = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -233,7 +233,7 @@ exports.getAll = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -281,7 +281,7 @@ exports.getByPerson = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -327,7 +327,7 @@ exports.getByFollowings = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -395,7 +395,7 @@ exports.getMostLikedF = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -457,7 +457,7 @@ exports.getMostHatedF = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -518,7 +518,7 @@ exports.getMostCommentedF = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds

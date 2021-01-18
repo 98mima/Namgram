@@ -20,6 +20,10 @@ const commentRoutes = require('./routes/comment');
 const imageRoutes = require('./routes/image');
 const chatRoutes = require('./routes/chat');
 
+const Person = require('./models/person');
+let { creds } = require("./config/credentials");
+let driver = neo4j.driver("bolt://0.0.0.0:7687", neo4j.auth.basic(creds.neo4jusername, creds.neo4jpw));
+
 let client = redis.createClient();
 client.on('connect', function () {
     console.log('Konektovano sa Redis')
@@ -67,6 +71,17 @@ io.on("connection", (socket) => {
     socket.on("comment", (socket) => {
         clientR.get(`socket:${socket.commented}`).then(socketId => {
             io.to(socketId).emit("commented", socket);
+        })
+    })
+    socket.on("chat", async (socket) => {
+        const session = driver.session();
+        const persons = await session.run('MATCH (n:Person {username:$username}) RETURN n', {
+            username: socket.to
+        })
+        session.close();
+        const Data = persons.records.map(r => new Person(r.get('n')))
+        clientR.get(`socket:${Data[0].id}`).then(socketId => {
+            io.to(socketId).emit("newMessage", socket);
         })
     })
     //clients[socket.handshake.query.userId] = socket.id;

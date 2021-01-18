@@ -38,7 +38,9 @@ function App() {
             <Route path="/posts" component={Posts} />
             <Route path="/hot" component={Hot} />
             <Route path="/post/:id" component={SinglePost} />
+            <Route path="/chat/:username" component={Chat} />
             <Route path="/chat" component={Chat} />
+            
             <Route path="/" component={Home} />
           </Switch>
       </Router>

@@ -34,13 +34,11 @@ const theme = createMuiTheme({
 axios.defaults.baseURL = "http://localhost:8080/";
 //test
 ReactDOM.render(
-  <React.StrictMode>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <App />
       </ThemeProvider>
-    </Provider>
-  </React.StrictMode>,
+    </Provider>,
   document.getElementById('root')
 );
 

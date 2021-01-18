@@ -1,47 +1,40 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
   Avatar,
   Button,
   createStyles,
-  Fade,
   fade,
   makeStyles,
   Theme,
 } from "@material-ui/core";
-import Popper from "@material-ui/core/Popper";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
-import InputBase from "@material-ui/core/InputBase";
 import Badge from "@material-ui/core/Badge";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import AutoComplete from "@material-ui/lab/AutoComplete";
 import MenuIcon from "@material-ui/icons/Menu";
-import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
-import InputAdornment from "@material-ui/core/InputAdornment";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux";
 import { logoutAction } from "../../redux/auth/actions";
-import { AddCircleRounded, LocationDisabledSharp } from "@material-ui/icons";
-import { DebounceInput } from "react-debounce-input";
+import { AddCircleRounded } from "@material-ui/icons";
 import { IUser } from "../../models/user";
 import { getProfileByUsername } from "../../services/profile";
 import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField/TextField";
 import WhatshotIcon from '@material-ui/icons/Whatshot';
-import _ from "lodash";
 import { getUserById } from "../../services/user";
 import { getPost } from "../../services/posts";
-import { IImage, INotification } from "../../models/post";
+import { IImage } from "../../models/post";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -192,18 +185,10 @@ function Navbar() {
     history.push(("/profile/" + auth?.id) as string);
     handleMenuClose();
   };
-  const handeNewPost = () => {
-    history.push("/posts/create");
-  };
 
   const handleLogout = () => {
     dispatch(logoutAction());
     handleMenuClose();
-  };
-
-  const handleHome = () => {
-    if (auth) history.push("/posts");
-    else history.push("/");
   };
 
   const searchUsers = (username: any) => {
@@ -312,6 +297,7 @@ function Navbar() {
           <Link to="/" className={classes.link}>
             <img
               className={classes.logo}
+                alt="Slicka"
               src="https://cdn.discordapp.com/attachments/777890574253817889/792441180054749224/e52d18ae-4e0c-40cf-8d30-07396304f4e0_200x200.png"
             />
           </Link>

@@ -53,7 +53,9 @@ exports.getMessages = async (req, res) => {
                 Data = JSON.parse(reply)
                 return res.status(200).json(Data)
             }
-            console.log(err)
+            else {
+                return res.status(200).json("nema poruka")
+            }
         })
     }
     catch (err) {
@@ -71,19 +73,19 @@ exports.joinChat = async (req, res) => {
         session.close();
         const followers = _manyPeople(persons)
 
-        followers.forEach(follower => {
-            let active = []
-            const keyActive = JSON.stringify(Object.assign({}, { user: follower.username }, { collection: "chatters" }));
-            client.get(keyActive, function (err, reply) {
-                if (reply) {
-                    active = JSON.parse(reply)
-                    if (active.indexOf(follower.username) == -1) {
-                        active.push(req.body.username)
-                        client.set(keyActive, JSON.stringify(active))
-                    }
-                }
-            })
-        });
+        // followers.forEach(follower => {
+        //     let active = []
+        //     const keyActive = JSON.stringify(Object.assign({}, { user: follower.username }, { collection: "chatters" }));
+        //     client.get(keyActive, function (err, reply) {
+        //         if (reply) {
+        //             active = JSON.parse(reply)
+        //             if (active.indexOf(follower.username) == -1) {
+        //                 active.push(req.body.username)
+        //                 client.set(keyActive, JSON.stringify(active))
+        //             }
+        //         }
+        //     })
+        // });
 
         var username = req.body.username
         var username2 = req.body.username2
@@ -98,9 +100,12 @@ exports.joinChat = async (req, res) => {
             if (reply) {
                 Data = JSON.parse(reply)
                 return res.status(200).json({
-                    "messages": Data, "active": active,
+                    "messages": Data,
                     "status": "OK"
                 })
+            }
+            else {
+                return res.status(200).json("nema poruka")
             }
         })
     }

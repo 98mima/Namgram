@@ -1,4 +1,5 @@
 const Image = require('../models/image');
+const Person = require('../models/person');
 const uuid = require('node-uuid');
 let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
@@ -38,6 +39,9 @@ const getBlobName = originalName => {
 
 function _manyImages(neo4jResult) {
     return neo4jResult.records.map(r => new Image(r.get('image')))
+}
+function _manyPerson(neo4jResult) {
+    return neo4jResult.records.map(r => new Person(r.get('person')))
 }
 
 router.get('/:id', imageController.get);
@@ -108,6 +112,12 @@ router.post('/addProfilePic', uploadStrategy, async (req, res) => {
         const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
         let session = driver.session();
+        let person = await session.run('MATCH (person:Person {id: $id}) set person.profilePic = $blobName RETURN person', {
+            id: personId,
+            blobName: blobName
+        });
+        person = _manyPerson(person)
+        console.log(person)
         const query = [
 
             'create (b:Image {id:$id, person:$personId, blobName:$blobName})'
@@ -119,7 +129,6 @@ router.post('/addProfilePic', uploadStrategy, async (req, res) => {
                 personId: personId,
                 blobName: blobName
             }))
-
         const Data1 = _manyImages(d)
         const Data = Data1[0]
         await blockBlobClient.uploadStream(stream,

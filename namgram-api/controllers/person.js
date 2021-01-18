@@ -137,7 +137,13 @@ exports.getFollowing = async (req, res) => {
             username: req.params.username
         })
         session.close();
-        const Data = _manyPeople(persons)
+        let Data = _manyPeople(persons)
+        let pics = await Promise.all(Data.map(p => {
+            console.log(p.profilePic)
+            return p.sasUrl = generateSAS(p.profilePic)
+        } )) 
+        Data.map((image, index) =>
+            image.sasUrl = pics[index])
         res.status(200)
             .json({ message: "Prikupljeno", Data })
     }
@@ -155,6 +161,11 @@ exports.getFollowers = async (req, res) => {
         })
         session.close();
         const Data = _manyPeople(persons)
+        let pics = await Promise.all(Data.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        } )) 
+        Data.map((image, index) =>
+            image.sasUrl = pics[index])
         res.status(200)
             .json({ message: "Prikupljeno", Data })
     }
@@ -172,8 +183,25 @@ exports.getRecommendedPeople = async (req, res) => {
          LIMIT 5', {
             username: req.params.username
         })
+        let recommended = _manyPeople(persons)
+        let following = await session.run('MATCH (n:Person {username: $username})-[:follows]->(person) RETURN person', {
+            username: req.params.username
+        })
         session.close();
-        const Data = _manyPeople(persons)
+        following = _manyPeople(following)
+        console.log(recommended)
+
+        recommended = recommended.filter(rec => !following.includes(rec))
+        // following.forEach((foll, index) => {
+        // recommended.filter(user => user!== foll)
+        // recommended.splice(recommended.indexOf(user), 1)
+        // });
+        const Data = recommended
+        let pics = await Promise.all(Data.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        Data.map((image, index) =>
+        image.sasUrl = pics[index])
         res.status(200)
             .json({ message: "Prikupljeno", Data })
     }

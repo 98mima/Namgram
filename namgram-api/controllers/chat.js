@@ -73,19 +73,22 @@ exports.joinChat = async (req, res) => {
         session.close();
         const followers = _manyPeople(persons)
 
-        // followers.forEach(follower => {
-        //     let active = []
-        //     const keyActive = JSON.stringify(Object.assign({}, { user: follower.username }, { collection: "chatters" }));
-        //     client.get(keyActive, function (err, reply) {
-        //         if (reply) {
-        //             active = JSON.parse(reply)
-        //             if (active.indexOf(follower.username) == -1) {
-        //                 active.push(req.body.username)
-        //                 client.set(keyActive, JSON.stringify(active))
-        //             }
-        //         }
-        //     })
-        // });
+        followers.forEach(follower => {
+            let active = []
+            const keyActive = JSON.stringify(Object.assign({}, { user: follower.username }, { collection: "chatters" }));
+            client.get(keyActive, function (err, reply) {
+                if (reply) {
+                    active = JSON.parse(reply)
+                    if (active.indexOf(follower.username) == -1) {
+                        active.push(req.body.username)
+                        client.set(keyActive, JSON.stringify(active))
+                    }
+                    else {
+                        client.set(keyActive, JSON.stringify(active))
+                    }
+                }
+            })
+        })
 
         var username = req.body.username
         var username2 = req.body.username2
@@ -132,7 +135,9 @@ exports.leaveChat = async (req, res) => {
                     active = JSON.parse(reply)
                 }
             })
-            active.splice(active.indexOf(req.body.username), 1)
+            console.log(active)
+            //active.splice(active.indexOf(req.body.username), 1)
+            active = active.filter(user => user!== req.body.username)
             client.set(keyActive, JSON.stringify(active))
         });
 

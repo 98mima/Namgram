@@ -1,7 +1,7 @@
 import { IAuth } from "../../models/auth"
 import { IChat, IMessage } from "../../models/chat"
 import { IUser } from "../../models/user"
-import { ChatActionTypes, SET_CHAT_HEADS, CLEAR_CHAT_HEADS, CLEAR_NEW_MESSAGES, MESSAGE_SENT, LOAD_CHAT } from "./actions"
+import { ChatActionTypes, SET_CHAT_HEADS, CLEAR_CHAT_HEADS, CLEAR_NEW_MESSAGES, MESSAGE_SENT, LOAD_CHAT, NEW_MESSAGE } from "./actions"
 
 
 export interface ChatState{
@@ -30,6 +30,8 @@ export default (state = initialState, action: ChatActionTypes) => {
         //             messages: [...(state.chat as IChat).messages, action.payload]}}
         case LOAD_CHAT:
             return {...state, messages: action.payload.messages, chatter: action.payload.chatter}
+        case NEW_MESSAGE:
+            return {...state, chatNotifications: state.chatNotifications + 1}
         case CLEAR_NEW_MESSAGES:
             return {...state, chatNotifications: 0}
         case MESSAGE_SENT:

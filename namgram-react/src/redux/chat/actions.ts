@@ -1,3 +1,4 @@
+import { RootState } from "..";
 import { IMessage } from "../../models/chat";
 import { IUser } from "../../models/user";
 import { loadUserMessages, sendToUser } from "../../services/chat";
@@ -24,8 +25,7 @@ export interface ClearChatHeads {
 }
 
 export interface NewMessageAction {
-    type: typeof NEW_MESSAGE,
-    payload: IMessage
+    type: typeof NEW_MESSAGE
 }
 
 export interface ClearNewMessages {
@@ -68,7 +68,18 @@ export const loadChatHeads = (username: string) => (dispatch: any) => {
 
   export const sendMessage = (from: string, to: string, content: string) => (dispatch: any) => {
     sendToUser(from, to, content).then(res => {
-        const msg: IMessage = {body: content, myMessage: true, date: new Date().toUTCString()}
-        dispatch({type: MESSAGE_SENT, payload: msg})
+        const msg: IMessage = {body: content, myMessage: true, date: new Date().toUTCString()};
+        dispatch({type: MESSAGE_SENT, payload: msg});
     })
+  }
+
+  export const messageReceived = (from: string, to: string, body: string) => (dispatch: any, getState: any) => {
+      const state: RootState = getState();
+      const {chatter} = state.chat;
+      if(chatter?.username === from){
+          const msg: IMessage = {body, myMessage: false, date: new Date().toUTCString()}
+          dispatch({type: MESSAGE_SENT, msg})
+      }else{
+          dispatch({type: NEW_MESSAGE});
+      }
   }

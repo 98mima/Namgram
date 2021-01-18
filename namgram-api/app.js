@@ -70,8 +70,8 @@ io.on("connection", (socket) => {
         })
     })
     socket.on("chat", (socket) => {
-        clientR.get(`socket:${socket.commented}`).then(socketId => {
-            io.to(socketId).emit("commented", socket);
+        clientR.get(`socket:${socket.to}`).then(socketId => {
+            io.to(socketId).emit("chat", socket);
         })
     })
     //clients[socket.handshake.query.userId] = socket.id;

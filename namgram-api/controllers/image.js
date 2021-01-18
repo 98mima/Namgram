@@ -181,7 +181,6 @@ exports.get = async (req, res) => {
             return findProps(p)
         }))
         Data1.map(image => {
-            const containerClient = blobServiceClient.getContainerClient(containerName);
             const blobName = image.blobName
             const blobClient = client.getBlobClient(blobName);
             const blobSAS = storage.generateBlobSASQueryParameters({
@@ -228,7 +227,6 @@ exports.getAll = async (req, res) => {
             return findProps(p)
         }))
         Data1.map(image => {
-            const containerClient = blobServiceClient.getContainerClient(containerName);
             const blobName = image.blobName
             const blobClient = client.getBlobClient(blobName);
             const blobSAS = storage.generateBlobSASQueryParameters({
@@ -514,7 +512,6 @@ exports.getMostCommentedF = async (req, res) => {
         }))
 
         Data.map(image => {
-            const containerClient = blobServiceClient.getContainerClient(containerName);
             const blobName = image.blobName
             const blobClient = client.getBlobClient(blobName);
             const blobSAS = storage.generateBlobSASQueryParameters({

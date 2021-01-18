@@ -15,9 +15,9 @@ function _manyComments(neo4jResult) {
 }
 function _manyPeople(neo4jResult) {
     return neo4jResult.records.map(r => new Person(r.get('person')))
-  }
+}
 async function findCreator(postId, content) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -29,8 +29,8 @@ async function findCreator(postId, content) {
                 id: postId,
                 content: content
             }))
-            .then( result => {  
-            const user = _manyPeople(result)
+            .then(result => {
+                const user = _manyPeople(result)
                 session.close();
                 return user[0]
             })
@@ -43,7 +43,7 @@ async function findCreator(postId, content) {
     }
 }
 async function findCreatorForImageComm(postId, content) {
-    try{
+    try {
         let session = driver.session();
 
         const query = [
@@ -55,8 +55,8 @@ async function findCreatorForImageComm(postId, content) {
                 id: postId,
                 content: content
             }))
-            .then( result => {  
-            const user = _manyPeople(result)
+            .then(result => {
+                const user = _manyPeople(result)
                 session.close();
                 console.log(user[0])
                 return user[0]
@@ -91,13 +91,13 @@ exports.getByPost = async (req, res) => {
         res.status(200)
             .json({ message: "Prikupljeno", p })
     }
-    catch (err){
+    catch (err) {
         res.json({ success: false });
         console.log(err)
     }
 }
 exports.getByImage = async (req, res) => {
-    try{
+    try {
         let session = driver.session();
 
         const comments = await session.run('MATCH (image:Image {id: $id})<-[r1:commented]-(n:Person) return r1 as comment ORDER BY r1.date', {
@@ -118,7 +118,7 @@ exports.getByImage = async (req, res) => {
         res.status(200)
             .json({ message: "Prikupljeno", p })
     }
-    catch (err){
+    catch (err) {
         res.json({ success: false });
         console.log(err)
     }

@@ -1,45 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
-import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
-import CardActions from "@material-ui/core/CardActions";
-import Collapse from "@material-ui/core/Collapse";
 import Avatar from "@material-ui/core/Avatar";
-import IconButton from "@material-ui/core/IconButton";
 import { red } from "@material-ui/core/colors";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import ShareIcon from "@material-ui/icons/Share";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-//import Favorite from "@material-ui/icons/FavoriteBorder";
 import Satisfied from "@material-ui/icons/SentimentVerySatisfiedOutlined";
 import Dissatisfied from "@material-ui/icons/SentimentDissatisfied";
 import SendIcon from "@material-ui/icons/SendOutlined";
+import Comment from "@material-ui/icons/Comment";
 
 import {
   Button,
   CardActionArea,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   Fab,
-  Grid,
-  Link,
   Paper,
   TextField,
 } from "@material-ui/core";
 
 import moment from "moment"
 import { IComment, IImage } from "../../models/post";
-import { width, maxHeight, height } from "@material-ui/system";
 import {
   Backdrop,
   Fade,
@@ -59,11 +46,8 @@ import {
   removeLike,
 } from "../../services/posts";
 import { RootState } from "../../redux";
-import { useSelector, useDispatch } from "react-redux";
-import { Socket } from "socket.io-client";
-import { ADD_NOTIFICATION } from "../../redux/auth/actions";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { IAuth } from "../../models/auth";
 import { IUser } from "../../models/user";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -72,11 +56,11 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignContent: "center",
-      marginTop: "5rem",
-      maxHeight: "500px",
+      marginTop: "5rem"
     },
     img: {
-      maxWidth: "100%",
+      maxWidth: "30vw",
+      minWidth: "30vw",
       height: "auto",
     },
     imgContainer: {
@@ -168,17 +152,14 @@ function PaperComponent(props) {
 
 function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
   const { post, socket } = props;
-  const dispatch = useDispatch();
   const classes = useStyles();
-  const [expanded, setExpanded] = React.useState(false);
   const auth = useSelector((state: RootState) => state.auth.auth);
-  const loading = useSelector((state: RootState) => state.ui.loading);
   const history = useHistory();
 
-  const [likes, setLikes] = useState(0);
-  const [dislikes, setdisLikes] = useState(0);
-  const [alreadyLiked, setAlreadyLiked] = useState(false);
-  const [alreadyDisliked, setAlreadyDisliked] = useState(false);
+  const [likes, setLikes] = useState(props.post.likes);
+  const [dislikes, setdisLikes] = useState(props.post.dislikes);
+  const [alreadyLiked, setAlreadyLiked] = useState(props.post.ifLiked);
+  const [alreadyDisliked, setAlreadyDisliked] = useState(props.post.ifDisliked);
 
   const [openComments, setOpenComments] = React.useState(false);
 
@@ -194,14 +175,6 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
   const handleClose = () => {
     setOpen(false);
   };
-
-  useEffect(() => {
-    setAlreadyLiked(props.post.ifLiked);
-    setAlreadyDisliked(props.post.ifDisliked);
-    setLikes(props.post.likes);
-    setdisLikes(props.post.dislikes);
-    return () => {};
-  }, []);
 
   const onInput = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -254,9 +227,6 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
     history.push(`/profile/${userId}`);
   };
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
   const handleOpenComments = (imageId: string) => {
     setOpenComments(true);
     getComments(imageId).then((res) => {
@@ -335,7 +305,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               </CardActionArea>
             }
             title={post.creator.username}
-            subheader={moment(post.date).fromNow()}
+            subheader={moment(new Date(post.date)).fromNow()}
           />
           <div style={{ display: "flex", justifyContent: "space-around" }}>
             <CardHeader
@@ -371,6 +341,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               onClick={() => handleOpenComments(post.id)}
             >
               <Button variant="contained" color="secondary">
+              <Comment />
                 Comments
               </Button>
             </div>
@@ -394,7 +365,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
                         <CardActionArea
                           onClick={() => handleClick(comment.creator.id)}
                         >
-                          <Avatar></Avatar>
+                          <Avatar src={comment.creator.profilePic}></Avatar>
                         </CardActionArea>
                       </ListItemAvatar>
 
@@ -425,7 +396,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               </Fade>
             </Modal>
           </CardContent>
-          {auth?.id == post.creator.id && (
+          {auth?.id === post.creator.id && (
             <CardContent className={classes.button}>
               <Button
                 variant="contained"
@@ -466,7 +437,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
       </div>
 
       <div className={classes.imgContainer}>
-        <img className={classes.img} src={post.sasToken} />
+        <img alt="slicka" className={classes.img} src={post.sasToken} />
       </div>
     </div>
   );

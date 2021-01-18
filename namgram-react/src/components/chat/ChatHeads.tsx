@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux';
 import { CLEAR_NEW_MESSAGES, loadChatHeads } from '../../redux/chat/actions';
 import {IUser} from '../../models/user'
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles({
     table: {
@@ -49,12 +49,6 @@ function ChatHeads() {
 
     return (
             <Grid item xs={3} className={classes.borderRight500}>
-
-                <Divider />
-                <Grid item xs={12} style={{padding: '10px'}}>
-                    <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
-                </Grid>
-                <Divider />
                 <List>
                     {chatHeads && chatHeads.map((user: IUser) => 
                         <ListItem button key={user.id} onClick={() => {

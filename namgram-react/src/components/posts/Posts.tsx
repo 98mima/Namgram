@@ -30,6 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: "column",
       position: "absolute",
       justifyContent: "center",
+      marginLeft: "2rem",
     },
     loading: {
       margin: "20vh auto auto auto",
@@ -71,7 +72,7 @@ function Posts() {
   const auth = useSelector((state: RootState) => state.auth.auth);
   const socket = useSelector((state: RootState) => state.auth.socket);
   const history = useHistory();
-  const matches = useMediaQuery("(min-width:800px)");
+  const matches = useMediaQuery("(min-width:850px)");
 
   const [profiles, setProfiles] = React.useState<IUser[]>([]);
 
@@ -82,7 +83,7 @@ function Posts() {
         setProfiles(res);
       });
     }
-  }, [auth, profiles]);
+  }, [auth]);
 
   const loading = useSelector((state: RootState) => state.ui.loading);
 
@@ -92,7 +93,9 @@ function Posts() {
 
   return (
     <div className={classes.bigContainer}>
-      <Container className={matches ? classes.suggestions : classes.hidden}>
+      <Container
+        className={matches && profiles ? classes.suggestions : classes.hidden}
+      >
         <Typography style={{ color: "white" }}>Suggestions For You</Typography>
         <List className={classes.root}>
           {profiles.map((person) => (

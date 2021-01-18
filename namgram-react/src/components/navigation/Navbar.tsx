@@ -35,6 +35,7 @@ import WhatshotIcon from "@material-ui/icons/Whatshot";
 import { getUserById } from "../../services/user";
 import { getPost } from "../../services/posts";
 import { IImage } from "../../models/post";
+import Popper from "@material-ui/core/Popper/Popper";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -132,16 +133,11 @@ function Navbar() {
   const handleNotificationOpen = async (
     event: React.MouseEvent<HTMLElement>
   ) => {
-    const nots: { user: IUser; image: IImage }[] = [];
-    notifications.map((not) => {
-      Promise.all([getUserById(not.liker), getPost(not.post)]).then(
-        (res: [{ message: string; Data: IUser }, IImage]) => {
-          nots.push({ user: res[0].Data, image: res[1] });
-        }
-      );
-    });
-    //Nots su notifikacije napravljene
-    //setAnchorNotif(anchorNotif ? null : event.currentTarget);
+    const nots = await Promise.all(notifications.map(async (not) => {
+      const res = await Promise.all([getUserById(not.liker), getPost(not.post)]);
+      return {user: res[0].Data, image: res[1]};
+    }))
+    setNotifs(nots);
     setNotificationAnchor(notificationAnchor ? null : event.currentTarget);
   };
 

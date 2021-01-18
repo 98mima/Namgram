@@ -161,6 +161,7 @@ exports.sendMessage = async (req, res) => {
         var usernameSender = req.body.usernameSender
         var usernameReceiver = req.body.usernameReceiver
         var message = req.body.message
+        var date = new Date()
 
         const users = []
         users.push(usernameReceiver)
@@ -170,9 +171,9 @@ exports.sendMessage = async (req, res) => {
         const key = JSON.stringify(Object.assign({}, { user1: users[0] }, { user2: users[1] }, { collection: "messages" }));
         mess.push({
             "sender": usernameSender,
-            "message": message
+            "message": message,
+            "date": date
         })
-        console.log(mess)
         client.set(key, JSON.stringify(mess))
         res.json({ "status": "OK" })
     }

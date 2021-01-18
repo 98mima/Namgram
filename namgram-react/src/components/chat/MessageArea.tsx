@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
@@ -8,6 +8,10 @@ import  Divider  from '@material-ui/core/Divider';
 import  Fab   from '@material-ui/core/Fab';
 import  TextField  from '@material-ui/core/TextField';
 import SendIcon from '@material-ui/icons/SendOutlined'
+import { useParams } from 'react-router-dom';
+import { RootState } from '../../redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadChat, sendMessage } from '../../redux/chat/actions';
 
 const useStyles = makeStyles({
     table: {
@@ -29,9 +33,15 @@ const useStyles = makeStyles({
     }
   });
 
-function MessageArea(props: {roomId: string}) {
+function MessageArea(props: {username: string}) {
+    const username = props.username;
     const classes = useStyles();
+    const dispatch = useDispatch();
     const [newMessage, setNewMessage] = useState("");
+
+    const auth = useSelector((state: RootState) => state.auth.auth);
+    const chatter = useSelector((state: RootState) => state.chat.chatter);
+    const messages = useSelector((state: RootState) => state.chat.messages);
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNewMessage(event.currentTarget.value);
@@ -39,12 +49,20 @@ function MessageArea(props: {roomId: string}) {
 
     const handleSendMessage = () => {
         setNewMessage("");
+        dispatch(sendMessage(auth?.id as string, chatter?.id as string, newMessage));
       };
+
+      useEffect(() => {
+          if(auth) dispatch(loadChat(auth?.username as string, username));
+          return () => {
+          }
+      }, [auth])
     
     return (
-            <Grid item xs={9}>
+        <React.Fragment>
+            {username && <Grid item xs={9}>
                 <List className={classes.messageArea}>
-                    {/* {messages.map((message, i) => (
+                    {messages.map((message, i) => (
                     <ListItem key={i}>
                          <Grid container>
                              <Grid item xs={12}>
@@ -56,7 +74,7 @@ function MessageArea(props: {roomId: string}) {
                              </Grid> 
                          </Grid>
                      </ListItem>
-                    ))} */}
+                    ))}
                 </List>
                 <Divider />
                 <Grid container style={{padding: '20px'}}>
@@ -67,7 +85,9 @@ function MessageArea(props: {roomId: string}) {
                         <Fab onClick={handleSendMessage} color="primary" aria-label="add"><SendIcon /></Fab>
                     </Grid>
                 </Grid>
-            </Grid>
+            </Grid>}
+            
+            </React.Fragment>
     )
 }
 

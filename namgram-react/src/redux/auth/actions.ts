@@ -8,6 +8,7 @@ import io from 'socket.io-client';
 import { getUserById } from "../../services/user";
 import { getFollowers, getFollowing } from "../../services/profile";
 import { INotification } from "../../models/post";
+import { NEW_MESSAGE } from "../chat/actions";
 
 export const SET_AUTH = 'SET_AUTH';
 export const CLEAR_AUTH = 'CLEAR_AUTH';
@@ -56,10 +57,14 @@ export const authUser = () => (dispatch: any) => {
 
           const socket = io("ws://localhost:8000", {query: `userId=${user.id}`});
           //Da se poradi
-          socket.on("liked", (message: any) => {
+          socket.on("liked", (message: {post: string, liker: string}) => {
             dispatch({type: ADD_NOTIFICATION, 
               payload: {post: message.post, liker: message.liker}});
           })
+          // socket.on("chat", (message: {id: string, content: string}) => {
+          //   dispatch({type: NEW_MESSAGE, 
+          //     payload: {post: message.post, liker: message.liker}});
+          // })
           dispatch({type: SET_SOCKET, payload: socket});
           
           dispatch({ type: SET_AUTH, payload: {...user, followers, following} });

@@ -61,7 +61,7 @@ export const authUser = () => (dispatch: any) => {
             dispatch({type: ADD_NOTIFICATION, 
               payload: {post: message.post, liker: message.liker}});
           })
-          socket.on("chat", (message: {from: string, to: string, body: string}) => {
+          socket.on("newMessage", (message: {from: string, to: string, body: string}) => {
             dispatch(messageReceived(message.from, message.to, message.body));
           })
           dispatch({type: SET_SOCKET, payload: socket});

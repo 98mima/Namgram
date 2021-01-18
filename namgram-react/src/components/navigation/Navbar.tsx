@@ -157,7 +157,7 @@ function Navbar() {
   const dispatch = useDispatch();
 
   const auth = useSelector((state: RootState) => state.auth.auth);
-  const socket = useSelector((state: RootState) => state.auth.socket);
+  const chatNotifications = useSelector((state: RootState) => state.chat.chatNotifications);
   const notifications = useSelector(
     (state: RootState) => state.auth.notifications
   );
@@ -384,7 +384,7 @@ function Navbar() {
                 </Link>
                 <Link className={classes.link} to="/chat">
                   <IconButton aria-label="Chat" color="inherit">
-                    <Badge badgeContent={4} color="secondary">
+                    <Badge badgeContent={chatNotifications} color="secondary">
                       <MailIcon />
                     </Badge>
                   </IconButton>

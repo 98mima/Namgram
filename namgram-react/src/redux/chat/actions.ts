@@ -14,6 +14,7 @@ export const CLEAR_NEW_MESSAGES = "CLEAR_NEW_MESSAGES"
 
 export const LOAD_CHAT = "LOAD_CHAT"
 export const MESSAGE_SENT = "MESSAGE_SENT"
+export const CLEAR_CHAT = "CLEAR_CHAT"
 
 export interface SetChatHeadsActions {
     type: typeof SET_CHAT_HEADS,
@@ -42,7 +43,11 @@ export interface MessageSentAction {
     payload: IMessage
 }
 
-export type ChatActionTypes = SetChatHeadsActions | ClearChatHeads | NewMessageAction | ClearNewMessages | MessageSentAction | LoadChatAction
+export interface ClearChatAction {
+    type: typeof CLEAR_CHAT
+}
+
+export type ChatActionTypes = SetChatHeadsActions | ClearChatHeads | NewMessageAction | ClearNewMessages | MessageSentAction | LoadChatAction | ClearChatAction
 
 export const loadChatHeads = (username: string) => (dispatch: any) => {
     dispatch({type: START_LOADING});
@@ -76,10 +81,7 @@ export const loadChatHeads = (username: string) => (dispatch: any) => {
   export const messageReceived = (from: string, to: string, body: string) => (dispatch: any, getState: any) => {
       const state: RootState = getState();
       const {chatter} = state.chat;
-      if(chatter?.username === from){
-          const msg: IMessage = {body, myMessage: false, date: new Date().toUTCString()}
-          dispatch({type: MESSAGE_SENT, msg})
-      }else{
-          dispatch({type: NEW_MESSAGE});
-      }
+      const msg: IMessage = {body, myMessage: false, date: new Date().toUTCString()}
+      dispatch({type: MESSAGE_SENT, payload: msg})
+      dispatch({type: NEW_MESSAGE});
   }

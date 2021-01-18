@@ -21,7 +21,7 @@ const Chat = () => {
       <div>
         <Grid container component={Paper} className={classes.chatSection}>
             <ChatHeads />
-            {username && <MessageArea username={username} />}
+            {username && <MessageArea />}
         </Grid>
       </div>
   );

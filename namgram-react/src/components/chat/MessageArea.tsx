@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import { RootState } from '../../redux';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadChat, sendMessage } from '../../redux/chat/actions';
+import moment from 'moment';
 
 const useStyles = makeStyles({
     table: {
@@ -30,11 +31,17 @@ const useStyles = makeStyles({
     messageArea: {
       height: '70vh',
       overflowY: 'auto'
+    },
+    myMessage: {
+        textAlign: 'right'
+    },
+    theirMessage: {
+        textAlign: 'left'
     }
   });
 
-function MessageArea(props: {username: string}) {
-    const username = props.username;
+function MessageArea() {
+    const { username } = useParams<{username: string}>();
     const classes = useStyles();
     const dispatch = useDispatch();
     const [newMessage, setNewMessage] = useState("");
@@ -49,28 +56,27 @@ function MessageArea(props: {username: string}) {
 
     const handleSendMessage = () => {
         setNewMessage("");
-        dispatch(sendMessage(auth?.id as string, chatter?.id as string, newMessage));
+        dispatch(sendMessage(auth?.username as string, chatter?.username as string, newMessage));
       };
 
       useEffect(() => {
           if(auth) dispatch(loadChat(auth?.username as string, username));
           return () => {
           }
-      }, [auth])
+      }, [auth, username])
     
     return (
         <React.Fragment>
             {username && <Grid item xs={9}>
                 <List className={classes.messageArea}>
                     {messages.map((message, i) => (
-                    <ListItem key={i}>
-                         <Grid container>
+                    <ListItem  key={i}>
+                         <Grid container className={message.myMessage ? classes.myMessage : classes.theirMessage} >
                              <Grid item xs={12}>
-                                 
                                  <ListItemText primary={message.body}></ListItemText>
                              </Grid>
                               <Grid item xs={12}>
-                                 <ListItemText secondary="09:30"></ListItemText>
+                                 <ListItemText secondary={moment(message.date).fromNow()}></ListItemText>
                              </Grid> 
                          </Grid>
                      </ListItem>
@@ -81,7 +87,7 @@ function MessageArea(props: {username: string}) {
                     <Grid item xs={11}>
                         <TextField value={newMessage} onChange={onChange} label="Type Something" fullWidth />
                     </Grid>
-                    <Grid xs={1}>
+                    <Grid item xs={1}>
                         <Fab onClick={handleSendMessage} color="primary" aria-label="add"><SendIcon /></Fab>
                     </Grid>
                 </Grid>

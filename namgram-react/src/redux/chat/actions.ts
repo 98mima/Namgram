@@ -55,22 +55,20 @@ export const loadChatHeads = (username: string) => (dispatch: any) => {
     })
   };
 
-  export const loadChat = (username: string, username2: string) => (dispatch: any) => {
-    loadUserMessages(username, username2).then((messages: {sender: string, message: string, date: Date}[]) => {
-        console.log(messages)
-        const msgs: IMessage[] = messages.map(value => {
-            const msg: IMessage = {myMessage: username === value.sender, body: value.message, date: value.date};
-            return msg;
-        })
-        getProfileByUsername(username2).then(user => {
-            dispatch({type: LOAD_CHAT, payload: {messages: msgs, chatter: user}})
-        })
-    }).catch(err => console.log(err))
+  export const loadChat = (username: string, username2: string) => async (dispatch: any) => {
+    const messages: {sender: string, message: string, date: string}[] = await loadUserMessages(username, username2);
+    const msgs: IMessage[] = messages.map(value => {
+        const msg: IMessage = {myMessage: username === value.sender, body: value.message, date: value.date};
+        return msg;
+    })
+    const user: IUser = await getProfileByUsername(username2);
+    
+    dispatch({type: LOAD_CHAT, payload: {messages: msgs, chatter: user}})
   }
 
   export const sendMessage = (from: string, to: string, content: string) => (dispatch: any) => {
     sendToUser(from, to, content).then(res => {
-        const msg: IMessage = {body: content, myMessage: true, date: new Date()}
+        const msg: IMessage = {body: content, myMessage: true, date: new Date().toUTCString()}
         dispatch({type: MESSAGE_SENT, payload: msg})
     })
   }

@@ -2,7 +2,7 @@ import { IUser } from "./user";
 
 export interface IMessage {
     myMessage: boolean,
-    date: Date,
+    date: string,
     body: string
 }
 

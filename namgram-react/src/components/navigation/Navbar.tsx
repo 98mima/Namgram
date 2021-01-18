@@ -37,7 +37,7 @@ import { IUser } from "../../models/user";
 import { getProfileByUsername } from "../../services/profile";
 import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField/TextField";
-import WhatshotIcon from '@material-ui/icons/Whatshot';
+import WhatshotIcon from "@material-ui/icons/Whatshot";
 import _ from "lodash";
 import { getUserById } from "../../services/user";
 import { getPost } from "../../services/posts";
@@ -128,32 +128,37 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function Navbar() {
-  // const [anchorNotif, setAnchorNotif] = React.useState<null | HTMLElement>(
-  //   null
-  // );
+  const [notifs, setNotifs] = useState<{ user: IUser; image: IImage }[]>([]);
+  const [
+    notificationAnchor,
+    setNotificationAnchor,
+  ] = useState<null | HTMLElement>(null);
+  let open = Boolean(notificationAnchor);
+  let id = open ? "simple-popover" : undefined;
 
-  const handleNotificationOpen = (event: React.MouseEvent<HTMLElement>) => {
-    const nots: {user: IUser, image: IImage}[] = [];
+  const handleNotificationOpen = async (
+    event: React.MouseEvent<HTMLElement>
+  ) => {
+    const nots: { user: IUser; image: IImage }[] = [];
     notifications.map((not) => {
-      Promise.all([getUserById(not.liker), getPost(not.post)])
-        .then((res: [{message: string, Data: IUser}, IImage]) => {
-         nots.push({user: res[0].Data, image: res[1]});
-        })
+      Promise.all([getUserById(not.liker), getPost(not.post)]).then(
+        (res: [{ message: string; Data: IUser }, IImage]) => {
+          nots.push({ user: res[0].Data, image: res[1] });
+        }
+      );
     });
     //Nots su notifikacije napravljene
     //setAnchorNotif(anchorNotif ? null : event.currentTarget);
-    setNotificationAnchor(event.currentTarget);
+    setNotificationAnchor(notificationAnchor ? null : event.currentTarget);
   };
-
-  const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
-  const open = Boolean(notificationAnchor);
-  const id = "notif-popover";
 
   const history = useHistory();
   const dispatch = useDispatch();
 
   const auth = useSelector((state: RootState) => state.auth.auth);
-  const chatNotifications = useSelector((state: RootState) => state.chat.chatNotifications);
+  const chatNotifications = useSelector(
+    (state: RootState) => state.chat.chatNotifications
+  );
   const notifications = useSelector(
     (state: RootState) => state.auth.notifications
   );
@@ -166,7 +171,6 @@ function Navbar() {
     mobileMoreAnchorEl,
     setMobileMoreAnchorEl,
   ] = React.useState<null | HTMLElement>(null);
-
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -213,8 +217,10 @@ function Navbar() {
   };
 
   const handleCloseNotificationAnchor = () => {
-    setNotificationAnchor(null)
-  }
+    console.log("eo");
+    setNotificationAnchor(null);
+    open = false;
+  };
 
   const menuId = "primary-search-account-menu";
 
@@ -353,9 +359,9 @@ function Navbar() {
             />
           </div>
           <Link className={classes.link} to="/hot">
-                  <IconButton aria-label="Whats hot?" color="inherit">
-                    <WhatshotIcon />
-                  </IconButton>
+            <IconButton aria-label="Whats hot?" color="inherit">
+              <WhatshotIcon />
+            </IconButton>
           </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
@@ -409,22 +415,9 @@ function Navbar() {
                       </Fade>
                     )}
                   </Popper> */}
-        <Popover
-        id={id}
-        open={open}
-        anchorEl={notificationAnchor}
-        onClose={handleCloseNotificationAnchor}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
-      >
-        <Typography >The content of the Popover.</Typography>
-      </Popover>
+                  <Popper id={id} open={open} anchorEl={notificationAnchor}>
+                    <Typography>The content of the Popover.</Typography>
+                  </Popper>
                 </IconButton>
                 <IconButton
                   edge="end"

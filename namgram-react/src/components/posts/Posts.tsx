@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     root: {
       width: "500px",
-      maxWidth: 360,
+      maxWidth: 250,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: "column",
       position: "absolute",
       alignSelf: "flex-start",
-      left: "2rem",
+      left: "1rem",
       top: "5rem",
     },
     hidden: {
@@ -72,7 +72,7 @@ function Posts() {
   const auth = useSelector((state: RootState) => state.auth.auth);
   const socket = useSelector((state: RootState) => state.auth.socket);
   const history = useHistory();
-  const matches = useMediaQuery("(min-width:850px)");
+  const matches = useMediaQuery("(min-width:1250px)");
 
   const [profiles, setProfiles] = React.useState<IUser[]>([]);
 
@@ -93,32 +93,31 @@ function Posts() {
 
   return (
     <div className={classes.bigContainer}>
-      <Container
-        className={matches && profiles ? classes.suggestions : classes.hidden}
-      >
+      <Container className={matches ? classes.suggestions : classes.hidden}>
         <Typography style={{ color: "white" }}>Suggestions For You</Typography>
-        <List className={classes.root}>
-          {profiles.map((person) => (
-            <ListItem key={person.id}>
-              <ListItemAvatar>
-                <Avatar src={person.profilePic}></Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={person.username}
-                secondary={person.name + " " + person.lastname}
-              />
+        {profiles.length !== 0 ? (
+          <List className={classes.root}>
+            {profiles.map((person) => (
+              <ListItem key={person.id}>
+                <ListItemAvatar>
+                  <Avatar src={person.profilePic}></Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={person.username} />
 
-              <Button
-                type="submit"
-                variant="contained"
-                color="secondary"
-                onClick={() => visit(person.id)}
-              >
-                Visit
-              </Button>
-            </ListItem>
-          ))}
-        </List>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => visit(person.id)}
+                >
+                  Visit
+                </Button>
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <Typography>No suggestions currently</Typography>
+        )}
       </Container>
       <div className={classes.container}>
         {loading && (

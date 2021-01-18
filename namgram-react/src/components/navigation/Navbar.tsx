@@ -1,47 +1,41 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
   Avatar,
   Button,
   createStyles,
-  Fade,
   fade,
   makeStyles,
   Theme,
 } from "@material-ui/core";
-import Popper from "@material-ui/core/Popper";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
-import InputBase from "@material-ui/core/InputBase";
 import Badge from "@material-ui/core/Badge";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import AutoComplete from "@material-ui/lab/AutoComplete";
 import MenuIcon from "@material-ui/icons/Menu";
-import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
-import InputAdornment from "@material-ui/core/InputAdornment";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux";
-import { logoutAction } from "../../redux/auth/actions";
-import { AddCircleRounded, LocationDisabledSharp } from "@material-ui/icons";
-import { DebounceInput } from "react-debounce-input";
+import { CLEAR_NOTIFICATIONS, logoutAction } from "../../redux/auth/actions";
+import { AddCircleRounded } from "@material-ui/icons";
 import { IUser } from "../../models/user";
 import { getProfileByUsername } from "../../services/profile";
 import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField/TextField";
-import WhatshotIcon from '@material-ui/icons/Whatshot';
-import _ from "lodash";
+import WhatshotIcon from "@material-ui/icons/Whatshot";
 import { getUserById } from "../../services/user";
 import { getPost } from "../../services/posts";
-import { INotification } from "../../models/post";
+import { IImage } from "../../models/post";
+import Popper from "@material-ui/core/Popper/Popper";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -128,36 +122,41 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function Navbar() {
-  const [anchorNotif, setAnchorNotif] = React.useState<null | HTMLElement>(
-    null
-  );
+  const [notifs, setNotifs] = useState<{ user: IUser; image: IImage }[]>([]);
+  const [
+    notificationAnchor,
+    setNotificationAnchor,
+  ] = useState<null | HTMLElement>(null);
+  let open = Boolean(notificationAnchor);
+  let id = open ? "simple-popover" : undefined;
 
-  const handleNotificationOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setNotifs([]);
-    notifications.map((not) => {
-      getUserById(not.liker).then((res) => {
-        getPost(not.post).then((res2) => {
-          let n: INotification = {
-            liker: res.Data.username,
-            post: res2.id,
-          };
-          setNotifs([...notifs, n]);
-        });
-      });
-    });
-    console.log(notifs);
-    setAnchorNotif(anchorNotif ? null : event.currentTarget);
+  const handleNotificationOpen = async (
+    event: React.MouseEvent<HTMLElement>
+  ) => {
+    setNotificationAnchor(notificationAnchor ? null : event.currentTarget);
+    if (notificationAnchor) {
+      dispatch({ type: CLEAR_NOTIFICATIONS });
+    } else {
+      const nots = await Promise.all(
+        notifications.map(async (not) => {
+          const res = await Promise.all([
+            getUserById(not.liker),
+            getPost(not.post),
+          ]);
+          return { user: res[0].Data, image: res[1] };
+        })
+      );
+      setNotifs(nots);
+    }
   };
-  const [notifs, setNotifs] = React.useState<INotification[]>([]);
-
-  const open = Boolean(anchorNotif);
-  const id = open ? "transitions-popper" : undefined;
 
   const history = useHistory();
   const dispatch = useDispatch();
 
   const auth = useSelector((state: RootState) => state.auth.auth);
-  const socket = useSelector((state: RootState) => state.auth.socket);
+  const chatNotifications = useSelector(
+    (state: RootState) => state.chat.chatNotifications
+  );
   const notifications = useSelector(
     (state: RootState) => state.auth.notifications
   );
@@ -195,24 +194,22 @@ function Navbar() {
     history.push(("/profile/" + auth?.id) as string);
     handleMenuClose();
   };
-  const handeNewPost = () => {
-    history.push("/posts/create");
-  };
 
   const handleLogout = () => {
     dispatch(logoutAction());
     handleMenuClose();
   };
 
-  const handleHome = () => {
-    if (auth) history.push("/posts");
-    else history.push("/");
-  };
-
   const searchUsers = (username: any) => {
     getProfileByUsername(username).then((profile) => {
       setSearchResults([profile]);
     });
+  };
+
+  const handleCloseNotificationAnchor = () => {
+    console.log("eo");
+    setNotificationAnchor(null);
+    open = false;
   };
 
   const menuId = "primary-search-account-menu";
@@ -311,6 +308,7 @@ function Navbar() {
           <Link to="/" className={classes.link}>
             <img
               className={classes.logo}
+              alt="Slicka"
               src="https://cdn.discordapp.com/attachments/777890574253817889/792441180054749224/e52d18ae-4e0c-40cf-8d30-07396304f4e0_200x200.png"
             />
           </Link>
@@ -352,9 +350,9 @@ function Navbar() {
             />
           </div>
           <Link className={classes.link} to="/hot">
-                  <IconButton aria-label="Whats hot?" color="inherit">
-                    <WhatshotIcon />
-                  </IconButton>
+            <IconButton aria-label="Whats hot?" color="inherit">
+              <WhatshotIcon />
+            </IconButton>
           </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
@@ -384,7 +382,7 @@ function Navbar() {
                 </Link>
                 <Link className={classes.link} to="/chat">
                   <IconButton aria-label="Chat" color="inherit">
-                    <Badge badgeContent={4} color="secondary">
+                    <Badge badgeContent={chatNotifications} color="secondary">
                       <MailIcon />
                     </Badge>
                   </IconButton>
@@ -408,22 +406,15 @@ function Navbar() {
                       </Fade>
                     )}
                   </Popper> */}
-                  {/* <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorNotif}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
-      >
-        <Typography >The content of the Popover.</Typography>
-      </Popover> */}
+                  <Popper id={id} open={open} anchorEl={notificationAnchor}>
+                    {notifs.map((not) => (
+                      <Typography>
+                        {not.user.username +
+                          " reacted to your post " +
+                          not.image.sasToken}
+                      </Typography>
+                    ))}
+                  </Popper>
                 </IconButton>
                 <IconButton
                   edge="end"

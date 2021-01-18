@@ -49,6 +49,7 @@ function MessageArea() {
     const auth = useSelector((state: RootState) => state.auth.auth);
     const chatter = useSelector((state: RootState) => state.chat.chatter);
     const messages = useSelector((state: RootState) => state.chat.messages);
+    const socket = useSelector((state: RootState) => state.auth.socket);
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNewMessage(event.currentTarget.value);
@@ -57,6 +58,7 @@ function MessageArea() {
     const handleSendMessage = () => {
         setNewMessage("");
         dispatch(sendMessage(auth?.username as string, chatter?.username as string, newMessage));
+        socket?.emit("chat", {from: auth?.username, to: chatter?.username, body: newMessage});
       };
 
       useEffect(() => {

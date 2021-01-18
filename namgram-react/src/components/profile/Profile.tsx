@@ -11,6 +11,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import GridList from "@material-ui/core/GridList";
 import GridListTile from "@material-ui/core/GridListTile";
+import Create from "@material-ui/icons/Create";
 
 import "reactjs-popup/dist/index.css";
 
@@ -20,7 +21,6 @@ import { RootState } from "../../redux";
 import { follow, unfollow } from "../../services/profile";
 import {
   Backdrop,
-  CardActionArea,
   Fade,
   List,
   ListItem,
@@ -325,6 +325,7 @@ function Profile() {
                   history.push("/editProfile");
                 }}
               >
+                <Create />
                 Change profile
               </Button>
             )}

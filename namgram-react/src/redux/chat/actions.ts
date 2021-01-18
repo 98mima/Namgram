@@ -1,3 +1,4 @@
+import { RootState } from "..";
 import { IMessage } from "../../models/chat";
 import { IUser } from "../../models/user";
 import { loadUserMessages, sendToUser } from "../../services/chat";
@@ -13,6 +14,7 @@ export const CLEAR_NEW_MESSAGES = "CLEAR_NEW_MESSAGES"
 
 export const LOAD_CHAT = "LOAD_CHAT"
 export const MESSAGE_SENT = "MESSAGE_SENT"
+export const CLEAR_CHAT = "CLEAR_CHAT"
 
 export interface SetChatHeadsActions {
     type: typeof SET_CHAT_HEADS,
@@ -24,8 +26,7 @@ export interface ClearChatHeads {
 }
 
 export interface NewMessageAction {
-    type: typeof NEW_MESSAGE,
-    payload: IMessage
+    type: typeof NEW_MESSAGE
 }
 
 export interface ClearNewMessages {
@@ -42,7 +43,11 @@ export interface MessageSentAction {
     payload: IMessage
 }
 
-export type ChatActionTypes = SetChatHeadsActions | ClearChatHeads | NewMessageAction | ClearNewMessages | MessageSentAction | LoadChatAction
+export interface ClearChatAction {
+    type: typeof CLEAR_CHAT
+}
+
+export type ChatActionTypes = SetChatHeadsActions | ClearChatHeads | NewMessageAction | ClearNewMessages | MessageSentAction | LoadChatAction | ClearChatAction
 
 export const loadChatHeads = (username: string) => (dispatch: any) => {
     dispatch({type: START_LOADING});
@@ -68,7 +73,15 @@ export const loadChatHeads = (username: string) => (dispatch: any) => {
 
   export const sendMessage = (from: string, to: string, content: string) => (dispatch: any) => {
     sendToUser(from, to, content).then(res => {
-        const msg: IMessage = {body: content, myMessage: true, date: new Date().toUTCString()}
-        dispatch({type: MESSAGE_SENT, payload: msg})
+        const msg: IMessage = {body: content, myMessage: true, date: new Date().toUTCString()};
+        dispatch({type: MESSAGE_SENT, payload: msg});
     })
+  }
+
+  export const messageReceived = (from: string, to: string, body: string) => (dispatch: any, getState: any) => {
+      const state: RootState = getState();
+      const {chatter} = state.chat;
+      const msg: IMessage = {body, myMessage: false, date: new Date().toUTCString()}
+      dispatch({type: MESSAGE_SENT, payload: msg})
+      dispatch({type: NEW_MESSAGE});
   }

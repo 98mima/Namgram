@@ -187,7 +187,7 @@ exports.get = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -233,7 +233,7 @@ exports.getAll = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -281,7 +281,7 @@ exports.getByPerson = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -327,7 +327,7 @@ exports.getByFollowings = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -374,8 +374,8 @@ exports.getMostLikedF = async (req, res) => {
         const cacheValue = await clientR.get(key)
         //ako je u redisu
         if (cacheValue) {
-            const Data2 = JSON.parse(cacheValue)
-            return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
+            const Data1 = JSON.parse(cacheValue)
+            return res.status(200).json({ message: "Prikupljeno iz redisa", Data1 })
         }
         //ako nije
         let session = driver.session();
@@ -395,7 +395,7 @@ exports.getMostLikedF = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -437,8 +437,8 @@ exports.getMostHatedF = async (req, res) => {
         const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "imageD" }));
         const cacheValue = await clientR.get(key)
         if (cacheValue) {
-            const Data2 = JSON.parse(cacheValue)
-            return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
+            const Data1 = JSON.parse(cacheValue)
+            return res.status(200).json({ message: "Prikupljeno iz redisa", Data1 })
         }
         let session = driver.session();
         const images1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(image:Image) return image', {
@@ -457,7 +457,7 @@ exports.getMostHatedF = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds
@@ -518,7 +518,7 @@ exports.getMostCommentedF = async (req, res) => {
                 containerName,
                 blobName: blobName,
                 permissions: storage.BlobSASPermissions.parse("racwd"),
-                startsOn: new Date(),
+                startsOn: new Date(new Date().valueOf() - 86400),
                 expiresOn: new Date(new Date().valueOf() + 86400)
             },
                 cerds

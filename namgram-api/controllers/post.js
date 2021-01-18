@@ -14,6 +14,26 @@ const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
 client.get = util.promisify(client.get);
 
+var storage = require("@azure/storage-blob")
+const accountname = "namgram";
+const key = "b9/PjmImjnORF1berLyRe3OYyAO0dDGcTbqIYm5AkCm8tqYukKm/umiUPWLJujc2n+zPFwKbKKNFZAZm8kqWhA==";
+const cerds = new storage.StorageSharedKeyCredential(accountname, key);
+const {
+    BlobServiceClient,
+    StorageSharedKeyCredential,
+    newPipeline
+} = require('@azure/storage-blob');
+const sharedKeyCredential = new StorageSharedKeyCredential(
+    process.env.AZURE_STORAGE_ACCOUNT_NAME,
+    process.env.AZURE_STORAGE_ACCOUNT_ACCESS_KEY);
+const pipeline = newPipeline(sharedKeyCredential);
+const blobServiceClient = new BlobServiceClient(
+    `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net`,
+    pipeline
+);
+const containerName = 'namgram1609522522970';
+const clientBlob = blobServiceClient.getContainerClient(containerName)
+
 function _manyPosts(neo4jResult) {
     return neo4jResult.records.map(r => new Post(r.get('post')))
 }
@@ -175,6 +195,24 @@ async function findIfDisliked(node, userId) {
         console.log(err)
     }
 }
+async function generateSAS(blobName) {
+    const blobClient = clientBlob.getBlobClient(blobName);
+    const blobSAS = storage
+      .generateBlobSASQueryParameters(
+        {
+          containerName,
+          blobName: blobName,
+          permissions: storage.BlobSASPermissions.parse("racwd"),
+          startsOn: new Date(new Date().valueOf() - 86400),
+          expiresOn: new Date(new Date().valueOf() + 86400),
+        },
+        cerds
+      )
+      .toString();
+  
+    const sasUrl = blobClient.url + "?" + blobSAS;
+    return sasUrl;
+  }
 exports.getAll = async (req, res) => {
     try {
         let session = driver.session();
@@ -236,7 +274,11 @@ exports.getByFollowings = async (req, res) => {
             Data.map(post => {
                 return post.creator = findCreator(post)
             }))
-
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index])
         Data.map((post, index) => {
             post.creator = creators[index]
             post.ifLiked = ifLiked[index]
@@ -278,6 +320,11 @@ exports.getMostLiked = async (req, res) => {
             Data.map(post => {
                 return post.creator = findCreator(post)
             }))
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -326,6 +373,11 @@ exports.getMostHated = async (req, res) => {
             Data.map(post => {
                 return post.creator = findCreator(post)
             }))
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -373,6 +425,11 @@ exports.getMostCommented = async (req, res) => {
             Data.map(post => {
                 return post.creator = findCreator(post)
             }))
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -408,8 +465,8 @@ exports.getByPostId = async (req, res) => {
         post.commentsList = await findComments(post)
         post.creator = await findCreator(post)
         Data = post
-
-        //client.publish("posts", "Data.toString()")
+        
+        post.creator.profilePic = await generateSAS(post.creator.profilePic)
 
         session.close();
         res.status(200)

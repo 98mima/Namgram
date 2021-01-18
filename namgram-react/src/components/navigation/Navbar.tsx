@@ -25,7 +25,7 @@ import MoreIcon from "@material-ui/icons/MoreVert";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux";
-import { logoutAction } from "../../redux/auth/actions";
+import { CLEAR_NOTIFICATIONS, logoutAction } from "../../redux/auth/actions";
 import { AddCircleRounded } from "@material-ui/icons";
 import { IUser } from "../../models/user";
 import { getProfileByUsername } from "../../services/profile";
@@ -133,12 +133,21 @@ function Navbar() {
   const handleNotificationOpen = async (
     event: React.MouseEvent<HTMLElement>
   ) => {
-    const nots = await Promise.all(notifications.map(async (not) => {
-      const res = await Promise.all([getUserById(not.liker), getPost(not.post)]);
-      return {user: res[0].Data, image: res[1]};
-    }))
-    setNotifs(nots);
     setNotificationAnchor(notificationAnchor ? null : event.currentTarget);
+    if (notificationAnchor) {
+      dispatch({ type: CLEAR_NOTIFICATIONS });
+    } else {
+      const nots = await Promise.all(
+        notifications.map(async (not) => {
+          const res = await Promise.all([
+            getUserById(not.liker),
+            getPost(not.post),
+          ]);
+          return { user: res[0].Data, image: res[1] };
+        })
+      );
+      setNotifs(nots);
+    }
   };
 
   const history = useHistory();
@@ -398,7 +407,13 @@ function Navbar() {
                     )}
                   </Popper> */}
                   <Popper id={id} open={open} anchorEl={notificationAnchor}>
-                    <Typography>The content of the Popover.</Typography>
+                    {notifs.map((not) => (
+                      <Typography>
+                        {not.user.username +
+                          " reacted to your post " +
+                          not.image.sasToken}
+                      </Typography>
+                    ))}
                   </Popper>
                 </IconButton>
                 <IconButton

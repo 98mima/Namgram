@@ -25,7 +25,7 @@ import {
   TextField,
 } from "@material-ui/core";
 
-import moment from "moment"
+import moment from "moment";
 import { IComment, IImage } from "../../models/post";
 import {
   Backdrop,
@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignContent: "center",
-      marginTop: "5rem"
+      marginTop: "5rem",
     },
     img: {
       maxWidth: "30vw",
@@ -341,8 +341,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               onClick={() => handleOpenComments(post.id)}
             >
               <Button variant="contained" color="secondary">
-              <Comment />
-                Comments
+                <Comment /> Comments
               </Button>
             </div>
             <Modal

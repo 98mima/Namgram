@@ -53,7 +53,9 @@ exports.getMessages = async (req, res) => {
                 Data = JSON.parse(reply)
                 return res.status(200).json(Data)
             }
-            console.log(err)
+            else {
+                return res.status(200).json("nema poruka")
+            }
         })
     }
     catch (err) {

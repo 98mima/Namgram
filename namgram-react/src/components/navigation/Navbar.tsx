@@ -41,7 +41,7 @@ import WhatshotIcon from '@material-ui/icons/Whatshot';
 import _ from "lodash";
 import { getUserById } from "../../services/user";
 import { getPost } from "../../services/posts";
-import { INotification } from "../../models/post";
+import { IImage, INotification } from "../../models/post";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -135,17 +135,16 @@ function Navbar() {
   const handleNotificationOpen = (event: React.MouseEvent<HTMLElement>) => {
     setNotifs([]);
     notifications.map((not) => {
-      getUserById(not.liker).then((res) => {
-        getPost(not.post).then((res2) => {
+      Promise.all([getUserById(not.liker), getPost(not.post)])
+        .then((res: [{message: string, Data: IUser}, IImage]) => {
           let n: INotification = {
-            liker: res.Data.username,
-            post: res2.id,
+            liker: res[0].Data.username,
+            post: res[1].id,
           };
           setNotifs([...notifs, n]);
-        });
-      });
+          console.log(res)
+        })
     });
-    console.log(notifs);
     setAnchorNotif(anchorNotif ? null : event.currentTarget);
   };
   const [notifs, setNotifs] = React.useState<INotification[]>([]);

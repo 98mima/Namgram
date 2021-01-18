@@ -285,8 +285,8 @@ exports.unfollow = async (req, res) => {
 exports.deletePerson = async (req, res) => {
   let session = driver.session();
   try {
-    user = await session.run("MATCH (n:Person {username: $id}) DELETE n", {
-      id: req.body.username,
+    user = await session.run("MATCH (person:Person {username: $username}) DETACH DELETE person", {
+      username: req.body.username,
     });
     res.status(200).json({ message: "Obrisan", user });
   } catch (err) {

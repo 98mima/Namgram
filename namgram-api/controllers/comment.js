@@ -1,5 +1,6 @@
 const Comment = require('../models/comment');
 const Person = require('../models/person');
+const uuid = require('node-uuid');
 let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
 const _ = require('lodash');
@@ -16,18 +17,17 @@ function _manyComments(neo4jResult) {
 function _manyPeople(neo4jResult) {
     return neo4jResult.records.map(r => new Person(r.get('person')))
 }
-async function findCreator(postId, content) {
+async function findCreator(postId, commId) {
     try {
         let session = driver.session();
-
         const query = [
-            'MATCH (post:Post {id: $id})<-[r1:commented {content:$content}]-(person:Person) return person'
+            'MATCH (post:Post {id: $id})<-[r1:commented {commId:$commId}]-(person:Person) return person'
         ].join('\n')
 
         return session.readTransaction(txc =>
             txc.run(query, {
                 id: postId,
-                content: content
+                commId: commId
             }))
             .then(result => {
                 const user = _manyPeople(result)
@@ -42,18 +42,18 @@ async function findCreator(postId, content) {
         console.log(err)
     }
 }
-async function findCreatorForImageComm(postId, content) {
+async function findCreatorForImageComm(postId, commId) {
     try {
         let session = driver.session();
 
         const query = [
-            'MATCH (image:Image {id: $id})<-[r1:commented {content:$content}]-(person:Person) return person'
+            'MATCH (image:Image {id: $id})<-[r1:commented {commId:$commId}]-(person:Person) return person'
         ].join('\n')
 
         return session.readTransaction(txc =>
             txc.run(query, {
                 id: postId,
-                content: content
+                commId: commId
             }))
             .then(result => {
                 const user = _manyPeople(result)
@@ -83,7 +83,7 @@ exports.getByPost = async (req, res) => {
         let creators = []
         creators = await Promise.all(
             p.map(post => {
-                return post.creator = findCreator(req.params.postId, post.content)
+                return post.creator = findCreator(req.params.postId, post.commId)
             }))
         p.map((post, index) =>
             post.creator = creators[index])
@@ -110,7 +110,7 @@ exports.getByImage = async (req, res) => {
         let creators = []
         creators = await Promise.all(
             p.map(post => {
-                return post.creator = findCreatorForImageComm(req.params.imageId, post.content)
+                return post.creator = findCreatorForImageComm(req.params.imageId, post.commId)
             }))
         p.map((post, index) =>
             post.creator = creators[index])
@@ -135,12 +135,13 @@ exports.addToPost = async (req, res) => {
         const query = [
             'match (p:Post), (a:Person) \
              where p.id = $postId and a.id = $personId\
-             create (p)<-[comment:commented {date:$date, content:$content}]-(a) \
+             create (p)<-[comment:commented {commId:$commId, date:$date, content:$content}]-(a) \
              RETURN comment'
         ].join('\n')
 
         const com = await session.writeTransaction(txc =>
             txc.run(query, {
+                commId: uuid.v4(),
                 date: today,
                 content: req.body.content,
                 personId: req.body.personId,
@@ -173,12 +174,13 @@ exports.addToImage = async (req, res) => {
         const query = [
             'match (p:Image), (a:Person) \
              where p.id = $imageId and a.id = $personId\
-             create (p)<-[comment:commented {date:$date, content:$content}]-(a) \
+             create (p)<-[comment:commented {commId:$commId, date:$date, content:$content}]-(a) \
              RETURN comment'
         ].join('\n')
 
         const com = await session.writeTransaction(txc =>
             txc.run(query, {
+                commId: uuid.v4(),
                 date: now.toUTCString(),
                 content: req.body.content,
                 personId: req.body.personId,
@@ -199,5 +201,27 @@ exports.addToImage = async (req, res) => {
         console.log(err);
     }
 };
-
-
+exports.deleteFromImage = async (req, res) => {
+    let session = driver.session();
+    try {
+      comm = await session.run("MATCH (p:Person)-[r:commented {id:$id}]->(image:Image) DETACH DELETE r", {
+        id: req.params.id,
+      });
+      res.status(200).json({ message: "Obrisan"});
+    } catch (err) {
+      res.json({ success: false });
+      console.log(err);
+    }
+  };
+  exports.deleteFromPost = async (req, res) => {
+    let session = driver.session();
+    try {
+      comm = await session.run("MATCH (p:Person)-[r:commented {id:$id}]->(post:Post) DETACH DELETE r", {
+        id: req.params.id,
+      });
+      res.status(200).json({ message: "Obrisan"});
+    } catch (err) {
+      res.json({ success: false });
+      console.log(err);
+    }
+  };

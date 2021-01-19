@@ -63,7 +63,7 @@ function CreatePost() {
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement | HTMLInputElement>) => {
     if (!event.currentTarget.files?.length) return;
     const name = event.currentTarget.files[0].name;
-    if (name.includes(".jpg") || name.includes(".png")) {
+    if (name.includes(".jpg") || name.includes(".png") || name.includes(".JPG") || name.includes(".PNG")) {
       setFile(event.currentTarget.files[0]);
     } else {
         dispatch({type: SET_ERROR, payload: "Tip fajla nije podržan (podržani .jpg i .png)"})

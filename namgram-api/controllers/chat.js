@@ -126,19 +126,18 @@ exports.leaveChat = async (req, res) => {
         })
         session.close();
         const followers = _manyPeople(persons)
-        let active = []
-
+        
         followers.forEach(follower => {
+            let active = []
             const keyActive = JSON.stringify(Object.assign({}, { user: follower.username }, { collection: "chatters" }));
             client.get(keyActive, function (err, reply) {
                 if (reply) {
                     active = JSON.parse(reply)
+                    console.log(active)
+                    active.splice(active.indexOf(req.body.username), 1)
+                    client.set(keyActive, JSON.stringify(active))
                 }
             })
-            console.log(active)
-            //active.splice(active.indexOf(req.body.username), 1)
-            active = active.filter(user => user!== req.body.username)
-            client.set(keyActive, JSON.stringify(active))
         });
 
         res.json({ "status": "OK" })

@@ -58,7 +58,6 @@ async function findCreatorForImageComm(postId, commId) {
             .then(result => {
                 const user = _manyPeople(result)
                 session.close();
-                console.log(user[0])
                 return user[0]
             })
             .catch(err => {

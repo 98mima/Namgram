@@ -100,7 +100,6 @@ function findComments(node) {
                 const listOfComments = _manyComments(result)
 
                 session.close();
-                console.log(listOfComments)
 
                 return listOfComments
             })
@@ -198,21 +197,21 @@ async function findIfDisliked(node, userId) {
 async function generateSAS(blobName) {
     const blobClient = clientBlob.getBlobClient(blobName);
     const blobSAS = storage
-      .generateBlobSASQueryParameters(
-        {
-          containerName,
-          blobName: blobName,
-          permissions: storage.BlobSASPermissions.parse("racwd"),
-          startsOn: new Date(new Date().valueOf() - 86400),
-          expiresOn: new Date(new Date().valueOf() + 86400),
-        },
-        cerds
-      )
-      .toString();
-  
+        .generateBlobSASQueryParameters(
+            {
+                containerName,
+                blobName: blobName,
+                permissions: storage.BlobSASPermissions.parse("racwd"),
+                startsOn: new Date(new Date().valueOf() - 86400),
+                expiresOn: new Date(new Date().valueOf() + 86400),
+            },
+            cerds
+        )
+        .toString();
+
     const sasUrl = blobClient.url + "?" + blobSAS;
     return sasUrl;
-  }
+}
 exports.getAll = async (req, res) => {
     try {
         let session = driver.session();
@@ -298,12 +297,12 @@ exports.getMostLiked = async (req, res) => {
     try {
         const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "postL" }));
         const cacheValue = await client.get(key)
-        //ako je u redisu
+
         if (cacheValue) {
             const Data2 = JSON.parse(cacheValue)
             return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
         }
-        //ako nije
+
         let session = driver.session();
         const posts1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(post:Post) return post', {
             id: req.params.userId
@@ -351,12 +350,12 @@ exports.getMostHated = async (req, res) => {
     try {
         const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "postL" }));
         const cacheValue = await client.get(key)
-        //ako je u redisu
+
         if (cacheValue) {
             const Data2 = JSON.parse(cacheValue)
             return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
         }
-        //ako nije
+
         let session = driver.session();
         const posts1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(post:Post) return post', {
             id: req.params.userId
@@ -403,12 +402,12 @@ exports.getMostCommented = async (req, res) => {
     try {
         const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "postL" }));
         const cacheValue = await client.get(key)
-        //ako je u redisu
+
         if (cacheValue) {
             const Data2 = JSON.parse(cacheValue)
             return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
         }
-        //ako nije
+
         let session = driver.session();
         const posts1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(post:Post) return post', {
             id: req.params.userId
@@ -465,7 +464,7 @@ exports.getByPostId = async (req, res) => {
         post.commentsList = await findComments(post)
         post.creator = await findCreator(post)
         Data = post
-        
+
         post.creator.profilePic = await generateSAS(post.creator.profilePic)
 
         session.close();
@@ -482,16 +481,15 @@ exports.getByPerson = async (req, res) => {
     try {
         let session = driver.session();
         const key = JSON.stringify(Object.assign({}, { user: req.params.id }, { collection: "post" }));
-        //da li je u redisu
+
         const cacheValue = await client.get(key)
 
-        //ako jeste
         if (cacheValue) {
             const Data = JSON.parse(cacheValue)
 
             return res.status(200).json({ message: "Prikupljeno iz redisa", Data })
         }
-        //ako nije
+
         const posts = await session.run('MATCH (n:Person {id: $id})-[r:created]->(post:Post) RETURN post', {
             id: req.params.id
         })
@@ -514,7 +512,7 @@ exports.createPost = async (req, res) => {
     try {
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
         var yyyy = today.getFullYear();
         today = dd + '.' + mm + '.' + yyyy;
 
@@ -643,7 +641,7 @@ exports.deletePost = async (req, res) => {
         const rel = await session.run('match (a:Person)-[r]->(post:Post {id:$postId}) delete r ', {
             postId: req.body.postId
         })
-        p = await session.run('MATCH (post:Post {id: $postId}) DELETE post', {
+        post = await session.run('MATCH (post:Post {id: $postId}) DELETE post', {
             postId: req.body.postId
         });
         res.status(200)

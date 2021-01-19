@@ -5,9 +5,6 @@ const dotenv = require('dotenv');
 const redis = require('redis');
 const app = express();
 var server = require('http').createServer(app)
-var realtime = require('./real_time')
-// const redisUrl = 'redis://127.0.0.1:6379';
-// const client = redis.createClient(redisUrl);
 
 const cors = require('cors');
 const neo4j = require('neo4j-driver');
@@ -28,8 +25,6 @@ let client = redis.createClient();
 client.on('connect', function () {
     console.log('Konektovano sa Redis')
 })
-
-//realtime(http)
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
@@ -94,7 +89,7 @@ io.on("connection", (socket) => {
 });
 
 server.listen(8000, () => {
-    console.log("Slusa brat");
+    console.log("Jos jedan server");
 })
 
 const port = 8080;

@@ -92,7 +92,6 @@ exports.get = async (req, res) => {
     if (image.records[0]) {
       const blobName = pic[0].blobName;
       Data.profilePic = await generateSAS(blobName);
-      console.log(Data);
     } else Data.profilePic = "false";
 
     session.close();
@@ -148,7 +147,6 @@ exports.getFollowing = async (req, res) => {
     session.close();
     let Data = _manyPeople(persons)
     let pics = await Promise.all(Data.map(p => {
-      console.log(p.profilePic)
       return p.sasUrl = generateSAS(p.profilePic)
     }))
     Data.map((image, index) =>
@@ -199,7 +197,6 @@ exports.getRecommendedPeople = async (req, res) => {
     })
     session.close();
     following = _manyPeople(following)
-    console.log(recommended)
 
     recommended = recommended.filter(rec => !following.includes(rec))
     const Data = recommended

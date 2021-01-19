@@ -82,6 +82,7 @@ exports.joinChat = async (req, res) => {
                     if (active.indexOf(follower.username) == -1) {
                         active.push(req.body.username)
                         client.set(keyActive, JSON.stringify(active))
+                        client.expire(keyActive, 180);
                     }
                     else {
                         client.set(keyActive, JSON.stringify(active))

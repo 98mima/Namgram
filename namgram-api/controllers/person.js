@@ -140,48 +140,48 @@ exports.getByUsername = async (req, res) => {
 };
 
 exports.getFollowing = async (req, res) => {
-    try {
-        let session = driver.session();
-        const persons = await session.run('MATCH (n:Person {username: $username})-[:follows]->(person) RETURN person', {
-            username: req.params.username
-        })
-        session.close();
-        let Data = _manyPeople(persons)
-        let pics = await Promise.all(Data.map(p => {
-            console.log(p.profilePic)
-            return p.sasUrl = generateSAS(p.profilePic)
-        } )) 
-        Data.map((image, index) =>
-            image.sasUrl = pics[index])
-        res.status(200)
-            .json({ message: "Prikupljeno", Data })
-    }
-    catch (err) {
-        res.json({ success: false });
-        console.log(err);
-    }
+  try {
+    let session = driver.session();
+    const persons = await session.run('MATCH (n:Person {username: $username})-[:follows]->(person) RETURN person', {
+      username: req.params.username
+    })
+    session.close();
+    let Data = _manyPeople(persons)
+    let pics = await Promise.all(Data.map(p => {
+      console.log(p.profilePic)
+      return p.sasUrl = generateSAS(p.profilePic)
+    }))
+    Data.map((image, index) =>
+      image.sasUrl = pics[index])
+    res.status(200)
+      .json({ message: "Prikupljeno", Data })
+  }
+  catch (err) {
+    res.json({ success: false });
+    console.log(err);
+  }
 };
 
 exports.getFollowers = async (req, res) => {
-    try {
-        let session = driver.session();
-        const persons = await session.run('MATCH (n:Person {username: $username})<-[:follows]-(person) RETURN person', {
-            username: req.params.username
-        })
-        session.close();
-        const Data = _manyPeople(persons)
-        let pics = await Promise.all(Data.map(p => {
-            return p.sasUrl = generateSAS(p.profilePic)
-        } )) 
-        Data.map((image, index) =>
-            image.sasUrl = pics[index])
-        res.status(200)
-            .json({ message: "Prikupljeno", Data })
-    }
-    catch (err) {
-        res.json({ success: false });
-        console.log(err);
-    }
+  try {
+    let session = driver.session();
+    const persons = await session.run('MATCH (n:Person {username: $username})<-[:follows]-(person) RETURN person', {
+      username: req.params.username
+    })
+    session.close();
+    const Data = _manyPeople(persons)
+    let pics = await Promise.all(Data.map(p => {
+      return p.sasUrl = generateSAS(p.profilePic)
+    }))
+    Data.map((image, index) =>
+      image.sasUrl = pics[index])
+    res.status(200)
+      .json({ message: "Prikupljeno", Data })
+  }
+  catch (err) {
+    res.json({ success: false });
+    console.log(err);
+  }
 };
 
 exports.getRecommendedPeople = async (req, res) => {
@@ -191,34 +191,30 @@ exports.getRecommendedPeople = async (req, res) => {
       'MATCH (p:Person {username:$username})-[:like]->(image:Image)<-[:like]-(person:Person) \
        where not (p)-[:follows]->(person) RETURN person \
          LIMIT 5', {
-            username: req.params.username
-        })
-        let recommended = _manyPeople(persons)
-        let following = await session.run('MATCH (n:Person {username: $username})-[:follows]->(person) RETURN person', {
-            username: req.params.username
-        })
-        session.close();
-        following = _manyPeople(following)
-        console.log(recommended)
+      username: req.params.username
+    })
+    let recommended = _manyPeople(persons)
+    let following = await session.run('MATCH (n:Person {username: $username})-[:follows]->(person) RETURN person', {
+      username: req.params.username
+    })
+    session.close();
+    following = _manyPeople(following)
+    console.log(recommended)
 
-        recommended = recommended.filter(rec => !following.includes(rec))
-        // following.forEach((foll, index) => {
-        // recommended.filter(user => user!== foll)
-        // recommended.splice(recommended.indexOf(user), 1)
-        // });
-        const Data = recommended
-        let pics = await Promise.all(Data.map(p => {
-            return p.sasUrl = generateSAS(p.profilePic)
-        }))
-        Data.map((image, index) =>
-        image.sasUrl = pics[index])
-        res.status(200)
-            .json({ message: "Prikupljeno", Data })
-    }
-    catch (err) {
-        res.json({ success: false });
-        console.log(err);
-    }
+    recommended = recommended.filter(rec => !following.includes(rec))
+    const Data = recommended
+    let pics = await Promise.all(Data.map(p => {
+      return p.sasUrl = generateSAS(p.profilePic)
+    }))
+    Data.map((image, index) =>
+      image.sasUrl = pics[index])
+    res.status(200)
+      .json({ message: "Prikupljeno", Data })
+  }
+  catch (err) {
+    res.json({ success: false });
+    console.log(err);
+  }
 };
 exports.getRecommendedImages = async (req, res) => {
   try {
@@ -288,7 +284,7 @@ exports.deletePerson = async (req, res) => {
     user = await session.run("MATCH (person:Person {username: $username}) DETACH DELETE person", {
       username: req.params.username,
     });
-    res.status(200).json({ message: "Obrisan"});
+    res.status(200).json({ message: "Obrisan" });
   } catch (err) {
     res.json({ success: false });
     console.log(err);

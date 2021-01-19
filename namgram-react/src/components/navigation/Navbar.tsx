@@ -6,7 +6,12 @@ import {
   Button,
   createStyles,
   fade,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
   makeStyles,
+  Paper,
   Theme,
 } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
@@ -118,6 +123,10 @@ const useStyles = makeStyles((theme: Theme) =>
         cursor: "pointer",
       },
     },
+    root: {},
+    notificationContainer: {
+      backgroundColor: "white",
+    },
   })
 );
 
@@ -210,6 +219,10 @@ function Navbar() {
     console.log("eo");
     setNotificationAnchor(null);
     open = false;
+  };
+
+  const goToPost = (postId: string) => {
+    history.push("/post/" + postId);
   };
 
   const menuId = "primary-search-account-menu";
@@ -407,13 +420,26 @@ function Navbar() {
                     )}
                   </Popper> */}
                   <Popper id={id} open={open} anchorEl={notificationAnchor}>
-                    {notifs.map((not) => (
-                      <Typography>
-                        {not.user.username +
-                          " reacted to your post " +
-                          not.image.sasToken}
-                      </Typography>
-                    ))}
+                    <div className={classes.notificationContainer}>
+                      <List className={classes.root}>
+                        {notifs.map((not) => (
+                          <ListItem
+                            button={true}
+                            onClick={() => goToPost(not.image.id)}
+                            key={not.user.id}
+                          >
+                            <ListItemAvatar>
+                              <Avatar src={not.image.sasToken}></Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={
+                                not.user.username + " reacted to your post "
+                              }
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </div>
                   </Popper>
                 </IconButton>
                 <IconButton

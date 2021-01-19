@@ -170,6 +170,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
   const [openComments, setOpenComments] = React.useState(false);
 
   const [comments, setComments] = React.useState<IComment[]>([]);
+  const [numOfCom, setNumOfCom] = React.useState(props.post.comments);
   const [newComment, setNewComment] = useState("");
 
   const [open, setOpen] = React.useState(false);
@@ -226,6 +227,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
         };
         setComments([...comments, com]);
         setNewComment("");
+        setNumOfCom(numOfCom + 1);
       });
     }
   };
@@ -354,7 +356,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               onClick={() => handleOpenComments(post.id)}
             >
               <Button variant="contained" color="secondary">
-                <Comment /> Comments ({post.comments})
+                <Comment /> Comments ({numOfCom})
               </Button>
             </div>
             <Modal

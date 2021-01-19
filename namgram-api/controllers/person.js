@@ -286,7 +286,7 @@ exports.deletePerson = async (req, res) => {
   let session = driver.session();
   try {
     user = await session.run("MATCH (person:Person {username: $username}) DETACH DELETE person", {
-      username: req.body.username,
+      username: req.params.username,
     });
     res.status(200).json({ message: "Obrisan"});
   } catch (err) {

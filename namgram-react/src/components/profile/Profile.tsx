@@ -113,7 +113,7 @@ function Profile() {
   useEffect(() => {
     if (!profile) {
       dispatch(loadProfile(id));
-    } else if(profile.id !== id){
+    } else if (profile.id !== id) {
       dispatch(loadProfile(id));
     }
     if (
@@ -247,11 +247,7 @@ function Profile() {
                                 type="submit"
                                 variant="contained"
                                 color="secondary"
-                                onClick={() =>
-                                  visit(
-                                    person.id
-                                  )
-                                }
+                                onClick={() => visit(person.id)}
                               >
                                 Visit
                               </Button>
@@ -301,9 +297,7 @@ function Profile() {
                                 type="submit"
                                 variant="contained"
                                 color="secondary"
-                                onClick={() =>
-                                  visit(person.id)
-                                }
+                                onClick={() => visit(person.id)}
                               >
                                 Visit
                               </Button>

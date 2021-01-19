@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
-
 //MUI
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -21,22 +20,20 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
-  form: {
-    
-  },
+  form: {},
   input: {
     flex: 1,
-      width: "80%"
+    width: "80%",
   },
   image: {
     maxWidth: "600px",
   },
-  btn:{
+  btn: {
     marginTop: "3rem",
     width: "80%",
-  }
+  },
 }));
 
 function CreatePost() {
@@ -46,61 +43,87 @@ function CreatePost() {
 
   const [caption, setCaption] = useState("");
   const [file, setFile] = useState<File>();
-    const auth = useSelector((state: RootState) => state.auth.auth);
-    const loading = useSelector((state: RootState) => state.ui.loading);
-    const error = useSelector((state: RootState) => state.ui.error);
+  const auth = useSelector((state: RootState) => state.auth.auth);
+  const loading = useSelector((state: RootState) => state.ui.loading);
+  const error = useSelector((state: RootState) => state.ui.error);
 
   useEffect(() => {
     return () => {};
   }, []);
 
-  const onInput = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      event.preventDefault();
+  const onInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    event.preventDefault();
     setCaption(event.currentTarget.value);
   };
 
-
-  const onFileChange = (event: React.ChangeEvent<HTMLInputElement | HTMLInputElement>) => {
+  const onFileChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLInputElement>
+  ) => {
     if (!event.currentTarget.files?.length) return;
     const name = event.currentTarget.files[0].name;
-    if (name.includes(".jpg") || name.includes(".png") || name.includes(".JPG") || name.includes(".PNG")) {
+    if (
+      name.includes(".jpg") ||
+      name.includes(".png") ||
+      name.includes(".JPG") ||
+      name.includes(".PNG")
+    ) {
       setFile(event.currentTarget.files[0]);
     } else {
-        dispatch({type: SET_ERROR, payload: "Tip fajla nije podržan (podržani .jpg i .png)"})
+      dispatch({
+        type: SET_ERROR,
+        payload: "Tip fajla nije podržan (podržani .jpg i .png)",
+      });
     }
   };
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (caption && file) {
-        dispatch({type: START_LOADING});
-        const id = auth?.id as string;
-        uploadPost({caption, image: file, personId: id}).then(res => {
-            dispatch({type: STOP_LOADING});
-            dispatch({type: SET_ERROR, payload: ""})
-            history.push("/");
-            //Da bude redirect do slike
-        }).catch(err => {
-            dispatch({type: STOP_LOADING});
-            dispatch({type: SET_ERROR, payload: "Sva polja su obavezna!"})
+      dispatch({ type: START_LOADING });
+      const id = auth?.id as string;
+      uploadPost({ caption, image: file, personId: id })
+        .then((res) => {
+          dispatch({ type: STOP_LOADING });
+          dispatch({ type: SET_ERROR, payload: "" });
+          history.push("/");
+          //Da bude redirect do slike
         })
+        .catch((err) => {
+          dispatch({ type: STOP_LOADING });
+          dispatch({ type: SET_ERROR, payload: "Sva polja su obavezna!" });
+        });
     } else {
-      dispatch({type: SET_ERROR, payload: "Sva polja su obavezna!"})
+      dispatch({ type: SET_ERROR, payload: "Sva polja su obavezna!" });
     }
   };
 
   return (
     <form className={classes.form} noValidate onSubmit={onSubmit}>
-        <Paper className={classes.paper}>
-            <Typography>Create a post</Typography>
-            <TextField label="Enter something interesting!" placeholder="I'm so happy!" onChange={onInput} className={classes.input} />
-            {file && <img className={classes.image} src={URL.createObjectURL(file)} />}
-            <input type="file" name="file" onChange={onFileChange} />
-            <Button variant="contained" color="primary" className={classes.btn} type="submit">{loading ? <CircularProgress /> : "Submit"}</Button>
-            <Typography color="error">{error}</Typography>
-        
+      <Paper className={classes.paper}>
+        <Typography>Create a post</Typography>
+        <TextField
+          label="Enter something interesting!"
+          placeholder="I'm so happy!"
+          onChange={onInput}
+          className={classes.input}
+        />
+        {file && (
+          <img className={classes.image} src={URL.createObjectURL(file)} />
+        )}
+        <input type="file" name="file" onChange={onFileChange} />
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.btn}
+          type="submit"
+        >
+          {loading ? <CircularProgress /> : "Submit"}
+        </Button>
+        <Typography color="error">{error}</Typography>
       </Paper>
-     </form>
+    </form>
   );
 }
 

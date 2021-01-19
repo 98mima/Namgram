@@ -143,6 +143,12 @@ const useStyles = makeStyles((theme: Theme) =>
     deleteBtn: {
       color: "red",
     },
+    delCom: {
+      color: "red",
+      width: "10px",
+      padding: 0,
+      margin: 0,
+    },
   })
 );
 //@ts-ignore
@@ -187,7 +193,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
     postId: string
   ) => {
     event.preventDefault();
-    console.log(comments);
+    // console.log(comments);
     if (newComment) {
       const id = auth?.id as string;
       addComment(postId, id, newComment).then((res) => {
@@ -241,6 +247,13 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
   const handleDelete = (imageId: string) => {
     deletePost(imageId);
     history.push(`/profile/${auth?.id}`);
+  };
+  const handleDeleteCom = (commentId: string) => {
+    // let array: IComment[] = comments.filter(function (com) {
+    //   return com.id === commentId;
+    // });
+    // console.log(array);
+    // setComments(array);
   };
 
   const handleLike = (imageId: string) => {
@@ -341,7 +354,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               onClick={() => handleOpenComments(post.id)}
             >
               <Button variant="contained" color="secondary">
-                <Comment /> Comments
+                <Comment /> Comments ({post.comments})
               </Button>
             </div>
             <Modal
@@ -367,12 +380,19 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
                           <Avatar src={comment.creator.profilePic}></Avatar>
                         </CardActionArea>
                       </ListItemAvatar>
-
                       <ListItemText
                         primary={comment.creator.username}
                         secondary={comment.content}
                       />
                       <Typography>{moment(comment.date).fromNow()}</Typography>
+                      {comment.creator.id === auth?.id && (
+                        <Button
+                          className={classes.delCom}
+                          onClick={() => handleDeleteCom(comment.id)}
+                        >
+                          X
+                        </Button>
+                      )}
                     </ListItem>
                   ))}
                   <ListItem>

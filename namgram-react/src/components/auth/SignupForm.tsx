@@ -1,55 +1,54 @@
-import React, { useEffect, useState } from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles, Theme } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress'
-import Container from '@material-ui/core/Container';
+import React, { useEffect, useState } from "react";
+import Avatar from "@material-ui/core/Avatar";
+import Button from "@material-ui/core/Button";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import TextField from "@material-ui/core/TextField";
+import Link from "@material-ui/core/Link";
+import Grid from "@material-ui/core/Grid";
+import Box from "@material-ui/core/Box";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Container from "@material-ui/core/Container";
 
-
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import { ISignup } from "../../models/auth";
 import { START_LOADING, STOP_LOADING } from "../../redux/ui/actions";
-import { RootState } from '../../redux/index'
-import { signupAction } from '../../redux/auth/actions'
-import { useHistory } from 'react-router-dom';
+import { RootState } from "../../redux/index";
+import { signupAction } from "../../redux/auth/actions";
+import { useHistory } from "react-router-dom";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
+      {"Copyright © "}
       <Link color="inherit" href="http://localhost:3000/">
         Namgram
-      </Link>{' '}
+      </Link>{" "}
       {new Date().getFullYear()}
-      {'.'}
+      {"."}
     </Typography>
   );
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
-    marginTop: '3rem',
-    paddingTop: '10vh',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    background: 'rgb(255, 255, 255)',
-    padding: '2rem',
-    borderRadius: '20px'
+    marginTop: "3rem",
+    paddingTop: "10vh",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    background: "rgb(255, 255, 255)",
+    padding: "2rem",
+    borderRadius: "20px",
   },
   avatar: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: '100%',
+    width: "100%",
     marginTop: theme.spacing(3),
   },
   submit: {
@@ -71,7 +70,7 @@ export default function SignUp() {
   const [birthday, setBirthday] = React.useState<any>(new Date());
 
   const onBirthdayChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-   setBirthday(event.currentTarget.value);
+    setBirthday(event.currentTarget.value);
   };
 
   const loading = useSelector((state: RootState) => state.ui.loading);
@@ -81,11 +80,20 @@ export default function SignUp() {
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const user: ISignup = { name, lastname, username, email, password, birthday};
+    const user: ISignup = {
+      name,
+      lastname,
+      username,
+      email,
+      password,
+      birthday,
+    };
     dispatch(signupAction(user));
-  }
+  };
 
-  const onInput = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const onInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     if (event.currentTarget.name === "email")
       setEmail(event.currentTarget.value);
     else if (event.currentTarget.name === "password")
@@ -96,12 +104,11 @@ export default function SignUp() {
       setLastname(event.currentTarget.value);
     else if (event.currentTarget.name === "username")
       setUsername(event.currentTarget.value);
-
-  }
+  };
 
   useEffect(() => {
-    if(auth) history.push("/");
-  }, [auth])
+    if (auth) history.push("/");
+  }, [auth]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -178,7 +185,11 @@ export default function SignUp() {
               />
             </Grid>
             <Grid item xs={12}>
-            <input type="date" value={birthday} onChange={(event) => onBirthdayChange(event)}></input>
+              <input
+                type="date"
+                value={birthday}
+                onChange={(event) => onBirthdayChange(event)}
+              ></input>
             </Grid>
           </Grid>
           <Button

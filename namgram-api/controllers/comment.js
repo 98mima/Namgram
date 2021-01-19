@@ -202,7 +202,7 @@ exports.addToImage = async (req, res) => {
 exports.deleteFromImage = async (req, res) => {
     let session = driver.session();
     try {
-        comm = await session.run("MATCH (p:Person)-[r:commented {id:$id}]->(image:Image) DETACH DELETE r", {
+        comm = await session.run("MATCH (p:Person)-[r:commented {commId:$id}]->(image:Image) DETACH DELETE r", {
             id: req.params.id,
         });
         res.status(200).json({ message: "Obrisan" });
@@ -214,7 +214,7 @@ exports.deleteFromImage = async (req, res) => {
 exports.deleteFromPost = async (req, res) => {
     let session = driver.session();
     try {
-        comm = await session.run("MATCH (p:Person)-[r:commented {id:$id}]->(post:Post) DETACH DELETE r", {
+        comm = await session.run("MATCH (p:Person)-[r:commented {commId:$id}]->(post:Post) DETACH DELETE r", {
             id: req.params.id,
         });
         res.status(200).json({ message: "Obrisan" });

@@ -12,7 +12,7 @@ export interface IPost {
   dislikes: number;
 }
 export interface IComment {
-  id: string;
+  commId: string;
   content: string;
   date: Date;
   creator: IUser;

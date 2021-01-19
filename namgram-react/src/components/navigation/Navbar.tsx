@@ -429,13 +429,19 @@ function Navbar() {
                             key={not.user.id}
                           >
                             <ListItemAvatar>
-                              <Avatar src={not.image.sasToken}></Avatar>
+                              <Avatar src={not.user.profilePic}></Avatar>
                             </ListItemAvatar>
                             <ListItemText
                               primary={
                                 not.user.username + " reacted to your post "
                               }
                             />
+                            <ListItemAvatar>
+                              <Avatar
+                                style={{ margin: "1rem" }}
+                                src={not.image.sasToken}
+                              ></Avatar>
+                            </ListItemAvatar>
                           </ListItem>
                         ))}
                       </List>

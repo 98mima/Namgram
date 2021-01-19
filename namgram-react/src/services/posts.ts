@@ -79,7 +79,7 @@ export async function uploadPost(uploadForm: IPostUpload) {
 }
 export async function getComments(imageId: string) {
   return axios
-    .get<{ message: string; p: IImage[] }>(`comment/byImageId/${imageId}`)
+    .get<{ message: string; p: IComment[] }>(`comment/byImageId/${imageId}`)
     .then((res) => res.data.p);
 }
 export async function addComment(
@@ -110,5 +110,12 @@ export async function getPopularPosts(userId: string) {
     .get<{ message: string; Data1: IImage[] }>(`image/mostLikedF/${userId}`)
     .then((res) => {
       return res.data.Data1;
+    });
+}
+export async function deleteComment(id: string) {
+  return axios
+    .delete<{ id: string }>("comment/deleteFromImage/" + id)
+    .then((res) => {
+      return res.data;
     });
 }

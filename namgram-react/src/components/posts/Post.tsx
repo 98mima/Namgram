@@ -38,6 +38,7 @@ import {
 } from "@material-ui/core";
 import {
   addComment,
+  deleteComment,
   deletePost,
   dislikePost,
   getComments,
@@ -199,7 +200,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
       const id = auth?.id as string;
       addComment(postId, id, newComment).then((res) => {
         console.log(res);
-        const id = Math.random().toString();
+        // const id = Math.random().toString();
 
         const user: IUser = {
           //@ts-ignore
@@ -220,7 +221,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
           birthday: new Date(),
         };
         const com: IComment = {
-          id: id,
+          commId: res.commId,
           content: res.content,
           date: res.date,
           creator: user,
@@ -251,11 +252,12 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
     history.push(`/profile/${auth?.id}`);
   };
   const handleDeleteCom = (commentId: string) => {
-    // let array: IComment[] = comments.filter(function (com) {
-    //   return com.id === commentId;
-    // });
-    // console.log(array);
-    // setComments(array);
+    let array: IComment[] = comments.filter(function (com) {
+      return com.commId !== commentId;
+    });
+    console.log(array);
+    setComments(array);
+    deleteComment(commentId);
   };
 
   const handleLike = (imageId: string) => {
@@ -374,7 +376,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
               <Fade in={openComments}>
                 <List className={classes.comments}>
                   {comments.map((comment) => (
-                    <ListItem key={comment.id}>
+                    <ListItem key={comment.commId}>
                       <ListItemAvatar>
                         <CardActionArea
                           onClick={() => handleClick(comment.creator.id)}
@@ -390,7 +392,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
                       {comment.creator.id === auth?.id && (
                         <Button
                           className={classes.delCom}
-                          onClick={() => handleDeleteCom(comment.id)}
+                          onClick={() => handleDeleteCom(comment.commId)}
                         >
                           X
                         </Button>

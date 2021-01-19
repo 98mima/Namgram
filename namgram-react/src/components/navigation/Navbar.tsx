@@ -438,6 +438,7 @@ function Navbar() {
                             />
                             <ListItemAvatar>
                               <Avatar
+                                variant="square"
                                 style={{ margin: "1rem" }}
                                 src={not.image.sasToken}
                               ></Avatar>

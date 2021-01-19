@@ -20,7 +20,6 @@ exports.register = async (req, res, next) => {
   const usernameExist = await session.run('MATCH (n:Person {username: $username}) RETURN n', {
     username: req.body.username
   })
-  console.log(emailExist);
   if (!_.isEmpty(emailExist.records) || !_.isEmpty(usernameExist.records)) {
     return res.status(401).send('Korisnik sa takvim mejlom ili username-om vec postoji: ' + req.body.email + ' ' + req.body.username);
   }

@@ -59,11 +59,6 @@ router.delete('/deleteImage/:imageId', imageController.deleteImage);
 
 router.post('/add', uploadStrategy, async (req, res) => {
     try {
-        // var today = new Date();
-        // var dd = String(today.getDate()).padStart(2, '0');
-        // var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        // var yyyy = today.getFullYear();
-        // today = dd + '.' + mm + '.' + yyyy;
         const now = new Date();
 
         const content = req.body.caption
@@ -117,7 +112,6 @@ router.post('/addProfilePic', uploadStrategy, async (req, res) => {
             blobName: blobName
         });
         person = _manyPerson(person)
-        console.log(person)
         const query = [
 
             'create (b:Image {id:$id, person:$personId, blobName:$blobName})'

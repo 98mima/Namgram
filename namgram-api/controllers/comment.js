@@ -58,7 +58,6 @@ async function findCreatorForImageComm(postId, commId) {
             .then(result => {
                 const user = _manyPeople(result)
                 session.close();
-                console.log(user[0])
                 return user[0]
             })
             .catch(err => {
@@ -77,17 +76,17 @@ exports.getByPost = async (req, res) => {
         const comments = await session.run('MATCH (post:Post {id: $id})<-[r1:commented]-(n:Person) return r1 as comment', {
             id: req.params.postId
         });
-        const p = _manyComments(comments)
+        const comms = _manyComments(comments)
         session.close();
 
         let creators = []
         creators = await Promise.all(
-            p.map(post => {
+            comms.map(post => {
                 return post.creator = findCreator(req.params.postId, post.commId)
             }))
-        p.map((post, index) =>
+        comms.map((post, index) =>
             post.creator = creators[index])
-
+        const p = comms
         res.status(200)
             .json({ message: "Prikupljeno", p })
     }
@@ -103,18 +102,17 @@ exports.getByImage = async (req, res) => {
         const comments = await session.run('MATCH (image:Image {id: $id})<-[r1:commented]-(n:Person) return r1 as comment ORDER BY r1.date', {
             id: req.params.imageId
         });
-        const p = _manyComments(comments)
-        console.log(p)
+        const comms = _manyComments(comments)
         session.close();
 
         let creators = []
         creators = await Promise.all(
-            p.map(post => {
+            comms.map(post => {
                 return post.creator = findCreatorForImageComm(req.params.imageId, post.commId)
             }))
-        p.map((post, index) =>
+        comms.map((post, index) =>
             post.creator = creators[index])
-
+        const p = comms
         res.status(200)
             .json({ message: "Prikupljeno", p })
     }
@@ -204,24 +202,24 @@ exports.addToImage = async (req, res) => {
 exports.deleteFromImage = async (req, res) => {
     let session = driver.session();
     try {
-      comm = await session.run("MATCH (p:Person)-[r:commented {id:$id}]->(image:Image) DETACH DELETE r", {
-        id: req.params.id,
-      });
-      res.status(200).json({ message: "Obrisan"});
+        comm = await session.run("MATCH (p:Person)-[r:commented {commId:$id}]->(image:Image) DETACH DELETE r", {
+            id: req.params.id,
+        });
+        res.status(200).json({ message: "Obrisan" });
     } catch (err) {
-      res.json({ success: false });
-      console.log(err);
+        res.json({ success: false });
+        console.log(err);
     }
-  };
-  exports.deleteFromPost = async (req, res) => {
+};
+exports.deleteFromPost = async (req, res) => {
     let session = driver.session();
     try {
-      comm = await session.run("MATCH (p:Person)-[r:commented {id:$id}]->(post:Post) DETACH DELETE r", {
-        id: req.params.id,
-      });
-      res.status(200).json({ message: "Obrisan"});
+        comm = await session.run("MATCH (p:Person)-[r:commented {commId:$id}]->(post:Post) DETACH DELETE r", {
+            id: req.params.id,
+        });
+        res.status(200).json({ message: "Obrisan" });
     } catch (err) {
-      res.json({ success: false });
-      console.log(err);
+        res.json({ success: false });
+        console.log(err);
     }
-  };
+};

@@ -6,10 +6,29 @@ let neo4j = require('neo4j-driver');
 const _ = require('lodash');
 let driver = neo4j.driver("bolt://0.0.0.0:7687", neo4j.auth.basic(creds.neo4jusername, creds.neo4jpw));
 const util = require('util')
-const redis = require('redis');
-const redisUrl = 'redis://127.0.0.1:6379';
-const client = redis.createClient(redisUrl);
-client.get = util.promisify(client.get);
+// const redis = require('redis');
+// const redisUrl = 'redis://127.0.0.1:6379';
+// const client = redis.createClient(redisUrl);
+// client.get = util.promisify(client.get);
+var storage = require("@azure/storage-blob")
+const accountname = "namgram";
+const key = "b9/PjmImjnORF1berLyRe3OYyAO0dDGcTbqIYm5AkCm8tqYukKm/umiUPWLJujc2n+zPFwKbKKNFZAZm8kqWhA==";
+const cerds = new storage.StorageSharedKeyCredential(accountname, key);
+const {
+    BlobServiceClient,
+    StorageSharedKeyCredential,
+    newPipeline
+} = require('@azure/storage-blob');
+const sharedKeyCredential = new StorageSharedKeyCredential(
+    process.env.AZURE_STORAGE_ACCOUNT_NAME,
+    process.env.AZURE_STORAGE_ACCOUNT_ACCESS_KEY);
+const pipeline = newPipeline(sharedKeyCredential);
+const blobServiceClient = new BlobServiceClient(
+    `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net`,
+    pipeline
+);
+const containerName = 'namgram1609522522970';
+const client = blobServiceClient.getContainerClient(containerName)
 
 function _manyComments(neo4jResult) {
     return neo4jResult.records.map(r => new Comment(r.get('comment')))
@@ -17,6 +36,24 @@ function _manyComments(neo4jResult) {
 function _manyPeople(neo4jResult) {
     return neo4jResult.records.map(r => new Person(r.get('person')))
 }
+async function generateSAS(blobName) {
+    const blobClient = client.getBlobClient(blobName);
+    const blobSAS = storage
+      .generateBlobSASQueryParameters(
+        {
+          containerName,
+          blobName: blobName,
+          permissions: storage.BlobSASPermissions.parse("racwd"),
+          startsOn: new Date(new Date().valueOf() - 86400),
+          expiresOn: new Date(new Date().valueOf() + 86400),
+        },
+        cerds
+      )
+      .toString();
+  
+    const sasUrl = blobClient.url + "?" + blobSAS;
+    return sasUrl;
+  }
 async function findCreator(postId, commId) {
     try {
         let session = driver.session();
@@ -84,6 +121,11 @@ exports.getByPost = async (req, res) => {
             comms.map(post => {
                 return post.creator = findCreator(req.params.postId, post.commId)
             }))
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index])
         comms.map((post, index) =>
             post.creator = creators[index])
         const p = comms
@@ -110,6 +152,11 @@ exports.getByImage = async (req, res) => {
             comms.map(post => {
                 return post.creator = findCreatorForImageComm(req.params.imageId, post.commId)
             }))
+        let pics = await Promise.all(creators.map(p => {
+            return p.sasUrl = generateSAS(p.profilePic)
+        }))
+        creators.map((c, index) =>
+            c.creator = pics[index])
         comms.map((post, index) =>
             post.creator = creators[index])
         const p = comms
@@ -125,7 +172,7 @@ exports.addToPost = async (req, res) => {
     try {
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); 
         var yyyy = today.getFullYear();
         today = dd + '.' + mm + '.' + yyyy;
 

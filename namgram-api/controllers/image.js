@@ -228,7 +228,8 @@ exports.get = async (req, res) => {
             c.creator = pics[index])
         Data1.map((post, index) =>
             post.creator = creators[index])
-
+        // Data1[0].ifLiked = await findIfLiked(Data1[0], req.params.userId)
+        // Data1[0].ifDisliked = await findIfLiked(Data1[0], req.params.userId)
         res.status(200)
             .json({ message: "Prikupljeno", Data1: Data1[0] })
     }

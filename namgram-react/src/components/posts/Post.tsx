@@ -229,6 +229,11 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
         setComments([...comments, com]);
         setNewComment("");
         setNumOfCom(numOfCom + 1);
+        socket.emit("like", {
+          liker: auth?.id,
+          liked: post.creator.id,
+          post: post.id,
+        });
       });
     }
   };
@@ -276,6 +281,11 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
         likePost(auth?.id as string, imageId).then((res) => {
           setLikes((prevLikes) => prevLikes + 1);
           setdisLikes((prevDislikes) => prevDislikes - 1);
+          socket.emit("like", {
+            liker: auth?.id,
+            liked: post.creator.id,
+            post: post.id,
+          });
           setAlreadyLiked(true);
           setAlreadyDisliked(false);
         });
@@ -292,6 +302,11 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
     if (!alreadyLiked && !alreadyDisliked) {
       dislikePost(auth?.id as string, imageId).then((res) => {
         setdisLikes((prevDislikes) => prevDislikes + 1);
+        socket.emit("like", {
+          liker: auth?.id,
+          liked: post.creator.id,
+          post: post.id,
+        });
         setAlreadyDisliked(true);
       });
     } else if (alreadyLiked && !alreadyDisliked) {
@@ -299,6 +314,11 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
         dislikePost(auth?.id as string, imageId).then((res) => {
           setLikes((prevLikes) => prevLikes - 1);
           setdisLikes((prevDislikes) => prevDislikes + 1);
+          socket.emit("like", {
+            liker: auth?.id,
+            liked: post.creator.id,
+            post: post.id,
+          });
           setAlreadyLiked(false);
           setAlreadyDisliked(true);
         });

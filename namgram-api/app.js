@@ -52,7 +52,6 @@ const clientR = redis.createClient(redisUrl);
 clientR.get = util.promisify(clientR.get);
 io.on("connection", (socket) => {
     clientR.set("socket:" + socket.handshake.query.userId, socket.id);
-    //console.log(socket.handshake.query.userId, socket.id);
     socket.on("like", (socket) => {
         clientR.get(`socket:${socket.liked}`).then(socketId => {
             io.to(socketId).emit("liked", socket);
@@ -79,13 +78,6 @@ io.on("connection", (socket) => {
             io.to(socketId).emit("newMessage", socket);
         })
     })
-    //clients[socket.handshake.query.userId] = socket.id;
-    // io.to(socket.id).emit("chat", "I just met you");
-
-    // socket.on("like", (userId) => {
-    //     console.log(clients[userId])
-    //     io.to(clients[userId]).emit("chat", "Stigo lajk batoo")
-    // })
 });
 
 server.listen(8000, () => {

@@ -4,7 +4,6 @@ import { RootState } from "../../redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper/Paper";
 import Typography from "@material-ui/core/Typography/Typography";
-import TextField from "@material-ui/core/TextField/TextField";
 import Button from "@material-ui/core/Button/Button";
 import { SET_ERROR, START_LOADING, STOP_LOADING } from "../../redux/ui/actions";
 import Avatar from "@material-ui/core/Avatar/Avatar";

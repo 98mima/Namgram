@@ -40,6 +40,32 @@ function _manyPeople(neo4jResult) {
 function _manyimage(neo4jResult) {
   return neo4jResult.records.map((r) => new Image(r.get("image")));
 }
+async function findCreator(node) {
+  try {
+      let session = driver.session();
+
+      const query = [
+          'MATCH (image:Image {id: $id})<-[r1:created]-(person:Person) return person'
+      ].join('\n')
+
+      return session.readTransaction(txc =>
+          txc.run(query, {
+              id: node.id
+          }))
+          .then(result => {
+              const user = _manyPeople(result)
+              session.close();
+
+              return user[0]
+          })
+          .catch(err => {
+              console.log(err)
+          })
+  }
+  catch (err) {
+      console.log(err)
+  }
+}
 async function generateSAS(blobName) {
   const blobClient = clientBlob.getBlobClient(blobName);
   const blobSAS = storage
@@ -231,7 +257,23 @@ exports.getRecommendedImages = async (req, res) => {
         return (image.sasUrl = generateSAS(image.blobName));
       })
     );
-    Data.map((image, index) => (image.sasUrl = im[index]));
+    
+    let creators = []
+    creators = await Promise.all(
+      Data.map(post => {
+        return post.creator = findCreator(post)
+      }))
+      
+      let pics = await Promise.all(creators.map(p => {
+        return p.sasUrl = generateSAS(p.profilePic)
+      }))
+      creators.map((c, index) =>
+      c.creator = pics[index])
+      
+      Data.map((image, index) => {
+        image.sasUrl = im[index]
+        image.creator = creators[index]
+      });
     res.status(200).json({ message: "Prikupljeno", Data });
   } catch (err) {
     res.json({ success: false });

@@ -44,7 +44,7 @@ function _manyPerson(neo4jResult) {
     return neo4jResult.records.map(r => new Person(r.get('person')))
 }
 
-router.get('/:id/:userId', imageController.get);
+router.get('/:id', imageController.get);
 router.get('/getAll', imageController.getAll)
 router.get('/byId/:id', imageController.getByPerson);
 router.get('/byFollowings/:userId', imageController.getByFollowings);

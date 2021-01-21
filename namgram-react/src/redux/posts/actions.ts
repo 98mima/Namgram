@@ -2,8 +2,8 @@ import { IImage, IPost } from "../../models/post";
 import { IUser } from "../../models/user";
 import {
   getFollowerPosts,
-  getPosts,
   getPopularPosts,
+  getRecommendedPosts
 } from "../../services/posts";
 import { SET_ERROR, START_LOADING, STOP_LOADING } from "../ui/actions";
 
@@ -38,6 +38,20 @@ export const loadPopularPosts = (userId: string) => (dispatch: any) => {
   dispatch({ type: START_LOADING });
   getPopularPosts(userId)
     .then((posts) => {
+      dispatch({ type: SET_POSTS, payload: posts });
+      dispatch({ type: STOP_LOADING });
+    })
+    .catch((err) => {
+      dispatch({ type: STOP_LOADING });
+      dispatch({ type: SET_ERROR, payload: err });
+    });
+};
+
+export const loadRecommendedPosts = (username: string) => (dispatch: any) => {
+  dispatch({ type: START_LOADING });
+  getRecommendedPosts(username)
+    .then((posts) => {
+      console.log(posts)
       dispatch({ type: SET_POSTS, payload: posts });
       dispatch({ type: STOP_LOADING });
     })

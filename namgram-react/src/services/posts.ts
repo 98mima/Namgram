@@ -112,6 +112,14 @@ export async function getPopularPosts(userId: string) {
       return res.data.Data1;
     });
 }
+
+export async function getRecommendedPosts(username: string){
+  return axios
+    .get<{message: string; Data: IImage[]}>(`person/getRecommendedImages/${username}`)
+    .then((res) => {
+      return res.data.Data;
+    })
+}
 export async function deleteComment(id: string) {
   return axios
     .delete<{ id: string }>("comment/deleteFromImage/" + id)

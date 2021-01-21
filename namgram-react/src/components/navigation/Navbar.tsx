@@ -41,6 +41,7 @@ import { getUserById } from "../../services/user";
 import { getPost } from "../../services/posts";
 import { IImage } from "../../models/post";
 import Popper from "@material-ui/core/Popper/Popper";
+import ExploreIcon from '@material-ui/icons/Explore';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -355,8 +356,13 @@ function Navbar() {
             />
           </div>
           <Link className={classes.link} to="/hot">
-            <IconButton aria-label="Whats hot?" color="inherit">
+            <IconButton aria-label="What's hot?" color="inherit">
               <WhatshotIcon />
+            </IconButton>
+          </Link>
+          <Link className={classes.link} to="/recommended">
+            <IconButton aria-label="What's recommended for you?" color="inherit">
+              <ExploreIcon />
             </IconButton>
           </Link>
           <div className={classes.grow} />

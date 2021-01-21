@@ -277,7 +277,7 @@ exports.getByFollowings = async (req, res) => {
             return p.sasUrl = generateSAS(p.profilePic)
         }))
         creators.map((c, index) =>
-            c.creator = pics[index])
+            c.profilePic = pics[index])
         Data.map((post, index) => {
             post.creator = creators[index]
             post.ifLiked = ifLiked[index]
@@ -323,7 +323,7 @@ exports.getMostLiked = async (req, res) => {
             return p.sasUrl = generateSAS(p.profilePic)
         }))
         creators.map((c, index) =>
-            c.creator = pics[index])
+            c.profilePic = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -376,7 +376,7 @@ exports.getMostHated = async (req, res) => {
             return p.sasUrl = generateSAS(p.profilePic)
         }))
         creators.map((c, index) =>
-            c.creator = pics[index])
+            c.profilePic = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -428,7 +428,7 @@ exports.getMostCommented = async (req, res) => {
             return p.sasUrl = generateSAS(p.profilePic)
         }))
         creators.map((c, index) =>
-            c.creator = pics[index])
+            c.profilePic = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 

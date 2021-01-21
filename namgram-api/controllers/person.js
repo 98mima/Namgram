@@ -268,7 +268,7 @@ exports.getRecommendedImages = async (req, res) => {
         return p.sasUrl = generateSAS(p.profilePic)
       }))
       creators.map((c, index) =>
-      c.creator = pics[index])
+      c.profilePic = pics[index])
       
       Data.map((image, index) => {
         image.sasUrl = im[index]

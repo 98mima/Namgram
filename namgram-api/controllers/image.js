@@ -3,6 +3,7 @@ const Person = require('../models/person');
 let { creds } = require("./../config/credentials");
 let neo4j = require('neo4j-driver');
 const _ = require('lodash');
+const jwtDecode = require('jwt-decode');
 let driver = neo4j.driver("bolt://0.0.0.0:7687", neo4j.auth.basic(creds.neo4jusername, creds.neo4jpw));
 var storage = require("@azure/storage-blob")
 const accountname = "namgram";
@@ -226,8 +227,12 @@ exports.get = async (req, res) => {
         }))
         creators.map((c, index) =>
             c.profilePic = pics[index])
-        Data1.map((post, index) =>
-            post.creator = creators[index])
+        personId = jwtDecode(req.headers.authorization).id
+        Data1[0].ifLiked = await findIfLiked(Data1[0], personId)
+        Data1[0].ifDisliked = await findIfDisliked(Data1[0], personId)
+        Data1.map((post, index) => {
+            post.creator = creators[index]})
+        
         res.status(200)
             .json({ message: "Prikupljeno", Data1 })
     }
@@ -410,7 +415,6 @@ exports.getMostLikedF = async (req, res) => {
         if (cacheValue) {
             Data = JSON.parse(cacheValue)
         }
-        console.log(Data)
         let session = driver.session();
         Data = await Promise.all(Data.map(p => {
             return findProps(p)
@@ -471,7 +475,6 @@ exports.getMostHatedF = async (req, res) => {
         if (cacheValue) {
             Data = JSON.parse(cacheValue)
         }
-        console.log(Data)
         let session = driver.session();
         Data = await Promise.all(Data.map(p => {
             return findProps(p)
@@ -532,7 +535,6 @@ exports.getMostCommentedF = async (req, res) => {
         if (cacheValue) {
             Data = JSON.parse(cacheValue)
         }
-        console.log(Data)
         let session = driver.session();
         Data = await Promise.all(Data.map(p => {
             return findProps(p)

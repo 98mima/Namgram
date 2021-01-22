@@ -79,9 +79,7 @@ export const loadChatHeads = (username: string) => (dispatch: any) => {
     })
   }
 
-  export const messageReceived = (from: string, to: string, body: string) => (dispatch: any, getState: any) => {
-      const state: RootState = getState();
-      const {chatter} = state.chat;
+  export const messageReceived = (from: string, to: string, body: string) => (dispatch: any) => {
       const msg: IMessage = {body, myMessage: false, date: new Date().toUTCString()}
       dispatch({type: MESSAGE_SENT, payload: msg})
       dispatch({type: NEW_MESSAGE});

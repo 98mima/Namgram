@@ -404,7 +404,7 @@ exports.getByFollowings = async (req, res) => {
 exports.getMostLikedF = async (req, res) => {
     try {
         let Data = []
-        const key = JSON.stringify(Object.assign({}, { collection: "images" }));
+        const key = JSON.stringify(Object.assign({}, {user: req.params.username}, { collection: "images" }));
         const cacheValue = await clientR.get(key)
         
         if (cacheValue) {
@@ -465,7 +465,7 @@ exports.getMostLikedF = async (req, res) => {
 exports.getMostHatedF = async (req, res) => {
     try {
         let Data = []
-        const key = JSON.stringify(Object.assign({}, { collection: "images" }));
+        const key = JSON.stringify(Object.assign({}, {user: req.params.username}, { collection: "images" }));
         const cacheValue = await clientR.get(key)
         
         if (cacheValue) {
@@ -526,7 +526,7 @@ exports.getMostHatedF = async (req, res) => {
 exports.getMostCommentedF = async (req, res) => {
     try {
         let Data = []
-        const key = JSON.stringify(Object.assign({}, { collection: "images" }));
+        const key = JSON.stringify(Object.assign({}, {user: req.params.username}, { collection: "images" }));
         const cacheValue = await clientR.get(key)
         
         if (cacheValue) {

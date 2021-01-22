@@ -53,14 +53,18 @@ router.get('/:id', imageController.get);
 router.get('/getAll', imageController.getAll)
 router.get('/byId/:id', imageController.getByPerson);
 router.get('/byFollowings/:userId', imageController.getByFollowings);
-router.get('/mostLikedF/:userId', imageController.getMostLikedF);
-router.get('/mostHatedF/:userId', imageController.getMostHatedF);
-router.get('/mostCommentedF/:userId', imageController.getMostCommentedF);
+router.get('/mostLikedF/:username', imageController.getMostLikedF);
+router.get('/mostHatedF/:username', imageController.getMostHatedF);
+router.get('/mostCommentedF/:username', imageController.getMostCommentedF);
 router.post('/like', imageController.like);
 router.post('/removeLike', imageController.removeLike);
 router.post('/dislike', imageController.dislike);
 router.post('/removedisLike', imageController.removeDislike);
 router.delete('/deleteImage/:imageId', imageController.deleteImage);
+
+async function asyncForEach(followers, callback){
+
+        }
 
 router.post('/add', uploadStrategy, async (req, res) => {
     try {
@@ -97,23 +101,27 @@ router.post('/add', uploadStrategy, async (req, res) => {
         let Data = await session.run('MATCH (image:Image {blobName: $blobName}) RETURN image', {
             blobName: blobName
         })
+
+        const persons = await session.run('MATCH (n:Person {id: $personId})<--(person) RETURN person', {
+            personId: personId
+        })
+        const followers = _manyPerson(persons)
         session.close();
-
         let image = _manyImages(Data)[0]
-        const key = JSON.stringify(Object.assign({}, {collection: "images"} ));
 
-        const cacheValue = await clientR.get(key)
-        
-        if (cacheValue) {
-            Data = JSON.parse(cacheValue)
-            console.log(Data)
-        }
-        else
-            Data = []
-        Data.push(image)
-        clientR.set(key, JSON.stringify(Data));
-        clientR.expire(key, 864000);//jedan dan 
-
+        followers.forEach(async follower => {
+            const key = JSON.stringify(Object.assign({}, { user: follower.username }, { collection: "images" } ));
+            const cacheValue = await clientR.get(key)
+            if (cacheValue) {
+                Data = JSON.parse(cacheValue)
+            }
+            else
+              { 
+                Data = []}
+            Data.push(image)
+            clientR.set(key, JSON.stringify(Data));
+            clientR.expire(key, 864000);//jedan dan 
+        })
         res.json({ message: 'File uploaded to Azure Blob storage.', Data });
     } catch (err) {
         res.json({ message: err.message });

@@ -1,7 +1,7 @@
 import { RootState } from "..";
 import { IMessage } from "../../models/chat";
 import { IUser } from "../../models/user";
-import { loadUserMessages, sendToUser } from "../../services/chat";
+import { getActiveUsers, loadUserMessages, sendToUser } from "../../services/chat";
 import { getFollowers, getProfileByUsername } from "../../services/profile";
 import { SET_ERROR, START_LOADING, STOP_LOADING } from "../ui/actions";
 
@@ -51,7 +51,17 @@ export type ChatActionTypes = SetChatHeadsActions | ClearChatHeads | NewMessageA
 
 export const loadChatHeads = (username: string) => (dispatch: any) => {
     dispatch({type: START_LOADING});
-    getFollowers(username).then(users => {
+    Promise.all([getFollowers(username), getActiveUsers(username)]).then(res => {
+        const users = res[0];
+        const activeUsers = res[1];
+        users.forEach(user => user.active = false);
+        for(let i = 0; i < users.length; i++){
+            for(let j = 0; j < activeUsers.length; j++){
+                if(users[i].username === activeUsers[j]){
+                    users[i].active = true;
+                }
+            }
+        }
         dispatch({type: SET_CHAT_HEADS, payload: users});
         dispatch({type: STOP_LOADING});
     }).catch(err => {

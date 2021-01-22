@@ -63,7 +63,7 @@ function ChatHeads() {
               <ListItemText primary={`${user.name} ${user.lastname}`}>
                 Remy Sharp
               </ListItemText>
-              <ListItemText secondary={user.username}></ListItemText>
+              <ListItemText secondary={user.active ? "online" : "offline"}></ListItemText>
             </ListItem>
           ))}
       </List>

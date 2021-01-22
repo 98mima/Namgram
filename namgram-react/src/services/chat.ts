@@ -22,3 +22,8 @@ export async function loadUserMessages(username: string, username2: string) {
         return res.data;
     });
 }
+
+export async function getActiveUsers(username: string){
+  return axios.get<{chatters: string[]}>(`chat/getActive/${username}`)
+    .then(res => res.data.chatters);
+}

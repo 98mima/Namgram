@@ -1,4 +1,4 @@
-import { IImage, IPost } from "./post";
+import { IImage } from "./post";
 
 export interface IUser {
   birthday: Date;
@@ -9,6 +9,7 @@ export interface IUser {
   lastname: string;
   username: string;
   profilePic: string;
+  active?: boolean;
 }
 
 export interface IProfile {

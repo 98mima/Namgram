@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IComment, IImage, IPost, IPostUpload } from "../models/post";
+import { IComment, IImage, IPostUpload } from "../models/post";
 
 export async function getPost(id: string) {
   return axios

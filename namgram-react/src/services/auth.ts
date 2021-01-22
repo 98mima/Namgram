@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 import { ISignin, ISigninRes, ISignup, ISignupRes } from "../models/auth";
 export async function signin(user: ISignin) {

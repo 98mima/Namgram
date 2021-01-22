@@ -107,6 +107,12 @@ router.post('/addProfilePic', uploadStrategy, async (req, res) => {
         const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
         let session = driver.session();
+        const image = await session.run(
+            "MATCH (image:Image {person:$id}) delete image",
+            {
+              id: req.body.personId,
+            }
+          );
         let person = await session.run('MATCH (person:Person {id: $id}) set person.profilePic = $blobName RETURN person', {
             id: personId,
             blobName: blobName

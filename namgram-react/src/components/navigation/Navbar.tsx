@@ -11,18 +11,15 @@ import {
   ListItemAvatar,
   ListItemText,
   makeStyles,
-  Paper,
   Theme,
 } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
 import Badge from "@material-ui/core/Badge";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import AutoComplete from "@material-ui/lab/AutoComplete";
-import MenuIcon from "@material-ui/icons/Menu";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
@@ -34,7 +31,6 @@ import { CLEAR_NOTIFICATIONS, logoutAction } from "../../redux/auth/actions";
 import { AddCircleRounded } from "@material-ui/icons";
 import { IUser } from "../../models/user";
 import { getProfileByUsername } from "../../services/profile";
-import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField/TextField";
 import WhatshotIcon from "@material-ui/icons/Whatshot";
 import { getUserById } from "../../services/user";
@@ -272,27 +268,6 @@ function Navbar() {
         </Link>
         <p>Messages</p>
       </MenuItem>
-      {/* <MenuItem>
-        <IconButton
-          aria-describedby={id}
-          type="button"
-          onClick={handleNotificationOpen}
-          color="inherit"
-          aria-label="show new notifications"
-        >
-          <Badge badgeContent={notifications.length} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-          <Popper id={id} open={open} anchorEl={anchorNotif} transition>
-            {({ TransitionProps }) => (
-              <Fade {...TransitionProps} timeout={350}>
-                <div>The content of the Popper.</div>
-              </Fade>
-            )}
-          </Popper>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem> */}
 
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
@@ -318,9 +293,6 @@ function Navbar() {
               src="https://cdn.discordapp.com/attachments/777890574253817889/792441180054749224/e52d18ae-4e0c-40cf-8d30-07396304f4e0_200x200.png"
             />
           </Link>
-          {/* <Typography className={classes.title} variant="h6" noWrap>
-            namgram
-          </Typography> */}
           <div className={classes.search}>
             <AutoComplete
               classes={{
@@ -408,15 +380,6 @@ function Navbar() {
                   <Badge badgeContent={notifications.length} color="secondary">
                     <NotificationsIcon />
                   </Badge>
-                  {/* <Popper id={id} open={open} anchorEl={anchorNotif} transition>
-                    {({ TransitionProps }) => (
-                      <Fade {...TransitionProps} timeout={350}>
-                        {notifs.map((not) => (
-                          // <Typography key={i}>{not.liker} sadsad</Typography>
-                        ))}
-                      </Fade>
-                    )}
-                  </Popper> */}
                   <Popper id={id} open={open} anchorEl={notificationAnchor}>
                     <div className={classes.notificationContainer}>
                       <List className={classes.root}>
@@ -455,7 +418,6 @@ function Navbar() {
                   onClick={handleProfileMenuOpen}
                   color="inherit"
                 >
-                  {/* <AccountCircle /> */}
                   <Avatar src={auth.profilePic} />
                 </IconButton>{" "}
               </div>

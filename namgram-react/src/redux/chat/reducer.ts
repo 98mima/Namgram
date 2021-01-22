@@ -1,5 +1,4 @@
-import { IAuth } from "../../models/auth"
-import { IChat, IMessage } from "../../models/chat"
+import { IMessage } from "../../models/chat"
 import { IUser } from "../../models/user"
 import { ChatActionTypes, SET_CHAT_HEADS, CLEAR_CHAT_HEADS, CLEAR_NEW_MESSAGES, MESSAGE_SENT, LOAD_CHAT, NEW_MESSAGE, CLEAR_CHAT } from "./actions"
 

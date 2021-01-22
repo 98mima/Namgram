@@ -195,29 +195,18 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
     postId: string
   ) => {
     event.preventDefault();
-    // console.log(comments);
     if (newComment) {
       const id = auth?.id as string;
       addComment(postId, id, newComment).then((res) => {
-        console.log(res);
-        // const id = Math.random().toString();
 
         const user: IUser = {
-          //@ts-ignore
-          id: auth?.id,
-          //@ts-ignore
-          email: auth?.email,
-          //@ts-ignore
-          lastname: auth?.lastname,
-          //@ts-ignore
-          name: auth?.name,
-          //@ts-ignore
-          username: auth?.username,
-          //@ts-ignore
+          id: auth?.id as string,
+          email: auth?.email as string,
+          lastname: auth?.lastname as string,
+          name: auth?.name as string,
+          username: auth?.username as string,
           password: "1",
-          //@ts-ignore
-          profilePic: auth?.profilePic,
-          //@ts-ignore
+          profilePic: auth?.profilePic as string,
           birthday: new Date(),
         };
         const com: IComment = {

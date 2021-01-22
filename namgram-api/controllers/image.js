@@ -403,21 +403,16 @@ exports.getByFollowings = async (req, res) => {
 
 exports.getMostLikedF = async (req, res) => {
     try {
-        const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "imageL" }));
-        const cacheValue = await clientR.get(key)
-        //ako je u redisu
-        if (cacheValue) {
-            const Data1 = JSON.parse(cacheValue)
-            return res.status(200).json({ message: "Prikupljeno iz redisa", Data1 })
-        }
-        //ako nije
-        let session = driver.session();
-        const images1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(image:Image) return image', {
-            id: req.params.userId
-        })
-        const images = _manyImages(images1)
         let Data = []
-        Data = await Promise.all(images.map(p => {
+        const key = JSON.stringify(Object.assign({}, { collection: "images" }));
+        const cacheValue = await clientR.get(key)
+        
+        if (cacheValue) {
+            Data = JSON.parse(cacheValue)
+        }
+        console.log(Data)
+        let session = driver.session();
+        Data = await Promise.all(Data.map(p => {
             return findProps(p)
         }))
 
@@ -458,9 +453,6 @@ exports.getMostLikedF = async (req, res) => {
         let size = 5
         Data1 = Data.slice(0, size)
 
-        clientR.set(key, JSON.stringify(Data1));
-        clientR.expire(key, 10);
-
         res.status(200)
             .json({ message: "Prikupljeno", Data1 })
     }
@@ -472,19 +464,16 @@ exports.getMostLikedF = async (req, res) => {
 
 exports.getMostHatedF = async (req, res) => {
     try {
-        const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "imageD" }));
-        const cacheValue = await clientR.get(key)
-        if (cacheValue) {
-            const Data1 = JSON.parse(cacheValue)
-            return res.status(200).json({ message: "Prikupljeno iz redisa", Data1 })
-        }
-        let session = driver.session();
-        const images1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(image:Image) return image', {
-            id: req.params.userId
-        })
-        const images = _manyImages(images1)
         let Data = []
-        Data = await Promise.all(images.map(p => {
+        const key = JSON.stringify(Object.assign({}, { collection: "images" }));
+        const cacheValue = await clientR.get(key)
+        
+        if (cacheValue) {
+            Data = JSON.parse(cacheValue)
+        }
+        console.log(Data)
+        let session = driver.session();
+        Data = await Promise.all(Data.map(p => {
             return findProps(p)
         }))
 
@@ -504,6 +493,7 @@ exports.getMostHatedF = async (req, res) => {
             image.sasToken = sasUrl
         })
         session.close();
+
         let creators = []
         creators = await Promise.all(
             Data.map(post => {
@@ -513,7 +503,7 @@ exports.getMostHatedF = async (req, res) => {
             return p.sasUrl = generateSAS(p.profilePic)
         }))
         creators.map((c, index) =>
-            c.profilePic = pics[index]) 
+            c.profilePic = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -523,9 +513,6 @@ exports.getMostHatedF = async (req, res) => {
         let Data1 = []
         let size = 5
         Data1 = Data.slice(0, size)
-
-        clientR.set(key, JSON.stringify(Data1));
-        clientR.expire(key, 10);
 
         res.status(200)
             .json({ message: "Prikupljeno", Data1 })
@@ -538,19 +525,16 @@ exports.getMostHatedF = async (req, res) => {
 
 exports.getMostCommentedF = async (req, res) => {
     try {
-        const key = JSON.stringify(Object.assign({}, { user: req.params.userId }, { collection: "imageC" }));
-        const cacheValue = await clientR.get(key)
-        if (cacheValue) {
-            const Data2 = JSON.parse(cacheValue)
-            return res.status(200).json({ message: "Prikupljeno iz redisa", Data2 })
-        }
-        let session = driver.session();
-        const images1 = await session.run('match (a:Person {id: $id})-[r:follows]->(b:Person)-[r1:created]->(image:Image) return image', {
-            id: req.params.userId
-        })
-        const images = _manyImages(images1)
         let Data = []
-        Data = await Promise.all(images.map(p => {
+        const key = JSON.stringify(Object.assign({}, { collection: "images" }));
+        const cacheValue = await clientR.get(key)
+        
+        if (cacheValue) {
+            Data = JSON.parse(cacheValue)
+        }
+        console.log(Data)
+        let session = driver.session();
+        Data = await Promise.all(Data.map(p => {
             return findProps(p)
         }))
 
@@ -570,6 +554,7 @@ exports.getMostCommentedF = async (req, res) => {
             image.sasToken = sasUrl
         })
         session.close();
+
         let creators = []
         creators = await Promise.all(
             Data.map(post => {
@@ -589,9 +574,6 @@ exports.getMostCommentedF = async (req, res) => {
         let Data1 = []
         let size = 5
         Data1 = Data.slice(0, size)
-
-        clientR.set(key, JSON.stringify(Data1));
-        clientR.expire(key, 10);
 
         res.status(200)
             .json({ message: "Prikupljeno", Data1 })

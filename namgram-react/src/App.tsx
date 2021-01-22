@@ -15,6 +15,8 @@ import EditProfile from "./components/profile/EditProfile";
 import SinglePost from "./components/posts/SinglePost";
 import Hot from "./components/posts/Hot";
 import Explore from "./components/posts/Explore";
+import Hated from "./components/posts/Hated";
+import Commented from "./components/posts/Commented";
 
 function App() {
   const dispatch = useDispatch();
@@ -31,6 +33,8 @@ function App() {
           <Route path="/posts/create" component={CreatePost} />
           <Route path="/posts" component={Posts} />
           <Route path="/hot" component={Hot} />
+          <Route path="/hated" component={Hated} />
+          <Route path="/commented" component={Commented} />
           <Route path="/recommended" component={Explore} />
           <Route path="/post/:id" component={SinglePost} />
           <Route path="/chat/:username" component={Chat} />

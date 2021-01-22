@@ -195,7 +195,6 @@ exports.get = async (req, res) => {
             id: req.params.id
         });
         const p = _manyImages(im)
-
         Data1 = await Promise.all(p.map(p => {
             return findProps(p)
         }))
@@ -227,9 +226,12 @@ exports.get = async (req, res) => {
         }))
         creators.map((c, index) =>
             c.profilePic = pics[index])
-        personId = jwtDecode(req.headers.authorization).id
-        Data1[0].ifLiked = await findIfLiked(Data1[0], personId)
-        Data1[0].ifDisliked = await findIfDisliked(Data1[0], personId)
+        if(req.headers.authorization){
+            const personId = jwtDecode(req.headers.authorization).id
+            Data1[0].ifLiked = await findIfLiked(Data1[0], personId)
+            Data1[0].ifDisliked = await findIfDisliked(Data1[0], personId)
+        }
+        
         Data1.map((post, index) => {
             post.creator = creators[index]})
         

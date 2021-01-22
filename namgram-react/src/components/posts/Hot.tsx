@@ -8,7 +8,7 @@ import React, { useEffect } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux";
-import { loadPopularPosts, loadPosts } from "../../redux/posts/actions";
+import { loadPopularPosts } from "../../redux/posts/actions";
 import Post from "./Post";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -31,7 +31,7 @@ function Hot() {
   const socket = useSelector((state: RootState) => state.auth.socket);
 
   useEffect(() => {
-    if (auth) dispatch(loadPopularPosts(auth?.id as string));
+    if (auth) dispatch(loadPopularPosts(auth?.username as string));
   }, [auth]);
 
   const loading = useSelector((state: RootState) => state.ui.loading);

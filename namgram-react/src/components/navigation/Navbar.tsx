@@ -33,6 +33,8 @@ import { IUser } from "../../models/user";
 import { getProfileByUsername } from "../../services/profile";
 import TextField from "@material-ui/core/TextField/TextField";
 import WhatshotIcon from "@material-ui/icons/Whatshot";
+import ThumbDown from "@material-ui/icons/ThumbDown";
+import QuickReply from "@material-ui/icons/ModeComment";
 import { getUserById } from "../../services/user";
 import { getPost } from "../../services/posts";
 import { IImage } from "../../models/post";
@@ -335,6 +337,16 @@ function Navbar() {
           <Link className={classes.link} to="/recommended">
             <IconButton aria-label="What's recommended for you?" color="inherit">
               <ExploreIcon />
+            </IconButton>
+          </Link>
+          <Link className={classes.link} to="/hated">
+            <IconButton aria-label="What's the most hated?" color="inherit">
+              <ThumbDown />
+            </IconButton>
+          </Link>
+          <Link className={classes.link} to="/commented">
+            <IconButton aria-label="What's the most commented on?" color="inherit">
+              <QuickReply />
             </IconButton>
           </Link>
           <div className={classes.grow} />

@@ -61,6 +61,7 @@ export const loadChatHeads = (username: string) => (dispatch: any) => {
   };
 
   export const loadChat = (username: string, username2: string) => async (dispatch: any) => {
+      //@ts-ignore
     const messages: {sender: string, message: string, date: string}[] = await loadUserMessages(username, username2);
     const msgs: IMessage[] = messages.map(value => {
         const msg: IMessage = {myMessage: username === value.sender, body: value.message, date: value.date};

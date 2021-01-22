@@ -12,8 +12,13 @@ export async function sendToUser(from: string, to: string, content: string) {
 
 export async function loadUserMessages(username: string, username2: string) {
   return axios
-    .get<{ sender: string; message: string; date: string }[]>(
-      `chat/getMessages/${username}/${username2}`
+    .post<{ messages: { sender: string; message: string; date: string }[] | any[] }>(
+      `chat/join`, {username, username2}
     )
-    .then((res) => res.data);
+    .then((res) => {
+      if(res.data.messages)
+        return res.data.messages;
+      else
+        return res.data;
+    });
 }

@@ -51,7 +51,6 @@ export const loadRecommendedPosts = (username: string) => (dispatch: any) => {
   dispatch({ type: START_LOADING });
   getRecommendedPosts(username)
     .then((posts) => {
-      console.log(posts)
       dispatch({ type: SET_POSTS, payload: posts });
       dispatch({ type: STOP_LOADING });
     })

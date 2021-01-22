@@ -175,8 +175,8 @@ exports.getFollowing = async (req, res) => {
     let pics = await Promise.all(Data.map(p => {
       return p.sasUrl = generateSAS(p.profilePic)
     }))
-    Data.map((image, index) =>
-      image.sasUrl = pics[index])
+    Data.map((p, index) =>
+      p.profilePic = pics[index])
     res.status(200)
       .json({ message: "Prikupljeno", Data })
   }
@@ -197,8 +197,8 @@ exports.getFollowers = async (req, res) => {
     let pics = await Promise.all(Data.map(p => {
       return p.sasUrl = generateSAS(p.profilePic)
     }))
-    Data.map((image, index) =>
-      image.sasUrl = pics[index])
+    Data.map((p, index) =>
+      p.profilePic = pics[index])
     res.status(200)
       .json({ message: "Prikupljeno", Data })
   }

@@ -5,6 +5,7 @@ export async function getPost(id: string) {
   return axios
     .get<{ message: string; Data1: IImage[] }>(`image/${id}`)
     .then((res) => {
+      console.log(res.data)
       return res.data.Data1[0];
     });
 }
@@ -105,9 +106,9 @@ export async function deletePost(imageId: string) {
     });
 }
 
-export async function getPopularPosts(userId: string) {
+export async function getPopularPosts(username: string) {
   return axios
-    .get<{ message: string; Data1: IImage[] }>(`image/mostLikedF/${userId}`)
+    .get<{ message: string; Data1: IImage[] }>(`image/mostLikedF/${username}`)
     .then((res) => {
       return res.data.Data1;
     });
@@ -119,6 +120,23 @@ export async function getRecommendedPosts(username: string){
     .then((res) => {
       return res.data.Data;
     })
+}
+
+export async function getHatedPosts(username: string) {
+  return axios
+    .get<{ message: string; Data1: IImage[] }>(`image/mostHatedF/${username}`)
+    .then((res) => {
+      return res.data.Data1;
+    });
+}
+
+
+export async function getCommentedPosts(username: string) {
+  return axios
+    .get<{ message: string; Data1: IImage[] }>(`image/mostCommentedF/${username}`)
+    .then((res) => {
+      return res.data.Data1;
+    });
 }
 export async function deleteComment(id: string) {
   return axios

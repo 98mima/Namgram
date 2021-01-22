@@ -1,7 +1,9 @@
 import { IImage, IPost } from "../../models/post";
 import { IUser } from "../../models/user";
 import {
+  getCommentedPosts,
   getFollowerPosts,
+  getHatedPosts,
   getPopularPosts,
   getRecommendedPosts
 } from "../../services/posts";
@@ -34,9 +36,9 @@ export const loadPosts = (userId: string) => (dispatch: any) => {
     });
 };
 
-export const loadPopularPosts = (userId: string) => (dispatch: any) => {
+export const loadPopularPosts = (username: string) => (dispatch: any) => {
   dispatch({ type: START_LOADING });
-  getPopularPosts(userId)
+  getPopularPosts(username)
     .then((posts) => {
       dispatch({ type: SET_POSTS, payload: posts });
       dispatch({ type: STOP_LOADING });
@@ -50,6 +52,34 @@ export const loadPopularPosts = (userId: string) => (dispatch: any) => {
 export const loadRecommendedPosts = (username: string) => (dispatch: any) => {
   dispatch({ type: START_LOADING });
   getRecommendedPosts(username)
+    .then((posts) => {
+      dispatch({ type: SET_POSTS, payload: posts });
+      dispatch({ type: STOP_LOADING });
+    })
+    .catch((err) => {
+      dispatch({ type: STOP_LOADING });
+      dispatch({ type: SET_ERROR, payload: err });
+    });
+};
+
+
+export const loadHatedPosts = (username: string) => (dispatch: any) => {
+  dispatch({ type: START_LOADING });
+  getHatedPosts(username)
+    .then((posts) => {
+      dispatch({ type: SET_POSTS, payload: posts });
+      dispatch({ type: STOP_LOADING });
+    })
+    .catch((err) => {
+      dispatch({ type: STOP_LOADING });
+      dispatch({ type: SET_ERROR, payload: err });
+    });
+};
+
+
+export const loadCommentedPosts = (username: string) => (dispatch: any) => {
+  dispatch({ type: START_LOADING });
+  getCommentedPosts(username)
     .then((posts) => {
       dispatch({ type: SET_POSTS, payload: posts });
       dispatch({ type: STOP_LOADING });

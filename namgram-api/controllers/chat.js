@@ -63,6 +63,27 @@ exports.getMessages = async (req, res) => {
         console.log(err)
     }
 }
+exports.getActive = async (req, res) => {
+    try {
+        let keyA = JSON.stringify(Object.assign({}, { user: req.params.username }, { collection: "chatters" }));
+        let chatters = []
+        console.log(keyA)
+        client.get(keyA, function (err, reply) {
+            if (reply) {
+                chatters = JSON.parse(reply)
+                return res.json({ "chatters": chatters })
+            }
+            else {
+                chatters = []
+                return res.json({ "chatters": chatters })
+            }
+        })
+    }
+    catch (err) {
+        res.json({ success: false });
+        console.log(err)
+    }
+}
 
 exports.joinChat = async (req, res) => {
     try {
@@ -84,13 +105,12 @@ exports.joinChat = async (req, res) => {
                         client.set(keyActive, JSON.stringify(active))
                         client.expire(keyActive, 180);
                     }
-                    else {
-                        client.set(keyActive, JSON.stringify(active))
-                    }
+                }
+                else {
+                    client.set(keyActive, JSON.stringify(active))
                 }
             })
         })
-
         var username = req.body.username
         var username2 = req.body.username2
         const users = []
@@ -127,7 +147,7 @@ exports.leaveChat = async (req, res) => {
         })
         session.close();
         const followers = _manyPeople(persons)
-        
+
         followers.forEach(follower => {
             let active = []
             const keyActive = JSON.stringify(Object.assign({}, { user: follower.username }, { collection: "chatters" }));

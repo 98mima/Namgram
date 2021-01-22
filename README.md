@@ -8,14 +8,11 @@
   komentarisu, lajkuju, dislajkuju i komuniciraju.
   
 ## Struktura
-  * Frontend
-      Frontend aplikacija se nalazi u folderu namgram.
+  * Frontend aplikacija se nalazi u folderu namgram.
       Tehnologija za frontend je typescript React zajedno sa reduxom.
-  * Backend
-      Backend aplikacija se nalazi u folderu namgram-API.
+  * Backend aplikacija se nalazi u folderu namgram-API.
       Tehnologija za backend je Node.js pisan u javascriptu.
-  * Baze
-      Koristimo Neo4j i Redis noSQL baze za cuvanje podataka.
+  * Za baze koristimo Neo4j i Redis noSQL baze za cuvanje podataka.
       
 ## Pokretanje:
   1. Add database u neo4j gui. I podesi se username i password za administratora.

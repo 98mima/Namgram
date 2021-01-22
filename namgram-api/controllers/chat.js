@@ -109,7 +109,7 @@ exports.joinChat = async (req, res) => {
                 })
             }
             else {
-                return res.status(200).json("nema poruka")
+                return res.status(200).json([])
             }
         })
     }

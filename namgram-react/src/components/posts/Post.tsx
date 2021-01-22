@@ -262,6 +262,7 @@ function Post(props: { post: IImage; socket: SocketIOClient.Socket }) {
     });
     console.log(array);
     setComments(array);
+    setNumOfCom(numOfCom - 1);
     deleteComment(commentId);
   };
 

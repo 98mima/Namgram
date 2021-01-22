@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/all', postController.getAll);
 router.get('/byId/:id', postController.getByPerson);
-router.get('/byPostId/:id', postController.getByPostId);
+router.get('/byPostId/:id/:userId', postController.getByPostId);
 router.get('/byFollowings/:userId', postController.getByFollowings);
 router.get('/mostLiked/:userId', postController.getMostLiked);
 router.get('/mostHated/:userId', postController.getMostHated);

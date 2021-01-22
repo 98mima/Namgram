@@ -277,7 +277,7 @@ exports.getByFollowings = async (req, res) => {
             return p.sasUrl = generateSAS(p.profilePic)
         }))
         creators.map((c, index) =>
-            c.creator = pics[index])
+            c.profilePic = pics[index])
         Data.map((post, index) => {
             post.creator = creators[index]
             post.ifLiked = ifLiked[index]
@@ -323,7 +323,7 @@ exports.getMostLiked = async (req, res) => {
             return p.sasUrl = generateSAS(p.profilePic)
         }))
         creators.map((c, index) =>
-            c.creator = pics[index])
+            c.profilePic = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -376,7 +376,7 @@ exports.getMostHated = async (req, res) => {
             return p.sasUrl = generateSAS(p.profilePic)
         }))
         creators.map((c, index) =>
-            c.creator = pics[index])
+            c.profilePic = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -428,7 +428,7 @@ exports.getMostCommented = async (req, res) => {
             return p.sasUrl = generateSAS(p.profilePic)
         }))
         creators.map((c, index) =>
-            c.creator = pics[index])
+            c.profilePic = pics[index])
         Data.map((post, index) =>
             post.creator = creators[index])
 
@@ -463,10 +463,11 @@ exports.getByPostId = async (req, res) => {
 
         post.commentsList = await findComments(post)
         post.creator = await findCreator(post)
+        post.creator.profilePic = await generateSAS(post.creator.profilePic)
         Data = post
 
-        post.creator.profilePic = await generateSAS(post.creator.profilePic)
-
+        Data.ifLiked = await findIfDisliked(post, req.params.userId)
+        Data.ifDisliked = await findIfDisliked(post, req.params.userId)
         session.close();
         res.status(200)
             .json({ message: "Prikupljeno", Data })
@@ -496,7 +497,7 @@ exports.getByPerson = async (req, res) => {
         session.close();
         const Data = _manyPosts(posts)
 
-        client.set(key, JSON.stringify(mess));
+        client.set(key, JSON.stringify(Data));
         client.expire(key, 10);
 
         res.status(200)

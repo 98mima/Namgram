@@ -125,7 +125,7 @@ exports.getByPost = async (req, res) => {
             return p.sasUrl = generateSAS(p.profilePic)
         }))
         creators.map((c, index) =>
-            c.creator = pics[index])
+            c.profilePic = pics[index])
         comms.map((post, index) =>
             post.creator = creators[index])
         const p = comms

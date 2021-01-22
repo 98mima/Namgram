@@ -223,14 +223,13 @@ exports.get = async (req, res) => {
             }))
         let pics = await Promise.all(creators.map(p => {
             return p.sasUrl = generateSAS(p.profilePic)
-        })) 
+        }))
         creators.map((c, index) =>
             c.profilePic = pics[index])
         Data1.map((post, index) =>
             post.creator = creators[index])
-
         res.status(200)
-            .json({ message: "Prikupljeno", Data1: Data1[0] })
+            .json({ message: "Prikupljeno", Data1 })
     }
     catch (err) {
         res.json({ success: false });

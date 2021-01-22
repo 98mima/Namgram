@@ -271,7 +271,7 @@ exports.getRecommendedImages = async (req, res) => {
       c.profilePic = pics[index])
       
       Data.map((image, index) => {
-        image.sasUrl = im[index]
+        image.sasToken = im[index]
         image.creator = creators[index]
       });
     res.status(200).json({ message: "Prikupljeno", Data });

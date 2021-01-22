@@ -3,9 +3,9 @@ import { IComment, IImage, IPost, IPostUpload } from "../models/post";
 
 export async function getPost(id: string) {
   return axios
-    .get<{ message: string; Data1: IImage }>(`image/${id}`)
+    .get<{ message: string; Data1: IImage[] }>(`image/${id}`)
     .then((res) => {
-      return res.data.Data1;
+      return res.data.Data1[0];
     });
 }
 

@@ -26,11 +26,16 @@ const sharedKeyCredential = new StorageSharedKeyCredential(
     process.env.AZURE_STORAGE_ACCOUNT_NAME,
     process.env.AZURE_STORAGE_ACCOUNT_ACCESS_KEY);
 const pipeline = newPipeline(sharedKeyCredential);
-
 const blobServiceClient = new BlobServiceClient(
     `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net`,
     pipeline
 );
+
+const util = require('util')
+const redis = require('redis');
+const redisUrl = 'redis://127.0.0.1:6379';
+const clientR = redis.createClient(redisUrl);
+clientR.get = util.promisify(clientR.get);
 
 const getBlobName = originalName => {
     const identifier = Math.random().toString().replace(/0\./, '');
@@ -85,13 +90,30 @@ router.post('/add', uploadStrategy, async (req, res) => {
                 blobName: blobName
             }))
 
-        const Data1 = _manyImages(d)
-        const Data = Data1[0]
         await blockBlobClient.uploadStream(stream,
             uploadOptions.bufferSize, uploadOptions.maxBuffers,
             { blobHTTPHeaders: { blobContentType: "image/jpeg" } });
 
+        let Data = await session.run('MATCH (image:Image {blobName: $blobName}) RETURN image', {
+            blobName: blobName
+        })
         session.close();
+
+        let image = _manyImages(Data)[0]
+        const key = JSON.stringify(Object.assign({}, {collection: "images"} ));
+
+        const cacheValue = await clientR.get(key)
+        
+        if (cacheValue) {
+            Data = JSON.parse(cacheValue)
+            console.log(Data)
+        }
+        else
+            Data = []
+        Data.push(image)
+        clientR.set(key, JSON.stringify(Data));
+        clientR.expire(key, 864000);//jedan dan 
+
         res.json({ message: 'File uploaded to Azure Blob storage.', Data });
     } catch (err) {
         res.json({ message: err.message });
